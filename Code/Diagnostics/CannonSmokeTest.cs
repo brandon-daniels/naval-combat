@@ -18,7 +18,7 @@ public static class CannonSmokeTest
 			sailor.ReturnToDeck();
 			player.UseInputControls = false;
 			player.UseLookControls = false;
-			var cannons = sailor.Scene.GetAllComponents<ShipCannon>().ToArray();
+			var cannons = sailor.Scene.GetAllComponents<ShipCannon>().Where( x => x.Ship == sailor.Ship ).ToArray();
 			Check( cannons.Length == 4, "Two cannons on each side exist" );
 			foreach ( var cannon in cannons )
 			{
@@ -35,7 +35,7 @@ public static class CannonSmokeTest
 				cannon.Aim( player, 1, 1, 0.1f );
 				Check( cannon.Yaw > 0 && cannon.Elevation > 12, "Barrel aim responds" );
 				Check( cannon.Fire( player ) && !cannon.Fire( player ), "Shot fires and reload blocks repeat" );
-				var ball = sailor.Scene.GetAllComponents<Cannonball>().FirstOrDefault();
+				var ball = sailor.Scene.GetAllComponents<Cannonball>().FirstOrDefault( x => x.Source == sailor.Ship );
 				Check( ball.IsValid(), "Live ballistic cannonball spawned" );
 				await GameTask.DelaySeconds( 4 );
 				Check( !ball.IsValid(), "Cannonball impacts before lifetime expiry" );

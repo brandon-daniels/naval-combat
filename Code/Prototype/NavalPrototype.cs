@@ -11,8 +11,12 @@ public sealed class NavalPrototype : Component
 	[Property] public ArcadeOcean Ocean { get; set; }
 	[Property] public SailingWind Wind { get; set; }
 	[Property] public GameObject SpawnPoint { get; set; }
+	[Property] public bool SpawnNpcShip { get; set; } = true;
+	[Property] public Vector3 NpcShipOffset { get; set; } = new( -2400, 1100, 0 );
 	private GameObject content;
 	private GameObject playerObject;
+	private GameObject npcObject;
+	private GameObject npcShip;
 
 	protected override void OnStart()
 	{
@@ -50,10 +54,29 @@ public sealed class NavalPrototype : Component
 		camera.ZNear = 4;
 		camera.BackgroundColor = new Color( 0.34f, 0.58f, 0.7f );
 		CreatePlayer( controller, helm, spawn );
+		if ( SpawnNpcShip ) CreateNpc();
 		Log.Info( "Naval prototype: E at mast or helm. Mast: A/D rotate, W raise, S lower sails. Helm: A/D steer. Wind arrow shows where wind blows. R returns to deck." );
 	}
 
-	private void CreatePlayer( ArcadeShip ship, ShipHelm helm, GameObject spawn )
+	private void CreateNpc()
+	{
+		npcShip = Ship.GameObject.Clone( Ship.WorldPosition + NpcShipOffset, Rotation.Identity );
+		npcShip.Name = "NPC ship";
+		var ship = npcShip.GetComponent<ArcadeShip>();
+		ship.Ocean = Ocean;
+		ship.Sails.Wind = Wind;
+		var spawn = new GameObject( npcShip, true, "NPC deck spawn" );
+		spawn.LocalPosition = new Vector3( -65, 0, 42 );
+		var human = playerObject;
+		CreatePlayer( ship, ship.Helm, spawn, true );
+		npcObject = playerObject;
+		playerObject = human;
+		var captain = npcObject.AddComponent<ShipNpc>();
+		captain.Sailor = npcObject.GetComponent<ShipPlayer>();
+		captain.Target = Ship;
+	}
+
+	private void CreatePlayer( ArcadeShip ship, ShipHelm helm, GameObject spawn, bool npc = false )
 	{
 		// A walking player must have its own physics body, never be a child of the moving ship.
 		playerObject = new GameObject( content, false, "Sailor" );
@@ -67,7 +90,8 @@ public sealed class NavalPrototype : Component
 		dresser.BodyTarget = renderer;
 		dresser.Source = Dresser.ClothingSource.LocalUser;
 		dresser.ApplyHeightScale = false;
-		playerObject.AddComponent<MoveModeWalk>();
+		playerObject.AddComponent<DeckWalkMode>();
+		playerObject.AddComponent<OceanSwimMode>().Ocean = Ocean;
 		playerObject.AddComponent<SitMoveMode>();
 		var player = playerObject.AddComponent<PlayerController>();
 		player.Renderer = renderer;
@@ -79,6 +103,10 @@ public sealed class NavalPrototype : Component
 		player.EyeAngles = new Angles( 15, ship.WorldRotation.Angles().yaw, 0 );
 		player.ToggleCameraModeButton = "View";
 		player.EnablePressing = false; // ShipPlayer owns the E toggle, including release while looking at the wheel.
+		player.UseInputControls = !npc;
+		player.UseLookControls = !npc;
+		player.UseCameraControls = !npc;
+		if ( npc ) renderer.Tint = new Color( 0.85f, 0.25f, 0.18f );
 		player.RotateWithGround = true;
 		var sailor = playerObject.AddComponent<ShipPlayer>();
 		sailor.Controller = player;
@@ -86,7 +114,9 @@ public sealed class NavalPrototype : Component
 		sailor.Sails = ship.Sails;
 		sailor.Ship = ship;
 		sailor.SpawnPoint = spawn;
+		sailor.IsNpc = npc;
 		playerObject.Enabled = true;
+		if ( npc ) return;
 		var hud = new GameObject( content, true, "Sailing HUD" );
 		hud.AddComponent<ScreenPanel>();
 		hud.AddComponent<SailingHud>().Player = sailor;
@@ -97,6 +127,8 @@ public sealed class NavalPrototype : Component
 	{
 		// The player can have been reparented by the mounted movement mode.
 		if ( playerObject.IsValid() ) playerObject.Destroy();
+		if ( npcObject.IsValid() ) npcObject.Destroy();
+		if ( npcShip.IsValid() ) npcShip.Destroy();
 		if ( content.IsValid() ) content.Destroy();
 	}
 }

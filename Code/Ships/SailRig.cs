@@ -19,7 +19,17 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 	public float Alignment => Wind.IsValid() && Ship.IsValid()
 		? MathF.Pow( Math.Max( 0, Vector3.Dot( SailDirection, Wind.Direction ) ), 2 ) : 0;
 	public float DriveFraction => Enabled && Wind.IsValid() && Wind.Enabled && Ship.IsValid()
-		? Deployment * Alignment * Math.Clamp( 0.2f + 0.8f * Vector3.Dot( Ship.WorldRotation.Forward.WithZ( 0 ).Normal, Wind.Direction ), 0, 1 ) * Wind.CurrentStrength : 0;
+		? Deployment * Alignment * HeadingPower( Vector3.Dot( Ship.WorldRotation.Forward.WithZ( 0 ).Normal, Wind.Direction ) ) * Wind.CurrentStrength : 0;
+
+	/// <summary>Arcade sailing polar: no drive within 45 degrees of directly upwind.</summary>
+	public static float HeadingPower( float windAlignment )
+	{
+		float alignment = Math.Clamp( windAlignment, -1, 1 );
+		if ( alignment <= -0.707107f ) return 0;
+		if ( alignment < -0.5f ) return 0.35f * (alignment + 0.707107f) / 0.207107f;
+		if ( alignment < 0 ) return 0.35f + (alignment + 0.5f) * 0.5f;
+		return 0.6f + alignment * 0.4f;
+	}
 
 	private const int Columns = 12;
 	private const int Rows = 12;

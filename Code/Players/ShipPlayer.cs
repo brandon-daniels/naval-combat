@@ -8,6 +8,7 @@ public sealed class ShipPlayer : Component
 	[Property] public SailRig Sails { get; set; }
 	[Property] public ArcadeShip Ship { get; set; }
 	[Property] public GameObject SpawnPoint { get; set; }
+	[Property] public bool IsNpc { get; set; }
 	public bool IsAtHelm => Helm.IsValid() && Helm.GetOccupant() == Controller;
 	public bool CanUseHelm => Controller.IsValid() && Helm.IsValid() && Helm.CanEnter( Controller );
 	public bool IsAtMast => Sails.IsValid() && Sails.GetOccupant() == Controller;
@@ -34,7 +35,7 @@ public sealed class ShipPlayer : Component
 
 	protected override void OnUpdate()
 	{
-		if ( IsProxy || !Controller.IsValid() ) return;
+		if ( IsNpc || IsProxy || !Controller.IsValid() ) return;
 		if ( Input.Pressed( "Use" ) ) ToggleStation();
 		if ( Input.Pressed( "Reload" ) ) ReturnToDeck();
 
@@ -60,7 +61,8 @@ public sealed class ShipPlayer : Component
 			Controller.Body.Velocity = Ship.Body.GetVelocityAtPoint( WorldPosition );
 			inheritVelocity = false;
 		}
-		if ( !CurrentStation.IsValid() && WorldPosition.z < Ship.Ocean.HeightAt( WorldPosition, Time.Now ) - 80 ) ReturnToDeck();
+		// Human players swim; only the autonomous captain needs overboard recovery.
+		if ( IsNpc && !CurrentStation.IsValid() && WorldPosition.z < Ship.Ocean.HeightAt( WorldPosition, Time.Now ) - 80 ) ReturnToDeck();
 	}
 
 	public void ReturnToDeck()
