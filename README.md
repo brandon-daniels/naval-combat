@@ -1,6 +1,10 @@
 # Naval Combat
 
-A game project for S&box with a playable Citizen character, deck movement, and an arcade ship controlled from a bow helm. The planned game combines an ocean, ship physics, and sword combat.
+A game project for S&box. The planned game combines ship physics, PvPvE combat, player economy, ship upgrades, and piracy.
+
+<img width="1167" height="685" alt="image" src="https://github.com/user-attachments/assets/b8ac1933-23a1-4828-93a0-22119d7e9a60" />
+
+<img width="990" height="661" alt="Screenshot 2026-10-03 105628" src="https://github.com/user-attachments/assets/2f2fe23d-9748-4127-a143-451dbadfd92e" />
 
 ## Try sword combat
 
