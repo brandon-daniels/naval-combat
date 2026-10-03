@@ -6,6 +6,164 @@ A game project for S&box. The planned game combines ship physics, PvPvE combat, 
 
 <img width="990" height="661" alt="Screenshot 2026-10-03 105628" src="https://github.com/user-attachments/assets/2f2fe23d-9748-4127-a143-451dbadfd92e" />
 
+## Development plan
+
+### Product loop
+
+The first playable version should prove one complete risk-and-reward voyage:
+
+1. A player spawns with a ship and starting money.
+2. They dock at an island and invest in a production site.
+3. Production advances over time and creates a finite quantity of goods.
+4. The player loads those goods into ship cargo, consuming capacity.
+5. They sail to an island where the goods have a better sale price.
+6. Cargo makes the voyage valuable and exposes the player to NPC and player piracy.
+7. Successful sales fund permanent or match-long ship upgrades.
+8. Defeat drops some cargo for recovery or theft, then returns the player to the loop without eliminating them from the session.
+
+The initial target is a small multiplayer vertical slice with three islands, one commodity, one production investment, one cargo hold, one NPC pirate, cannon damage, and three meaningful ship upgrades. Additional content should be data-driven after that slice is fun and reliable.
+
+### Development principles
+
+- Keep gameplay rules in focused C# components and use the editor to compose scenes, connect references, place docks, and tune values.
+- Make money, inventory, production, purchases, damage, and loot authoritative. Clients may request actions and present feedback, but do not decide valuable state.
+- Separate definitions from runtime state. Goods, upgrades, and island market settings should be reusable resources or serializable definitions; balances, stock, cargo, health, and timers are runtime state.
+- Build one end-to-end commodity route before adding breadth. A complete simple loop is more useful than several disconnected systems.
+- Keep local prototypes as test beds until their multiplayer replacement passes host/client checks. Do not silently treat the current sailing prototype as network-ready.
+- Add editor-visible configuration and diagnostics with each system so designers can tune and verify it without changing code.
+
+### Code and editor foundation
+
+The following component boundaries are the intended groundwork. Names may change during implementation, but ownership should remain clear.
+
+| Area | Code responsibility | Editor responsibility |
+| --- | --- | --- |
+| Session | `NavalGameSession` owns match phase, joining, spawning, reconnect policy, and authoritative service references | Session root, spawn points, startup scene, network test setup |
+| Players | `PlayerWallet` stores authoritative money; player identity links owned character and ship | Starting funds and player spawn placement |
+| Goods | `GoodsDefinition` describes a commodity; `CargoHold` stores typed stacks and capacity | Goods assets, ship cargo capacity, cargo interaction points |
+| Islands | `IslandPort` identifies dock/load zones; `IslandMarket` quotes and executes trades | Port triggers, interaction markers, island/market assignments |
+| Production | `ProductionSite` accepts investment and advances server time into claimable output | Build/claim points, costs, duration, output, capacity |
+| Trading | `TradeService` validates distance, stock, cargo room, ownership, prices, and transfers atomically | Base prices and per-island demand multipliers |
+| Ships | `ShipOwnership` and a network-ready ship controller define who may operate each station | Ship prefab, helm/sail/cannon stations, spawn/respawn points |
+| Combat | `ShipHealth`, damage receivers, cannon authority, sinking/disable flow | Hit volumes, armor sections, effects, wreck/respawn anchors |
+| Loot | `CargoCrate` or wreck inventory represents server-spawned recoverable cargo | Drop presentation and pickup radius |
+| Upgrades | `ShipUpgradeDefinition` and `ShipUpgradeManager` validate purchases and apply modifiers | Upgrade assets, shop location, prices, stat tuning |
+| NPCs | Pirate perception and goals choose pursuit, attack, loot, retreat, and delivery; existing station AI executes ship tasks | NPC routes/spawns, difficulty profile, patrol areas |
+| UI | Read-only view models expose wallet, cargo, production, market, health, and upgrade state | HUD/panel composition and presentation tuning |
+| Persistence | A versioned profile boundary saves only the progression deliberately selected for release | Development reset/migration controls |
+
+Gameplay transfers should be atomic: validate the complete request first, then update money, stock, cargo, or upgrades as one authoritative operation. Definitions should use stable IDs so saved state and network messages never depend on scene object names.
+
+### Milestones and feature tracking
+
+Status legend: ✅ verified prototype, 🟡 partial/local prototype, ⬜ not started. A prototype is not considered complete for the main game until it is integrated into the vertical slice and tested with a host and client.
+
+#### 0. Baseline and design contracts
+
+- ✅ Arcade ship handling, physical deck, helm, sail, ocean, and three authored islands
+- ✅ Four cannon stations with ballistic projectiles and impact effects
+- ✅ Local NPC captain that sails, avoids islands, operates stations, and fires cannons
+- ✅ Separate multiplayer sword arena with host-authoritative damage
+- 🟡 Decide session length, starting money, cargo-loss percentage, respawn cost, and whether upgrades last for a match or across sessions
+- ⬜ Write stable IDs and initial balance sheet for one good, three island prices, one production site, and three upgrades
+- ⬜ Create the integrated gameplay scene while preserving the current prototype and combat test scenes
+
+Exit criteria: the rules for the first voyage are explicit, the integrated scene opens cleanly, and existing prototype tests still pass.
+
+#### 1. Authoritative multiplayer sailing shell
+
+- ⬜ Spawn one owned ship and character per connected player
+- ⬜ Define authority for hull physics, stations, sails, cannons, projectiles, and NPC ships
+- ⬜ Synchronize ship motion and station occupancy with usable remote interpolation
+- ⬜ Handle join, leave, reconnect, owner loss, and ship cleanup
+- ⬜ Add host/client smoke checks for station authorization and cannon firing
+
+Exit criteria: two players can join, board only permitted stations, sail, observe each other, and fire without valuable state being client-controlled.
+
+#### 2. Economy and production vertical slice
+
+- ⬜ Add authoritative wallets with starting funds and transaction reasons
+- ⬜ Add one goods definition and capacity-limited ship cargo
+- ⬜ Add dock detection and server-validated port interaction
+- ⬜ Add one investable production site with a visible countdown and claimable stock
+- ⬜ Add island buy/sell quotes and atomic load, unload, buy, and sell operations
+- ⬜ Add wallet, cargo, market, and production UI
+- ⬜ Add deterministic tests for insufficient funds, full cargo, wrong port, duplicate claims, disconnects, and timer completion
+
+Exit criteria: a host and client can independently invest, wait, load, sail, sell, and see correct replicated balances without duplication or negative values.
+
+#### 3. Ship combat, defeat, and piracy
+
+- 🟡 Cannon aiming/projectile foundation exists locally; damage is not implemented
+- ⬜ Add ship health, armor/damage rules, hit attribution, repair rules, and clear feedback
+- ⬜ Define disabled/sinking behavior that does not strand players
+- ⬜ Convert a configured percentage of defeated cargo into authoritative floating loot
+- ⬜ Add pickup validation, temporary ownership protection if needed, and despawn rules
+- ⬜ Add ship respawn with spawn protection and anti-camping placement
+- ⬜ Validate simultaneous pickup, disconnect during defeat, friendly-fire policy, and stale projectile ownership
+
+Exit criteria: either player can damage and defeat the other, cargo loss is conserved exactly, loot can be stolen, and both players re-enter the economy loop.
+
+#### 4. Upgrades and economic choices
+
+- ⬜ Add an island shipyard/shop and authoritative purchase flow
+- ⬜ Implement three first upgrades: cargo capacity, hull durability, and sail/handling performance
+- ⬜ Present current level, exact effect, price, affordability, and purchase result
+- ⬜ Apply upgrades from a centralized modifier pipeline instead of scattered conditionals
+- ⬜ Define caps, stacking order, resale/refund policy, and reset scope
+
+Exit criteria: earnings create distinct ship builds, all effects replicate, and reconnecting cannot duplicate or discard purchases.
+
+#### 5. Pirate NPC loop
+
+- 🟡 Local NPC navigation, station use, pursuit, and cannon firing exist
+- ⬜ Move NPC decisions and valuable outcomes under session authority
+- ⬜ Add target scoring based on cargo value, distance, danger, and recent attackers
+- ⬜ Add patrol, pursue, attack, loot, retreat, and deposit states
+- ⬜ Add disengage rules, difficulty tuning, and recovery from stuck or lost stations
+- ⬜ Reuse the same cargo, damage, loot, and market APIs used by players
+
+Exit criteria: a pirate can discover a loaded ship, engage it, steal dropped goods, and leave; empty or newly spawned ships are not relentlessly targeted.
+
+#### 6. Content, balance, and persistence
+
+- ⬜ Expand to several goods with readable regional supply/demand differences
+- ⬜ Add more production choices, islands, upgrade branches, and NPC profiles through definitions rather than bespoke code
+- ⬜ Add event logging/telemetry for income, losses, route time, combat outcomes, and upgrade choices
+- ⬜ Balance travel time, production time, margins, danger, recovery, and snowball prevention
+- ⬜ Implement versioned persistence only after the match loop and reset rules are stable
+- ⬜ Add onboarding, settings, accessibility, audio, final art, and performance budgets
+
+Exit criteria: repeated sessions create viable trading and piracy decisions, losing players can recover, and content can be added primarily in the editor.
+
+### Recommended first implementation slice
+
+Build milestone 2 as a local authoritative-domain simulation before attaching it to networking or polished UI. Start with plain C# transaction rules for wallet, cargo, production, and trade, then expose thin S&box Components for scene references, interactions, replication, and presentation. This keeps economic invariants testable while the editor remains the place for island layout and tuning.
+
+The first code slice should include:
+
+1. Stable definition IDs and a minimal goods catalog.
+2. Wallet and cargo APIs that cannot create negative balances, exceed capacity, or partially complete a failed transfer.
+3. A production clock based on authoritative elapsed time rather than a client countdown.
+4. Market quote and transaction results with explicit failure reasons for UI feedback.
+5. Port proximity/ownership validation at the component boundary.
+6. Diagnostic commands or tests that run the entire invest-to-sale loop and adversarial duplicate requests.
+
+Only after those rules pass should the scene receive dock triggers, interaction prompts, panels, and network request handlers.
+
+### Editor-driven development workflow
+
+For each milestone:
+
+1. Implement the smallest complete rule set in `Code/` and expose only designer-relevant properties.
+2. Compile/hotload in S&box and resolve all game/editor errors before scene work.
+3. Add or connect GameObjects, Components, triggers, references, and definition assets outside Play mode; save and reopen the scene to verify serialization.
+4. Exercise the feature locally with diagnostics, then perform a physical play pass.
+5. Use **Join via new instance** for all authoritative or replicated behavior and test both host and client perspectives, including denial cases.
+6. Record actual validation in `docs/PROJECT_CONTEXT.md` and update the tracker here. Mark an item complete only when its exit criteria are met.
+
+Avoid building core state solely in scene scripts or UI. The editor should configure and visualize the game; authoritative C# services and components should enforce its rules.
+
 ## Try sword combat
 
 Open `Assets/scenes/combat_test.scene` and press Play. A separate enclosed arena spawns a swordsman and a red sparring NPC. WASD moves, mouse looks, left click slashes, Shift runs, Space jumps, and C switches camera view. Approach the NPC to spar; it turns toward nearby players and attacks within sword range, but does not chase.

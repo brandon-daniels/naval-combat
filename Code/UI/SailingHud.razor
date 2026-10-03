@@ -3,9 +3,10 @@
 @namespace NavalCombat
 @inherits PanelComponent
 <root>
-	<div class="mode">@(AtCannon ? "AT THE CANNON" : AtHelm ? "AT THE HELM" : AtMast ? "WORKING THE SAILS" : "ON DECK")</div>
-	<div class="hint">@(AtCannon ? "W / S - Elevation | A / D - Aim | LEFT CLICK - Fire | E - Release" : AtHelm ? "A / D - Steer | E - Release helm" : AtMast ? "A / D - Rotate sail | W - Raise | S - Lower | E - Release mast" : "WASD - Walk | MOUSE - Look | SPACE - Jump | SHIFT - Run | C - View")</div>
+	<div class="mode">@(Swimming ? "SWIMMING" : AtCannon ? "AT THE CANNON" : AtHelm ? "AT THE HELM" : AtMast ? "WORKING THE SAILS" : "ON DECK")</div>
+	<div class="hint">@(Swimming ? "WASD - Swim | SPACE - Leap / board | CTRL - Dive | C - View" : AtCannon ? "W / S - Elevation | A / D - Aim | LEFT CLICK - Fire | E - Release" : AtHelm ? "A / D - Steer | E - Release helm" : AtMast ? "A / D - Rotate sail | W - Raise | S - Lower | E - Release mast" : "WASD - Walk | MOUSE - Look | SPACE - Jump | SHIFT - Run | C - View")</div>
 	@if ( Ready ) { <div class="prompt">E - @(Player.AvailableStation is ShipCannon ? "Use cannon" : Player.AvailableStation is SailRig ? "Work the sails" : "Take the helm")</div> }
+	else if ( Swimming ) { <div class="objective">Swim close to the hull, face the deck and press SPACE to jump aboard.</div> }
 	else if ( !AtHelm && !AtMast && !AtCannon ) { <div class="objective">Lower and align the sail at the mast, then steer at the bow wheel.</div> }
 	@if ( AtCannon ) { <div class="prompt">@CannonStatus</div> }
 	@if ( Rig.IsValid() && Rig.Wind.IsValid() ) {
@@ -21,6 +22,7 @@
 </root>
 @code {
 	[Property] public ShipPlayer Player { get; set; }
+	private bool Swimming => Player.IsValid() && Player.Controller.IsValid() && Player.Controller.IsSwimming;
 	private SailRig Rig => Player.IsValid() ? Player.Sails : null;
 	private bool AtCannon => Player.IsValid() && Player.ActiveCannon.IsValid();
 	private string CannonStatus => AtCannon ? $"{(Player.ActiveCannon.ReloadRemaining > 0 ? "RELOADING" : "READY")} | Elevation {Player.ActiveCannon.Elevation:0} | Aim {Player.ActiveCannon.Yaw:0}" : "";
@@ -33,5 +35,5 @@
 	private int Trim => Rig.IsValid() ? (int)Rig.SailAngle : 0;
 	private int WindAngle => Rig.IsValid() && Rig.Wind.IsValid() ? (int)(Rig.Wind.Heading - Rig.Ship.WorldRotation.Angles().yaw) : 0;
 	private string ArrowStyle => $"transform: rotate({-WindAngle}deg);";
-	protected override int BuildHash() => System.HashCode.Combine( System.HashCode.Combine( AtHelm, AtMast, AtCannon, CannonStatus ), Ready, Deployment, Catch, Power, Trim, WindAngle );
+	protected override int BuildHash() => System.HashCode.Combine( System.HashCode.Combine( AtHelm, AtMast, AtCannon, CannonStatus, Swimming ), Ready, Deployment, Catch, Power, Trim, WindAngle );
 }
