@@ -9,10 +9,10 @@ public sealed class ShipPlayer : Component
 	[Property] public ArcadeShip Ship { get; set; }
 	[Property] public GameObject SpawnPoint { get; set; }
 	[Property] public bool IsNpc { get; set; }
-	public bool IsAtHelm => Helm.IsValid() && Helm.GetOccupant() == Controller;
+	public bool IsAtHelm => Helm.IsValid() && Helm.Occupant == Controller;
 	public bool CanUseHelm => Controller.IsValid() && Helm.IsValid() && Helm.CanEnter( Controller );
-	public bool IsAtMast => Sails.IsValid() && Sails.GetOccupant() == Controller;
-	public ShipCannon ActiveCannon => Scene.GetAllComponents<ShipCannon>().FirstOrDefault( x => x.GetOccupant() == Controller );
+	public bool IsAtMast => Sails.IsValid() && Sails.Occupant == Controller;
+	public ShipCannon ActiveCannon => Scene.GetAllComponents<ShipCannon>().FirstOrDefault( x => x.Occupant == Controller );
 	public ShipStation CurrentStation => IsAtHelm ? Helm : IsAtMast ? Sails : ActiveCannon;
 	public ShipStation AvailableStation => CurrentStation.IsValid() ? null : Scene.GetAllComponents<ShipStation>()
 		.Where( x => x.Ship == Ship && x.CanEnter( Controller ) )

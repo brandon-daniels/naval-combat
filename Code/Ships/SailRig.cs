@@ -13,8 +13,8 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 	[Property] public float DeploymentSpeed { get; set; } = 0.4f;
 	private float deployment;
 	private float sailAngle;
-	[Property] public float Deployment { get => deployment; set => deployment = Math.Clamp( value, 0, 1 ); }
-	[Property] public float SailAngle { get => sailAngle; set => sailAngle = ((value + 180) % 360 + 360) % 360 - 180; }
+	[Property, Sync] public float Deployment { get => deployment; set => deployment = Math.Clamp( value, 0, 1 ); }
+	[Property, Sync] public float SailAngle { get => sailAngle; set => sailAngle = ((value + 180) % 360 + 360) % 360 - 180; }
 	public Vector3 SailDirection => Rotation.FromYaw( Ship.WorldRotation.Angles().yaw + SailAngle ).Forward;
 	public float Alignment => Wind.IsValid() && Ship.IsValid()
 		? MathF.Pow( Math.Max( 0, Vector3.Dot( SailDirection, Wind.Direction ) ), 2 ) : 0;
@@ -39,7 +39,7 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 
 	public void Adjust( PlayerController source, float rotation, float lower, float delta )
 	{
-		if ( !Enabled || !source.IsValid() || GetOccupant() != source ) return;
+		if ( !Enabled || !source.IsValid() || Occupant != source ) return;
 		float step = Math.Clamp( delta, 0, 0.1f );
 		SailAngle += Math.Clamp( rotation, -1, 1 ) * Math.Max( 0, RotationSpeed ) * step;
 		Deployment += Math.Clamp( lower, -1, 1 ) * Math.Max( 0, DeploymentSpeed ) * step;

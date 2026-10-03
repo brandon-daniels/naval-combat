@@ -30,8 +30,9 @@ public sealed class ArcadeShip : Component
 
 	protected override void OnFixedUpdate()
 	{
+		if ( IsProxy ) return;
 		if ( !Body.IsValid() || !Ocean.IsValid() ) return;
-		if ( !Helm.IsValid() || !Helm.Enabled || !Helm.IsOccupied )
+		if ( !Helm.IsValid() || !Helm.Enabled || !Helm.Occupied )
 		{
 			steering = 0;
 		}

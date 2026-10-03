@@ -1,0 +1,8 @@
+{
+  "Id": "goods.trade_goods",
+  "DisplayName": "Trade Goods",
+  "UnitSize": 1,
+  "BaseValue": 20,
+  "__references": [],
+  "__version": 0
+}

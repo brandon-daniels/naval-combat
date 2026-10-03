@@ -7,8 +7,8 @@ public sealed class ShipCannon : ShipStation
 	[Property] public GameObject Muzzle { get; set; }
 	[Property] public float ReloadSeconds { get; set; } = 2;
 	[Property] public float MuzzleSpeed { get; set; } = 1800;
-	public float Yaw { get; private set; }
-	public float Elevation { get; private set; } = 12;
+	[Sync] public float Yaw { get; private set; }
+	[Sync] public float Elevation { get; private set; } = 12;
 	public float ReloadRemaining => Math.Max( 0, readyAt - Time.Now );
 	private float readyAt;
 	private float recoil;
@@ -19,17 +19,35 @@ public sealed class ShipCannon : ShipStation
 	}
 	public void Aim( PlayerController player, float turn, float lift, float delta )
 	{
-		if ( GetOccupant() != player || !player.IsValid() || !Enabled ) return;
+		if ( Occupant != player || !player.IsValid() || !Enabled ) return;
 		Yaw = Math.Clamp( Yaw + turn * 35 * Math.Clamp( delta, 0, 0.1f ), -35, 35 );
 		Elevation = Math.Clamp( Elevation + lift * 25 * Math.Clamp( delta, 0, 0.1f ), 0, 45 );
 		UpdateBarrel();
 	}
 	public bool Fire( PlayerController player )
 	{
-		if ( Networking.IsActive || !Enabled || !player.IsValid() || GetOccupant() != player || ReloadRemaining > 0 || !Muzzle.IsValid() || !Ship.IsValid() ) return false;
+		if ( !Enabled || !player.IsValid() || Occupant != player || ReloadRemaining > 0 || !Muzzle.IsValid() || !Ship.IsValid() ) return false;
+		if ( Networking.IsActive )
+		{
+			RequestFire( player );
+			return true;
+		}
+		return FireAuthoritative( player );
+	}
+
+	[Rpc.Host]
+	private void RequestFire( PlayerController player )
+	{
+		if ( !player.IsValid() || player.Network.Owner != Rpc.Caller || Ship.Network.Owner != Rpc.Caller ) return;
+		FireAuthoritative( player );
+	}
+
+	private bool FireAuthoritative( PlayerController player )
+	{
+		if ( !GameplayAuthority.CanMutate || !Enabled || !player.IsValid() || Occupant != player || ReloadRemaining > 0 || !Muzzle.IsValid() || !Ship.IsValid() ) return false;
 		UpdateBarrel();
 		var ball = new GameObject( Scene, true, "Cannonball" );
-		ball.NetworkMode = NetworkMode.Never;
+		ball.NetworkMode = Networking.IsActive ? NetworkMode.Object : NetworkMode.Never;
 		ball.WorldPosition = Muzzle.WorldPosition;
 		var shot = ball.AddComponent<Cannonball>();
 		shot.Source = Ship;
@@ -37,6 +55,7 @@ public sealed class ShipCannon : ShipStation
 		CannonBurst.Spawn( Scene, Muzzle.WorldPosition, Muzzle.WorldRotation.Forward, false );
 		readyAt = Time.Now + Math.Max( 0.2f, ReloadSeconds );
 		recoil = 1;
+		if ( Networking.IsActive ) ball.NetworkSpawn( null );
 		return true;
 	}
 	protected override void OnUpdate()

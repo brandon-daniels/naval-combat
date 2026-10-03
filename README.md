@@ -64,29 +64,53 @@ Status legend: ✅ verified prototype, 🟡 partial/local prototype, ⬜ not sta
 - ✅ Four cannon stations with ballistic projectiles and impact effects
 - ✅ Local NPC captain that sails, avoids islands, operates stations, and fires cannons
 - ✅ Separate multiplayer sword arena with host-authoritative damage
-- 🟡 Decide session length, starting money, cargo-loss percentage, respawn cost, and whether upgrades last for a match or across sessions
-- ⬜ Write stable IDs and initial balance sheet for one good, three island prices, one production site, and three upgrades
-- ⬜ Create the integrated gameplay scene while preserving the current prototype and combat test scenes
+- ✅ First-slice session rules and balance contract are documented below
+- ✅ Stable-ID trade-goods and three ship-upgrade assets exist alongside the gameplay code foundation
+- ✅ `Assets/scenes/naval_gameplay.scene` is the independent integration scene; prototype and combat test scenes remain preserved
 
 Exit criteria: the rules for the first voyage are explicit, the integrated scene opens cleanly, and existing prototype tests still pass.
 
+Milestone 0 is complete. Its first-slice contract is:
+
+| Rule | Initial value |
+| --- | --- |
+| Session target | 30 minutes; session flow is implemented later |
+| Starting money | 500 per player |
+| Defeated cargo | 75% drops as loot; rounding and stack selection are implemented with loot |
+| Respawn cost | Free for the vertical slice to prevent elimination and deadlocks |
+| Upgrade lifetime | Match-scoped; all upgrade levels reset when the session ends |
+| Starting cargo capacity | 20 units |
+| Commodity | `goods.trade_goods` / Trade Goods, one capacity unit each |
+| Production investment | 100 money, 60 seconds, 10 Trade Goods |
+| Beacon Island role | Producer: claim production here; market buys Trade Goods for 18 |
+| Twin Rocks role | Mid-market: buys for 24 and sells for 28 |
+| Palm Island role | Destination: buys Trade Goods for 35 |
+| Cargo upgrade | `upgrade.expanded_hold`: +5 capacity per level |
+| Hull upgrade | `upgrade.reinforced_hull`: +150 maximum health per level |
+| Sailing upgrade | `upgrade.improved_rigging`: +10% sailing performance per level |
+| Upgrade pricing | Three levels; base prices 300/350/325 with a 1.75× level multiplier |
+
+These are tuning baselines, not promises of final balance. Economy values remain authoritative and integer-valued. The integrated scene initially inherits the proven local sailing world; subsequent milestones replace its local-only bootstrap with multiplayer session spawning and wire the authored economy components into its islands and ship.
+
 #### 1. Authoritative multiplayer sailing shell
 
-- ⬜ Spawn one owned ship and character per connected player
-- ⬜ Define authority for hull physics, stations, sails, cannons, projectiles, and NPC ships
-- ⬜ Synchronize ship motion and station occupancy with usable remote interpolation
-- ⬜ Handle join, leave, reconnect, owner loss, and ship cleanup
-- ⬜ Add host/client smoke checks for station authorization and cannon firing
+- 🟡 Spawn one owned ship and character per connected player (session spawning and ownership are implemented; live two-instance verification remains)
+- 🟡 Define authority for hull physics, stations, sails, cannons, projectiles, and NPC ships (player hulls are owner-simulated; station occupancy and cannon acceptance are host-validated; NPC authority remains)
+- 🟡 Synchronize ship motion and station occupancy with usable remote interpolation (network objects and synchronized occupancy/sail/cannon state are implemented; remote feel remains to be tuned)
+- 🟡 Handle join, leave, reconnect, owner loss, and ship cleanup (join, disconnect cleanup, and host slot rebuilding exist; reconnect/host migration need live verification)
+- 🟡 Add host/client smoke checks for station authorization and cannon firing (`naval_test_network_shell` checks ownership structure; active denial/fire checks remain)
 
 Exit criteria: two players can join, board only permitted stations, sail, observe each other, and fire without valuable state being client-controlled.
 
+The integrated scene now uses `NavalMultiplayerSession` instead of the local prototype bootstrap. It keeps the authored player ship as a disabled template, clones one ship and sailor for each connection, assigns both to that connection, and creates camera/HUD presentation locally. Ship movement, sail trim, and cannon aim are owner-simulated for responsiveness. The host owns station occupancy decisions and cannon-fire acceptance; cannonballs are host-spawned network objects. Run the scene as host, choose **Join via new instance**, then run `naval_test_network_shell` on the host to inspect connection-to-ship ownership before performing the physical station and firing checks.
+
 #### 2. Economy and production vertical slice
 
-- ⬜ Add authoritative wallets with starting funds and transaction reasons
-- ⬜ Add one goods definition and capacity-limited ship cargo
+- 🟡 Add authoritative wallets with starting funds and transaction reasons (wallet foundation exists; transaction history/reasons remain)
+- 🟡 Add one goods definition and capacity-limited ship cargo (code foundation exists; assets and scene wiring remain)
 - ⬜ Add dock detection and server-validated port interaction
-- ⬜ Add one investable production site with a visible countdown and claimable stock
-- ⬜ Add island buy/sell quotes and atomic load, unload, buy, and sell operations
+- 🟡 Add one investable production site with a visible countdown and claimable stock (mechanics exist; interaction and UI remain)
+- 🟡 Add island buy/sell quotes and atomic load, unload, buy, and sell operations (market mechanics exist; port request boundary remains)
 - ⬜ Add wallet, cargo, market, and production UI
 - ⬜ Add deterministic tests for insufficient funds, full cargo, wrong port, duplicate claims, disconnects, and timer completion
 
@@ -95,7 +119,7 @@ Exit criteria: a host and client can independently invest, wait, load, sail, sel
 #### 3. Ship combat, defeat, and piracy
 
 - 🟡 Cannon aiming/projectile foundation exists locally; damage is not implemented
-- ⬜ Add ship health, armor/damage rules, hit attribution, repair rules, and clear feedback
+- 🟡 Add ship health, armor/damage rules, hit attribution, repair rules, and clear feedback (health/repair foundation exists)
 - ⬜ Define disabled/sinking behavior that does not strand players
 - ⬜ Convert a configured percentage of defeated cargo into authoritative floating loot
 - ⬜ Add pickup validation, temporary ownership protection if needed, and despawn rules
@@ -106,7 +130,7 @@ Exit criteria: either player can damage and defeat the other, cargo loss is cons
 
 #### 4. Upgrades and economic choices
 
-- ⬜ Add an island shipyard/shop and authoritative purchase flow
+- 🟡 Add an island shipyard/shop and authoritative purchase flow (upgrade purchase mechanics exist; shop interaction remains)
 - ⬜ Implement three first upgrades: cargo capacity, hull durability, and sail/handling performance
 - ⬜ Present current level, exact effect, price, affordability, and purchase result
 - ⬜ Apply upgrades from a centralized modifier pipeline instead of scattered conditionals

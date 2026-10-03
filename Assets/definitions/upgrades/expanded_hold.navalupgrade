@@ -1,0 +1,11 @@
+{
+  "Id": "upgrade.expanded_hold",
+  "DisplayName": "Expanded Hold",
+  "Stat": "CargoCapacity",
+  "MaximumLevel": 3,
+  "BaseCost": 300,
+  "CostMultiplier": 1.75,
+  "AmountPerLevel": 5,
+  "__references": [],
+  "__version": 0
+}
