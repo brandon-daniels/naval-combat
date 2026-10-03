@@ -1,0 +1,15 @@
+# Normalize text in Git; keep C# working files consistent with .editorconfig.
+* text=auto
+*.cs text eol=crlf
+*.razor text eol=crlf
+*.md text eol=lf
+*.scene text eol=lf
+*.meta text eol=lf
+*.sbproj text eol=lf
+*.config text eol=lf
+*.shader text eol=lf
+*.vmat text eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.shader_c binary

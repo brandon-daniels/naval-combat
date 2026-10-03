@@ -1,0 +1,14 @@
+CombatHud {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	color: white;
+	font-family: Poppins;
+	font-size: 17px;
+	pointer-events: none;
+	.card { position: absolute; left: 28px; top: 28px; padding: 20px; background-color: #142535ee; border-radius: 8px; flex-direction: column; gap: 7px; }
+	.title { font-size: 25px; font-weight: bold; color: #edca83; }
+	.health { font-size: 22px; font-weight: bold; }
+	.hint { font-size: 14px; color: #b8c8d6; }
+	.crosshair { position: absolute; left: 50%; top: 50%; font-size: 24px; }
+}

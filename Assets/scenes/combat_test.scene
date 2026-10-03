@@ -1,0 +1,222 @@
+{
+  "__guid": "123b0241-f47d-4aba-bcf7-a9fe3e62ec76",
+  "GameObjects": [
+    {
+      "__guid": "f5e2030e-88d5-4e40-b519-d3f691de236c",
+      "Flags": 0,
+      "Name": "Sun",
+      "Rotation": "-0.0729315,0.4822396,0.1305433,0.8631827",
+      "Tags": "light_directional,light",
+      "Enabled": true,
+      "Components": [
+        {
+          "__type": "Sandbox.DirectionalLight",
+          "__guid": "068d0a05-dba4-42ce-8577-91c08b00173b",
+          "FogMode": "Enabled",
+          "FogStrength": 1,
+          "LightColor": "0.94419,0.97767,1,1",
+          "Shadows": true,
+          "SkyColor": "0.2532,0.32006,0.35349,1"
+        }
+      ]
+    },
+    {
+      "__guid": "14327a2f-5359-44bb-8d64-01831ad9147c",
+      "Flags": 0,
+      "Name": "2D Skybox",
+      "Tags": "skybox",
+      "Enabled": true,
+      "Components": [
+        {
+          "__type": "Sandbox.SkyBox2D",
+          "__guid": "e359ccd7-daeb-4f3a-9af7-c143c68bba54",
+          "SkyMaterial": "materials/skybox/skybox_day_01.vmat",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.EnvmapProbe",
+          "__guid": "f96e3ef7-9fcb-46c7-82d0-a9c77b8e67ea",
+          "Texture": "textures/cubemaps/default2.vtex",
+          "Bounds": {
+            "Mins": "-512,-512,-512",
+            "Maxs": "512,512,512"
+          },
+          "DelayBetweenUpdates": 0.1,
+          "Feathering": 0.02,
+          "FrameInterval": 5,
+          "MaxDistance": 512,
+          "Projection": "Sphere",
+          "RenderDynamically": false,
+          "TintColor": "1,1,1,1",
+          "UpdateStrategy": "OnEnabled",
+          "ZFar": 4096,
+          "ZNear": 16
+        }
+      ]
+    },
+    {
+      "Scale": "24,24,0.6",
+      "__guid": "e60565ed-21bc-4cfc-8c02-acc4ee60bfcc",
+      "Components": [
+        {
+          "Tint": "0.25,0.32,0.37,1",
+          "__guid": "1bed05a0-105c-43c7-9cfe-e9265bf3131b",
+          "__type": "Sandbox.ModelRenderer",
+          "Model": "models/dev/box.vmdl"
+        },
+        {
+          "__guid": "e54162e1-c7b2-40bb-a49d-eb8dcf2342a1",
+          "__type": "Sandbox.BoxCollider",
+          "Scale": "50,50,50",
+          "Static": true
+        }
+      ],
+      "Name": "Arena floor",
+      "Position": "0,0,-15",
+      "Enabled": true
+    },
+    {
+      "Scale": "24,0.4,3.2",
+      "__guid": "47156854-65da-4332-8e30-1221b0ad0808",
+      "Components": [
+        {
+          "Tint": "0.45,0.51,0.56,1",
+          "__guid": "6007ec40-5652-4418-ab17-92351fbf7bf2",
+          "__type": "Sandbox.ModelRenderer",
+          "Model": "models/dev/box.vmdl"
+        },
+        {
+          "__guid": "6454991b-40c6-4c40-a052-98a5d1333e6a",
+          "__type": "Sandbox.BoxCollider",
+          "Scale": "50,50,50",
+          "Static": true
+        }
+      ],
+      "Name": "North wall",
+      "Position": "0,600,65",
+      "Enabled": true
+    },
+    {
+      "Scale": "24,0.4,3.2",
+      "__guid": "5346d8c0-e6da-484f-aff9-0f3a8eb2f2c7",
+      "Components": [
+        {
+          "Tint": "0.45,0.51,0.56,1",
+          "__guid": "ea5f4a0e-ab5d-48a1-b8a1-246cdc23d6f2",
+          "__type": "Sandbox.ModelRenderer",
+          "Model": "models/dev/box.vmdl"
+        },
+        {
+          "__guid": "4a546015-e04e-4d6f-b760-18dddd0aa2bf",
+          "__type": "Sandbox.BoxCollider",
+          "Scale": "50,50,50",
+          "Static": true
+        }
+      ],
+      "Name": "South wall",
+      "Position": "0,-600,65",
+      "Enabled": true
+    },
+    {
+      "Scale": "0.4,24,3.2",
+      "__guid": "7f61ffef-c553-4780-91d3-1259f88264fa",
+      "Components": [
+        {
+          "Tint": "0.45,0.51,0.56,1",
+          "__guid": "1f4dd6e8-c532-4038-ae1a-2b32dc468c1f",
+          "__type": "Sandbox.ModelRenderer",
+          "Model": "models/dev/box.vmdl"
+        },
+        {
+          "__guid": "d056189a-7de2-4662-a742-526acd4acc31",
+          "__type": "Sandbox.BoxCollider",
+          "Scale": "50,50,50",
+          "Static": true
+        }
+      ],
+      "Name": "East wall",
+      "Position": "600,0,65",
+      "Enabled": true
+    },
+    {
+      "Scale": "0.4,24,3.2",
+      "__guid": "d1d940eb-5cd5-419b-beca-6a3e94eb3f28",
+      "Components": [
+        {
+          "Tint": "0.45,0.51,0.56,1",
+          "__guid": "8863c9bc-5998-4a3d-836c-f9166fdb300d",
+          "__type": "Sandbox.ModelRenderer",
+          "Model": "models/dev/box.vmdl"
+        },
+        {
+          "__guid": "8095a5de-f1ac-4b3e-b860-fbc240bea0c1",
+          "__type": "Sandbox.BoxCollider",
+          "Scale": "50,50,50",
+          "Static": true
+        }
+      ],
+      "Name": "West wall",
+      "Position": "-600,0,65",
+      "Enabled": true
+    },
+    {
+      "Scale": "2,2,1.8",
+      "__guid": "3072ea03-487b-445f-bb73-25729479372a",
+      "Components": [
+        {
+          "Tint": "0.65,0.47,0.25,1",
+          "__guid": "5cd8ee46-cc56-4906-9824-02fa91ab2bf3",
+          "__type": "Sandbox.ModelRenderer",
+          "Model": "models/dev/box.vmdl"
+        },
+        {
+          "__guid": "fea13228-f78d-4f52-b329-1197b503eb00",
+          "__type": "Sandbox.BoxCollider",
+          "Scale": "50,50,50",
+          "Static": true
+        }
+      ],
+      "Name": "Cover block",
+      "Position": "0,260,45",
+      "Enabled": true
+    },
+    {
+      "__guid": "f3c01915-f1ac-4270-8447-19dfde38bbf5",
+      "Enabled": true,
+      "Name": "Combat arena",
+      "Components": [
+        {
+          "__guid": "a082520c-0001-4f11-826d-cfc5976148bd",
+          "__type": "NavalCombat.CombatArena",
+          "NpcSpawn": "180,0,4"
+        }
+      ]
+    }
+  ],
+  "SceneProperties": {
+    "FixedUpdateFrequency": 50,
+    "MaxFixedUpdates": 5,
+    "NetworkFrequency": 60,
+    "NetworkInterpolation": true,
+    "ThreadedAnimation": true,
+    "TimeScale": 1,
+    "UseFixedUpdate": true,
+    "NavMesh": {
+      "Enabled": false,
+      "IncludeStaticBodies": true,
+      "IncludeKeyframedBodies": true,
+      "EditorAutoUpdate": true,
+      "AgentHeight": 64,
+      "AgentRadius": 16,
+      "AgentStepSize": 18,
+      "AgentMaxSlope": 40,
+      "ExcludedBodies": "",
+      "IncludedBodies": ""
+    }
+  },
+  "Title": "Sword Combat Test",
+  "Description": "Player versus player sword arena with a sparring NPC.",
+  "ResourceVersion": 1,
+  "__references": [],
+  "__version": 1
+}

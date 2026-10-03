@@ -1,0 +1,19 @@
+@using Sandbox
+@using Sandbox.UI
+@namespace NavalCombat
+@inherits PanelComponent
+<root>
+	<div class="card">
+		<div class="title">SWORD COMBAT TEST</div>
+		<div>WASD move · Mouse look · Left click slash · C camera</div>
+		<div class="health">Health: @(Player?.Health ?? 100) / 100</div>
+		<div>@(Player?.Feedback ?? "Waiting for player")</div>
+		<div class="hint">Red NPC fights back at close range. Four hits defeat an opponent.</div>
+		<div class="hint">Host and join via the editor network menu to test PvP.</div>
+	</div>
+	<div class="crosshair">+</div>
+</root>
+@code {
+	private SwordFighter Player => Scene.GetAllComponents<SwordFighter>().FirstOrDefault( x => x.IsLocalPlayer );
+	protected override int BuildHash() => System.HashCode.Combine( Player?.Health, Player?.Feedback );
+}
