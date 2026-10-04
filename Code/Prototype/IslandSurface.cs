@@ -62,12 +62,12 @@ public sealed class IslandSurface : Component, Component.ExecuteInEditor
 		if ( !renderer.IsValid() )
 		{
 			renderer = GameObject.AddComponent<ModelRenderer>();
-			renderer.Flags |= ComponentFlags.NotSaved;
+			renderer.Flags |= ComponentFlags.NotSaved | ComponentFlags.NotNetworked;
 		}
 		if ( !collider.IsValid() )
 		{
 			collider = GameObject.AddComponent<ModelCollider>();
-			collider.Flags |= ComponentFlags.NotSaved;
+			collider.Flags |= ComponentFlags.NotSaved | ComponentFlags.NotNetworked;
 		}
 		renderer.Model = model;
 		renderer.Tint = Tint;

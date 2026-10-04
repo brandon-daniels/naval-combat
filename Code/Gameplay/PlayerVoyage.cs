@@ -8,12 +8,13 @@ public sealed class PlayerVoyage : Component
 	[Property] public ShipPlayer Sailor { get; set; }
 	[Property] public PlayerWallet Wallet { get; set; }
 	[Property] public ProductionSite Production { get; set; }
+	[Property] public string PlayerId { get; set; }
 	[Sync( SyncFlags.FromHost )] public string Feedback { get; private set; } = "Sail to the gold buoy at Beacon Island.";
 	public CargoHold Cargo => Sailor.Ship.GetComponent<CargoHold>();
 	public ShipUpgradeManager Upgrades => Sailor.Ship.GetComponent<ShipUpgradeManager>();
 	public VoyagePort NearestPort => Scene.GetAllComponents<VoyagePort>()
 		.OrderBy( x => x.WorldPosition.Distance( Sailor.Ship.WorldPosition ) ).FirstOrDefault();
-	public string Identity => Network.Owner?.Id.ToString() ?? "local";
+	public string Identity => PlayerId;
 	private float nextRequest;
 
 	protected override void OnUpdate()

@@ -75,7 +75,7 @@ public sealed class ArcadeOcean : Component, Component.ExecuteInEditor
 		}
 		mesh.CreateIndexBuffer( indices.Length, indices );
 		renderer = GameObject.AddComponent<ModelRenderer>();
-		renderer.Flags |= ComponentFlags.NotSaved;
+		renderer.Flags |= ComponentFlags.NotSaved | ComponentFlags.NotNetworked;
 		renderer.Model = Model.Builder.AddMesh( mesh ).Create();
 		UpdateMaterial();
 	}

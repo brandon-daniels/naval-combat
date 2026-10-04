@@ -29,6 +29,8 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 
 	protected override void OnStart()
 	{
+		CreateLocalPresentation();
+		if ( Networking.IsActive && !Networking.IsHost ) return;
 		if ( !ShipTemplate.IsValid() )
 		{
 			Log.Error( "Naval multiplayer session requires an authored ship template." );
@@ -37,7 +39,6 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 
 		ShipTemplate.GameObject.Enabled = false;
 		if ( NpcShipTemplate.IsValid() ) NpcShipTemplate.Enabled = false;
-		CreateLocalPresentation();
 
 		if ( !Networking.IsActive )
 		{
@@ -48,8 +49,8 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 
 	protected override void OnUpdate()
 	{
-		if ( !hud.IsValid() || hud.Player.IsValid() ) return;
-		hud.Player = Scene.GetAllComponents<ShipPlayer>().FirstOrDefault( x => !x.IsNpc && !x.IsProxy );
+		if ( !hud.IsValid() ) return;
+		if ( !hud.Player.IsValid() ) hud.Player = Scene.GetAllComponents<ShipPlayer>().FirstOrDefault( x => !x.IsNpc && !x.IsProxy );
 		if ( !hud.Player.IsValid() || !hud.Player.Ship.IsValid() ) return;
 		var ship = hud.Player.Ship;
 		if ( ship.Ocean.IsValid() ) ship.Ocean.FollowTarget = ship.GameObject;
@@ -143,6 +144,7 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 		voyage.Sailor = sailor;
 		voyage.Wallet = wallet;
 		voyage.Production = production;
+		voyage.PlayerId = owner?.Id.ToString() ?? Guid.NewGuid().ToString();
 		sailor.GameObject.Name = owner is null ? "Local sailor" : $"{owner.DisplayName}'s sailor";
 		sailor.GameObject.NetworkMode = Networking.IsActive ? NetworkMode.Object : NetworkMode.Never;
 

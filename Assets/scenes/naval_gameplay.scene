@@ -329,7 +329,7 @@
           "Scale": "1,1,1",
           "Tags": "",
           "Enabled": true,
-          "NetworkMode": 0,
+          "NetworkMode": 2,
           "NetworkFlags": 0,
           "NetworkOrphaned": 0,
           "NetworkTransmit": true,

@@ -4,7 +4,7 @@ A game project for S&box. The planned game combines ship physics, PvPvE combat, 
 
 ## Play the first voyage
 
-The startup scene is now `Assets/scenes/naval_gameplay.scene`. Press Play to start aboard a ship with 500 coins and an empty cargo hold. This is a playable local trading slice; multiplayer is still being validated, and ship damage, defeat, loot, and pirate attacks are later milestones.
+The startup scene is now `Assets/scenes/naval_gameplay.scene`. Press Play locally to start aboard a ship with 500 coins and an empty cargo hold. This is a playable local trading slice. Multiplayer is experimental: two-player spawning works, but remote physics and custom-resource delivery still block a complete client voyage. Ship damage, defeat, loot, and pirate attacks are later milestones.
 
 1. Walk to the mast, press **E**, then hold **S** to lower the sail. Use **A/D** to align it with the wind and press **E** to release.
 2. Take the bow helm with **E** and steer with **A/D**. The voyage HUD lists every port's distance and direction relative to your bow.
@@ -109,11 +109,11 @@ These are tuning baselines, not promises of final balance. Economy values remain
 
 #### 1. Authoritative multiplayer sailing shell
 
-- 🟡 Spawn one owned ship and character per connected player (session spawning and ownership are implemented; live two-instance verification remains)
+- ✅ Two-instance check confirms one owned ship and character per connected player
 - 🟡 Define authority for hull physics, stations, sails, cannons, projectiles, and NPC ships (player hulls are owner-simulated; station occupancy and cannon acceptance are host-validated; NPC authority remains)
 - 🟡 Synchronize ship motion and station occupancy with usable remote interpolation (network objects and synchronized occupancy/sail/cannon state are implemented; remote feel remains to be tuned)
 - 🟡 Handle join, leave, reconnect, owner loss, and ship cleanup (join, disconnect cleanup, and host slot rebuilding exist; reconnect/host migration need live verification)
-- 🟡 Add host/client smoke checks for station authorization and cannon firing (`naval_test_network_shell` checks ownership structure; active denial/fire checks remain)
+- 🟡 `naval_test_network_shell` passes with two players; `naval_test_voyage_network` currently fails on remote physics/port validation before reaching its cannon checks
 
 Exit criteria: two players can join, board only permitted stations, sail, observe each other, and fire without valuable state being client-controlled.
 

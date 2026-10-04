@@ -9,8 +9,8 @@ public sealed class ShipCannon : ShipStation
 	[Property] public float MuzzleSpeed { get; set; } = 1800;
 	[Sync] public float Yaw { get; private set; }
 	[Sync] public float Elevation { get; private set; } = 12;
-	public float ReloadRemaining => Math.Max( 0, readyAt - Time.Now );
-	private float readyAt;
+	public float ReloadRemaining => Math.Max( 0, ReadyAt - Time.Now );
+	[Sync( SyncFlags.FromHost )] public float ReadyAt { get; private set; }
 	private float recoil;
 	public override Transform CalculateEyeTransform( PlayerController player )
 	{
@@ -53,7 +53,7 @@ public sealed class ShipCannon : ShipStation
 		shot.Source = Ship;
 		shot.Velocity = Muzzle.WorldRotation.Forward * MuzzleSpeed + Ship.Body.GetVelocityAtPoint( Muzzle.WorldPosition );
 		CannonBurst.Spawn( Scene, Muzzle.WorldPosition, Muzzle.WorldRotation.Forward, false );
-		readyAt = Time.Now + Math.Max( 0.2f, ReloadSeconds );
+		ReadyAt = Time.Now + Math.Max( 0.2f, ReloadSeconds );
 		recoil = 1;
 		if ( Networking.IsActive ) ball.NetworkSpawn( null );
 		return true;

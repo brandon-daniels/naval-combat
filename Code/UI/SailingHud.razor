@@ -23,6 +23,8 @@
 		<div class="voyage">
 			<div class="voyage-title">THE FIRST VOYAGE</div>
 			<div>@($"Coins {Voyage.Wallet.Balance}  |  Cargo {Voyage.Cargo.UsedCapacity}/{Voyage.Cargo.Capacity}")</div>
+			<div>@($"Speed {Player.Ship.Body.Velocity.WithZ( 0 ).Length:0}  |  Hull {Hull.Health}/{Hull.MaximumHealth}")</div>
+			<div class="feedback">@(Voyage.NearestPort is { } nearby && nearby.CanTrade( Player ) ? $"Trading available: {nearby.PortName}" : "Sail to a buoy and slow down to trade")</div>
 			<div>@ProductionStatus</div>
 			@foreach ( var port in Player.Scene.GetAllComponents<VoyagePort>() )
 			{
@@ -41,6 +43,7 @@
 @code {
 	[Property] public ShipPlayer Player { get; set; }
 	private PlayerVoyage Voyage => Player.IsValid() ? Player.GetComponent<PlayerVoyage>() : null;
+	private ShipHealth Hull => Player.Ship.GetComponent<ShipHealth>();
 	private string ProductionStatus => Voyage.Production.HasOutput ? "10 goods ready: return to Beacon to load" : Voyage.Production.IsProducing ? $"Production: {Voyage.Production.RemainingSeconds:0}s remaining" : "Invest at Beacon, then deliver to Palm Island";
 	private string PortText( VoyagePort port )
 	{

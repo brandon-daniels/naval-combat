@@ -56,6 +56,7 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 		if ( !Yard.IsValid() ) return;
 		if ( cloth.IsValid() ) cloth.Destroy();
 		cloth = new GameObject( Yard, true, "Sail canvas" );
+		cloth.NetworkMode = NetworkMode.Never;
 		cloth.Flags |= GameObjectFlags.NotSaved;
 		int faceCount = (Columns + 1) * (Rows + 1);
 		vertices = new Vertex[faceCount * 2];
