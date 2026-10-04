@@ -11,8 +11,12 @@ public sealed class NavalPrototype : Component
 	[Property] public ArcadeOcean Ocean { get; set; }
 	[Property] public SailingWind Wind { get; set; }
 	[Property] public GameObject SpawnPoint { get; set; }
+	[Property] public bool SpawnNpcShip { get; set; } = true;
+	[Property] public Vector3 NpcShipOffset { get; set; } = new( -2400, 1100, 0 );
 	private GameObject content;
 	private GameObject playerObject;
+	private GameObject npcObject;
+	private GameObject npcShip;
 
 	protected override void OnStart()
 	{
@@ -50,13 +54,33 @@ public sealed class NavalPrototype : Component
 		camera.ZNear = 4;
 		camera.BackgroundColor = new Color( 0.34f, 0.58f, 0.7f );
 		CreatePlayer( controller, helm, spawn );
+		if ( SpawnNpcShip ) CreateNpc();
 		Log.Info( "Naval prototype: E at mast or helm. Mast: A/D rotate, W raise, S lower sails. Helm: A/D steer. Wind arrow shows where wind blows. R returns to deck." );
 	}
 
-	private void CreatePlayer( ArcadeShip ship, ShipHelm helm, GameObject spawn )
+	private void CreateNpc()
 	{
-		var sailor = CreateSailor( content, ship, spawn, false );
+		npcShip = Ship.GameObject.Clone( Ship.WorldPosition + NpcShipOffset, Rotation.Identity );
+		npcShip.Name = "NPC ship";
+		var ship = npcShip.GetComponent<ArcadeShip>();
+		ship.Ocean = Ocean;
+		ship.Sails.Wind = Wind;
+		var spawn = new GameObject( npcShip, true, "NPC deck spawn" );
+		spawn.LocalPosition = new Vector3( -65, 0, 42 );
+		var human = playerObject;
+		CreatePlayer( ship, ship.Helm, spawn, true );
+		npcObject = playerObject;
+		playerObject = human;
+		var captain = npcObject.AddComponent<ShipNpc>();
+		captain.Sailor = npcObject.GetComponent<ShipPlayer>();
+		captain.Target = Ship;
+	}
+
+	private void CreatePlayer( ArcadeShip ship, ShipHelm helm, GameObject spawn, bool npc = false )
+	{
+		var sailor = CreateSailor( content, ship, spawn, npc );
 		playerObject = sailor.GameObject;
+		if ( npc ) return;
 		var hud = new GameObject( content, true, "Sailing HUD" );
 		hud.AddComponent<ScreenPanel>();
 		hud.AddComponent<SailingHud>().Player = sailor;
@@ -65,7 +89,7 @@ public sealed class NavalPrototype : Component
 	public static ShipPlayer CreateSailor( GameObject parent, ArcadeShip ship, GameObject spawn, bool npc )
 	{
 		// A walking player must have its own physics body, never be a child of the moving ship.
-		var playerObject = new GameObject( parent, false, npc ? "NPC captain" : "Sailor" );
+		var playerObject = new GameObject( parent, false, "Sailor" );
 		playerObject.Tags.Add( "player" );
 		playerObject.WorldPosition = spawn.WorldPosition;
 		playerObject.WorldRotation = Rotation.FromYaw( ship.WorldRotation.Angles().yaw );
@@ -110,6 +134,8 @@ public sealed class NavalPrototype : Component
 	{
 		// The player can have been reparented by the mounted movement mode.
 		if ( playerObject.IsValid() ) playerObject.Destroy();
+		if ( npcObject.IsValid() ) npcObject.Destroy();
+		if ( npcShip.IsValid() ) npcShip.Destroy();
 		if ( content.IsValid() ) content.Destroy();
 	}
 }

@@ -79,10 +79,10 @@ public static class HelmSmokeTest
 			Check( (ship.WorldTransform.PointToLocal( player.WorldPosition ) - localStart).Length > 15, "Walking resumes after release" );
 			player.WorldPosition = ship.WorldPosition + Vector3.Down * 200;
 			await GameTask.DelaySeconds( 0.8f );
-			Check( player.IsSwimming, "Falling overboard enters swimming" );
+			Check( player.IsSwimming && (player.WorldPosition - sailor.SpawnPoint.WorldPosition).Length > 30, "Overboard player enters swimming mode" );
 			sailor.ReturnToDeck();
-			await GameTask.DelaySeconds( 0.8f );
-			Check( player.IsOnGround, "Manual recovery returns player to deck" );
+			await GameTask.DelaySeconds( 1 );
+			Check( player.IsOnGround && (player.WorldPosition - sailor.SpawnPoint.WorldPosition).Length < 40, "Manual recovery returns player to deck" );
 			Log.Info( "HELM TEST PASSED: walk, range, mount, wind propulsion, steer, release, moving deck, recovery." );
 		}
 		catch ( Exception error )

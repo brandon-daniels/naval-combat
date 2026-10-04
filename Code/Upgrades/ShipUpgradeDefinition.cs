@@ -9,7 +9,7 @@ public enum ShipUpgradeStat
 	SailingPerformance
 }
 
-[AssetType( Name = "Ship Upgrade", Extension = "navalupgrade", Category = "Naval Combat" )]
+[AssetType( Name = "Ship Upgrade", Extension = "nupgrade", Category = "Naval Combat" )]
 public sealed class ShipUpgradeDefinition : GameResource
 {
 	[Property] public string Id { get; set; } = "upgrade.unassigned";

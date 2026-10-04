@@ -2,7 +2,7 @@ using System;
 
 namespace NavalCombat;
 
-[AssetType( Name = "Naval Goods", Extension = "navalgoods", Category = "Naval Combat" )]
+[AssetType( Name = "Naval Goods", Extension = "ngoods", Category = "Naval Combat" )]
 public sealed class GoodsDefinition : GameResource
 {
 	[Property] public string Id { get; set; } = "goods.cargo";

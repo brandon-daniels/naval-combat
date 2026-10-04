@@ -136,6 +136,13 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 		var spawn = shipObject.GetAllObjects( true ).FirstOrDefault( x => x.Name == "Deck spawn" );
 		if ( !spawn.IsValid() ) spawn = shipObject;
 		var sailor = NavalPrototype.CreateSailor( GameObject, ship, spawn, false );
+		var wallet = sailor.GameObject.AddComponent<PlayerWallet>();
+		var production = sailor.GameObject.AddComponent<ProductionSite>();
+		production.OutputGoods = ResourceLibrary.Get<GoodsDefinition>( "definitions/goods/trade_goods.ngoods" );
+		var voyage = sailor.GameObject.AddComponent<PlayerVoyage>();
+		voyage.Sailor = sailor;
+		voyage.Wallet = wallet;
+		voyage.Production = production;
 		sailor.GameObject.Name = owner is null ? "Local sailor" : $"{owner.DisplayName}'s sailor";
 		sailor.GameObject.NetworkMode = Networking.IsActive ? NetworkMode.Object : NetworkMode.Never;
 

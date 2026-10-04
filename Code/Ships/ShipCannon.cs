@@ -86,6 +86,7 @@ public sealed class Cannonball : Component
 	}
 	protected override void OnFixedUpdate()
 	{
+		if ( !GameplayAuthority.CanMutate || IsProxy ) return;
 		age += Time.Delta;
 		if ( age > 8 || !Source.IsValid() ) { GameObject.Destroy(); return; }
 		var start = WorldPosition;

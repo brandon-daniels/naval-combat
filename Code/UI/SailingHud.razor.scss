@@ -7,6 +7,11 @@ SailingHud {
 	pointer-events: none;
 	font-family: Poppins;
 	color: white;
+	.voyage { position: absolute; left: 24px; top: 72px; width: 400px; padding: 18px; background-color: rgba(9, 24, 32, 0.9); border-radius: 10px; flex-direction: column; font-size: 14px; gap: 7px; }
+	.voyage-title { color: #edbd60; font-size: 18px; font-weight: 700; }
+	.route { color: #b8d1d8; font-size: 12px; }
+	.actions { margin-top: 10px; color: #edbd60; }
+	.feedback { margin-top: 10px; color: #9fdfc1; }
 	.mode { position: absolute; left: 32px; top: 28px; font-size: 20px; font-weight: 700; letter-spacing: 3px; }
 	.hint { position: absolute; bottom: 28px; align-self: center; background-color: rgba(9, 24, 32, 0.9); padding: 14px 24px; border-radius: 8px; font-size: 16px; }
 	.prompt { position: absolute; bottom: 110px; align-self: center; background-color: #edbd60; color: #172d36; padding: 12px 24px; border-radius: 8px; font-size: 22px; font-weight: 700; }

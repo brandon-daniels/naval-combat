@@ -7,8 +7,6 @@ public sealed class ShipNpc : Component
 {
 	[Property] public ShipPlayer Sailor { get; set; }
 	[Property] public ArcadeShip Target { get; set; }
-	[Property] public bool AutoAcquireTarget { get; set; } = true;
-	[Property] public float DeckWalkSpeed { get; set; } = 120;
 	[Property] public float EngagementRange { get; set; } = 1800;
 	[Property] public float IslandClearance { get; set; } = 700;
 	[Property] public float CruisingDeployment { get; set; } = 0.65f;
@@ -49,9 +47,9 @@ public sealed class ShipNpc : Component
 			player.WishVelocity = Vector3.Zero;
 			return;
 		}
-		if ( AutoAcquireTarget && (!Target.IsValid() || Target == ship || !Target.Enabled) )
-			Target = Scene.GetAllComponents<ArcadeShip>().Where( x => x != ship && x.Enabled ).OrderBy( x => (x.WorldPosition - ship.WorldPosition).Length ).FirstOrDefault();
 		if ( !Target.IsValid() || Target == ship || !Target.Enabled )
+			Target = Scene.GetAllComponents<ArcadeShip>().Where( x => x != ship && x.Enabled ).OrderBy( x => (x.WorldPosition - ship.WorldPosition).Length ).FirstOrDefault();
+		if ( !Target.IsValid() )
 		{
 			Activity = "Waiting for another ship";
 			Sailor.CurrentStation?.Release( player );
@@ -177,7 +175,7 @@ public sealed class ShipNpc : Component
 		var waypoint = Math.Abs( local.x - seat.x ) > 35 ? new Vector3( seat.x, 0, seat.z ) : seat;
 		if ( Math.Abs( local.y ) > 18 && Math.Abs( local.x - seat.x ) > 35 ) waypoint = new Vector3( local.x, 0, seat.z );
 		var direction = (ship.WorldPosition + ship.WorldRotation * waypoint - WorldPosition).WithZ( 0 );
-		player.WishVelocity = direction.Normal * Math.Min( Math.Clamp( DeckWalkSpeed, 40, 220 ), direction.Length * 4 );
+		player.WishVelocity = direction.Normal * Math.Min( 120, direction.Length * 4 );
 		if ( direction.Length > 5 ) player.EyeAngles = new Angles( 0, Heading( direction ), 0 );
 		blockedTime = (local - lastPosition).WithZ( 0 ).Length < 0.25f ? blockedTime + Time.Delta : 0;
 		lastPosition = local;

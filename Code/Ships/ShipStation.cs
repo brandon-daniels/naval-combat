@@ -12,7 +12,9 @@ public abstract class ShipStation : BaseChair
 	public override bool CanEnter( PlayerController player )
 	{
 		if ( !Enabled || !Ship.IsValid() || !player.IsValid() || Occupied ) return false;
-		if ( !player.Enabled || player.IsProxy || !player.IsOnGround || !player.Body.IsValid() || !player.Body.Enabled ) return false;
+		if ( !player.Enabled || !player.IsOnGround || !player.Body.IsValid() ) return false;
+		if ( Networking.IsActive && player.Network.Owner != Ship.Network.Owner ) return false;
+		if ( !player.IsProxy && !player.Body.Enabled ) return false;
 		if ( !SeatPosition.IsValid() || (player.WorldPosition - SeatPosition.WorldPosition).Length > UseDistance ) return false;
 		var target = WorldPosition + WorldRotation.Up * 45;
 		var trace = Scene.Trace.Ray( player.EyePosition, target ).IgnoreGameObjectHierarchy( player.GameObject ).Run();
@@ -21,6 +23,7 @@ public abstract class ShipStation : BaseChair
 
 	public bool TryTake( PlayerController player )
 	{
+		if ( player.IsValid() && player.IsProxy ) return false;
 		if ( !CanEnter( player ) ) return false;
 		if ( Networking.IsActive )
 		{

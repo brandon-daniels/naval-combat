@@ -2,6 +2,21 @@
 
 A game project for S&box. The planned game combines ship physics, PvPvE combat, player economy, ship upgrades, and piracy.
 
+## Play the first voyage
+
+The startup scene is now `Assets/scenes/naval_gameplay.scene`. Press Play to start aboard a ship with 500 coins and an empty cargo hold. This is a playable local trading slice; multiplayer is still being validated, and ship damage, defeat, loot, and pirate attacks are later milestones.
+
+1. Walk to the mast, press **E**, then hold **S** to lower the sail. Use **A/D** to align it with the wind and press **E** to release.
+2. Take the bow helm with **E** and steer with **A/D**. The voyage HUD lists every port's distance and direction relative to your bow.
+3. Approach Beacon Island's gold trade buoy. Raise the sail at the mast to slow down; trading requires the ship within 650 units of the buoy, speed below 100, and the sailor aboard.
+4. Press **1** to invest 100 coins. After 60 seconds, press **1** at Beacon again to load ten Trade Goods. Production is reserved to your sailor and continues while you sail elsewhere.
+5. Sail to a green buoy and press **2** to sell your cargo. Beacon pays 18 per unit, Twin Rocks 24, and Palm Island 35, giving a 250-coin profit on a Palm delivery.
+6. At any port, use **3 / 4 / 5** to purchase cargo, hull, or sailing upgrades. The HUD shows current levels and the next price. Upgrades last for the current play session.
+
+Four cannons remain usable with **E**, **WASD** aiming, and left-click firing. **C** changes camera view; **R** returns you to the deck. Falling into the sea enters swimming mode.
+
+Editor configuration: the three **trade buoy** objects in `naval_gameplay.scene` expose location, trade radius, production availability, commodity, and sale price. Goods use `.ngoods` resources and upgrades use `.nupgrade` resources (S&box limits custom asset extensions to eight characters). Preserve their `.meta` files when moving resources. The prototype and combat scenes remain available separately.
+
 <img width="1167" height="685" alt="image" src="https://github.com/user-attachments/assets/b8ac1933-23a1-4828-93a0-22119d7e9a60" />
 
 <img width="990" height="661" alt="Screenshot 2026-10-03 105628" src="https://github.com/user-attachments/assets/2f2fe23d-9748-4127-a143-451dbadfd92e" />
@@ -107,12 +122,12 @@ The integrated scene now uses `NavalMultiplayerSession` instead of the local pro
 #### 2. Economy and production vertical slice
 
 - 🟡 Add authoritative wallets with starting funds and transaction reasons (wallet foundation exists; transaction history/reasons remain)
-- 🟡 Add one goods definition and capacity-limited ship cargo (code foundation exists; assets and scene wiring remain)
-- ⬜ Add dock detection and server-validated port interaction
-- 🟡 Add one investable production site with a visible countdown and claimable stock (mechanics exist; interaction and UI remain)
-- 🟡 Add island buy/sell quotes and atomic load, unload, buy, and sell operations (market mechanics exist; port request boundary remains)
-- ⬜ Add wallet, cargo, market, and production UI
-- ⬜ Add deterministic tests for insufficient funds, full cargo, wrong port, duplicate claims, disconnects, and timer completion
+- ✅ Local goods resource and capacity-limited ship cargo are wired into the playable scene
+- 🟡 Offshore trade buoys validate ship distance, sailor proximity, speed, and RPC ownership; full multiplayer validation remains
+- ✅ Per-player production with a visible countdown, reserved output, and capacity-safe loading at Beacon
+- 🟡 Atomic production loading and cargo sales work through the request boundary; market purchases/unloading remain
+- ✅ Local voyage HUD shows money, cargo, production, route guidance, sale prices, upgrade prices, and transaction feedback
+- 🟡 Live `naval_test_voyage` covers investment, timed completion, early/duplicate/full-hold claims, out-of-range requests, sales, and upgrade affordability; disconnect and multiplayer cases remain
 
 Exit criteria: a host and client can independently invest, wait, load, sail, sell, and see correct replicated balances without duplication or negative values.
 
@@ -130,11 +145,11 @@ Exit criteria: either player can damage and defeat the other, cargo loss is cons
 
 #### 4. Upgrades and economic choices
 
-- 🟡 Add an island shipyard/shop and authoritative purchase flow (upgrade purchase mechanics exist; shop interaction remains)
-- ⬜ Implement three first upgrades: cargo capacity, hull durability, and sail/handling performance
-- ⬜ Present current level, exact effect, price, affordability, and purchase result
-- ⬜ Apply upgrades from a centralized modifier pipeline instead of scattered conditionals
-- ⬜ Define caps, stacking order, resale/refund policy, and reset scope
+- 🟡 Trade buoys provide a host-validated upgrade shop; dedicated shipyard presentation remains
+- ✅ Local cargo capacity, maximum/current hull health, and sailing speed upgrades apply their resource-defined effects
+- 🟡 HUD shows current level, price, and purchase result; richer effect previews remain
+- ✅ Centralized upgrade modifiers apply from captured base stats without compounding each frame
+- 🟡 Three levels and match-scoped reset are implemented; resale/refunds are not offered in this slice
 
 Exit criteria: earnings create distinct ship builds, all effects replicate, and reconnecting cannot duplicate or discard purchases.
 
@@ -194,7 +209,7 @@ Open `Assets/scenes/combat_test.scene` and press Play. A separate enclosed arena
 
 Each fighter has 100 health. Sword hits deal 25 damage, with a 0.65-second cooldown (the NPC attacks half as often). Defeated fighters cannot attack and respawn after three seconds. The HUD shows your health and hit/miss feedback. Swords and characters use placeholder geometry and Citizen models.
 
-For PvP, use the editor network menu to start hosting, then **Join via new instance**. Each connection owns its movement; the host validates sword cooldown, health, range, obstruction and damage. Run `naval_test_combat` in local play or `naval_test_combat_network` with exactly two connected players for integration checks. The arena is separate from sailing; the project startup scene remains `minimal.scene`.
+For PvP, use the editor network menu to start hosting, then **Join via new instance**. Each connection owns its movement; the host validates sword cooldown, health, range, obstruction and damage. Run `naval_test_combat` in local play or `naval_test_combat_network` with exactly two connected players for integration checks. The arena is separate from sailing; open `combat_test.scene` explicitly when testing sword combat.
 
 ## Try the arcade prototype
 
@@ -214,7 +229,7 @@ Walk toward the brass wheel at the front of the ship until the **E · Take the h
 
 The player uses the built-in S&box `PlayerController`, the default Citizen model, and the local user's avatar clothing. The widened deck, cabin, and rails have collision. The ship uses four-point spring buoyancy, assisted steering, and placeholder geometry. The ocean has dramatic intersecting swells, cel-shaded blue/teal bands, and animated white foam ribbons along wave crests. Its denser mesh follows the ship and fades into distant haze. Water is opaque, without reflections or underwater rendering. Adjust `WaveHeight` and `FoamStrength` on `ArcadeOcean` to tune it.
 
-The sailing prototype remains local and refuses startup in an active network session. Multiplayer spawning and sword combat are available in the separate combat arena described above. The original minimal scene and project startup setting remain unchanged.
+The sailing prototype remains local and refuses startup in an active network session. Multiplayer spawning is handled by the integrated gameplay scene, while sword combat remains available in the separate combat arena described above. The project now starts in `naval_gameplay.scene`; the original minimal scene remains preserved for reference.
 
 Handling values are inspector properties on `ArcadeShip`; initial defaults live in `Code/Ships/ArcadeShip.cs`. The ship and islands are saved scene objects. Edit them outside Play mode and save the scene to retain changes. Player, camera, HUD and wind streaks are created at runtime; play-mode edits are temporary.
 
@@ -225,7 +240,7 @@ To repeat the physics integration check, play the scene locally and run `naval_t
 ## Open the project
 
 1. Open `naval_combat.sbproj` with the S&box editor.
-2. Open `Assets/scenes/minimal.scene` and enter play mode to inspect the starter scene.
+2. Press Play to launch `Assets/scenes/naval_gameplay.scene`, or open another preserved test scene explicitly.
 3. Add gameplay components under `Code/` and attach them to GameObjects in the editor.
 
 S&box compiles and hotloads C# changes during development. Inspect the editor console for errors and verify behavior in play mode.
@@ -250,7 +265,7 @@ Open `Assets/scenes/naval_prototype.scene` with Play stopped. Expand **Naval Pro
 - **Practice islands**: move/rotate/scale Beacon Island, Twin Rocks Island or Palm Island as whole groups. Expand an island to edit landmarks and terrain sections. IslandSurface exposes terrain radius, ring proportions, heights and tint; generated collision follows the surface.
 - **Ocean / Sailing wind**: edit wave and wind settings directly.
 
-Save the scene after editing. Keep helm, mast, spawn and component references connected. Terrain and sail previews regenerate from their saved settings; they are not external model assets. The startup scene remains unchanged.
+Save the scene after editing. Keep helm, mast, spawn and component references connected. Terrain and sail previews regenerate from their saved settings; they are not external model assets. The project startup scene is the integrated `naval_gameplay.scene`.
 
 The ocean now uses a Wind Waker-inspired blue palette, drifting white foam outlines and broad rolling swells with softer small waves. WaveHeight and FoamStrength remain editable on the saved Ocean object.
 

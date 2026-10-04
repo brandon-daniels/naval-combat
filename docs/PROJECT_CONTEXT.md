@@ -14,11 +14,11 @@ Milestone 0 validation: S&box 26.10.02 game and editor compilation passed with z
 
 `NavalMultiplayerSession` replaces the disabled local `NavalPrototype` bootstrap in `naval_gameplay.scene`. It keeps the authored player ship and NPC ship disabled as templates, creates local-only camera/HUD/wind presentation, and spawns one cloned ship plus sailor for every active connection. Player ships and sailors are owned network objects. Hull simulation stops on proxies; movement, sail trim, and cannon aim are owner-simulated. Station take/release requests are validated by the host and occupancy is synchronized from the host. Cannon fire is requested from the owning client, revalidated against player and ship ownership by the host, and creates a host-spawned network cannonball. Disconnect cleanup and host slot reconstruction are implemented.
 
-`naval_test_network_shell` is a host-side structural diagnostic for one sailor and distinct owned ship per connection, active networking, ship references, and station authority bindings. Current validation is limited to a successful S&box 26.10.02 game/editor compile with zero errors and warnings. A live two-instance sailing pass, authorization-denial checks, cannon RPC check, reconnect, host migration, remote interpolation tuning, and authoritative NPC activation remain before Milestone 1 can be marked complete. The editor's automated Play command still launches the manifest startup scene, and the open prototype scene has pre-existing unsaved changes that must not be discarded to restart the editor around a temporary startup-scene change.
+`naval_test_network_shell` is a host-side structural diagnostic for one sailor and distinct owned ship per connection, active networking, ship references, and station authority bindings. Current validation is limited to a successful S&box 26.10.02 game/editor compile with zero errors and warnings. A live two-instance sailing pass, authorization-denial checks, cannon RPC check, reconnect, host migration, remote interpolation tuning, and authoritative NPC activation remain before Milestone 1 can be marked complete. The manifest now launches `naval_gameplay.scene`; an already-running editor may need to reload the project before it observes that manifest change.
 
 ## Current state
 
-Sword combat arena added 2026-10-03: `Assets/scenes/combat_test.scene` is a separate enclosed test scene, with a cover block, lighting, and `CombatArena`. It generates a Citizen swordsman for each player and one red stationary sparring NPC, all using `PlayerController` and visible primitive swords. Left click swings; WASD/mouse/Shift/Space/C use the existing movement bindings. The NPC turns toward nearby players and counterattacks in range, without pursuit. `SwordFighter` handles 100 health, 25-damage waist-height sword traces, a 0.65-second attack cooldown (double for NPC), hit feedback, three-second respawn and fall recovery. The host alone resolves damage and hit traces; movement remains owner simulated, without anti-cheat or lag compensation. Sword presentation uses right-hand IK. `CombatHud` shows controls, health and feedback. Sailing components and the manifest startup scene are unchanged; swords are currently arena-only.
+Sword combat arena added 2026-10-03: `Assets/scenes/combat_test.scene` is a separate enclosed test scene, with a cover block, lighting, and `CombatArena`. It generates a Citizen swordsman for each player and one red stationary sparring NPC, all using `PlayerController` and visible primitive swords. Left click swings; WASD/mouse/Shift/Space/C use the existing movement bindings. The NPC turns toward nearby players and counterattacks in range, without pursuit. `SwordFighter` handles 100 health, 25-damage waist-height sword traces, a 0.65-second attack cooldown (double for NPC), hit feedback, three-second respawn and fall recovery. The host alone resolves damage and hit traces; movement remains owner simulated, without anti-cheat or lag compensation. Sword presentation uses right-hand IK. `CombatHud` shows controls, health and feedback. Sword combat remains arena-only and the test scene must be opened explicitly.
 
 Combat validation: S&box 26.10.02 compilation passed with zero errors/warnings. Local `naval_test_combat` passed range rejection, cooldown, NPC damage/defeat/respawn and NPC retaliation. Two live instances passed `naval_test_combat_network`: host damages client, client RPC damages host, client defeat blocks attacks, and client respawns at its own spawn. Camera screenshot verified arena, both sword visuals and HUD. Physical mouse/keyboard feel and host migration have not been systematically tested. API references: installed `Sandbox.Engine.xml`, [network events](https://sbox.game/dev/doc/networking/network-events), [RPC messages](https://sbox.game/dev/doc/networking/rpc-messages), and [PlayerController](https://sbox.game/dev/doc/scene/components/reference/player-controller).
 
@@ -29,7 +29,7 @@ Final combat checks also passed wall obstruction and facing-away rejection. Clos
 | Title | Naval Combat |
 | Identity | `local.naval_combat` |
 | Project type | `game` |
-| Startup scene | `Assets/scenes/minimal.scene` |
+| Startup scene | `Assets/scenes/naval_gameplay.scene` |
 | Network mode | Multiplayer |
 | Player limits | 1 to 64 (configuration, not a tested capacity) |
 | Manifest tick rate | 50 |
@@ -39,7 +39,7 @@ Final combat checks also passed wall obstruction and facing-away rejection. Clos
 | Package references | Empty |
 | Generated C# target | .NET 10, C# 14, root namespace `Sandbox` |
 
-The original minimal scene contains a sun, skybox/environment probe, a plane, three physics cubes, and a camera with post-processing. It is preserved as the manifest startup scene.
+The original minimal scene contains a sun, skybox/environment probe, a plane, three physics cubes, and a camera with post-processing. It remains preserved as a reference scene. The manifest now starts `naval_gameplay.scene` so the normal Play action launches the integrated game instead of the three-box starter scene.
 
 The user chose arcade ship handling. A separate `Assets/scenes/naval_prototype.scene` now creates a local handling test:
 
@@ -143,22 +143,3 @@ The NPC retains waypoints between updates and replans when a target moves 450 un
 Scope: island avoidance covers the authored IslandSurface terrain, not arbitrary moving obstacles or ship-to-ship collision avoidance. Shoreline envelopes are deliberately conservative; narrow channels and targets too close to shore may be rejected. The NPC remains local-only and uses the existing physical station interactions.
 
 Navigation validation: S&box 26.10.02 compilation passed with zero errors/warnings. `naval_test_routes` passed direct travel, two-leg upwind routing, island detours, combined island/upwind routing, wind reversal, unsafe destination rejection, the shared no-go polar, and clearance/sailability of every planned leg. Live `naval_test_navigation false` passed Beacon Island avoidance and cannon engagement in 50 seconds; `naval_test_navigation true` passed an upwind tack change and cannon engagement in 52 seconds. Both sampled actual hull clearance throughout, with human input isolated and scene positions/wind restored afterward. `naval_test_sails` passed afterward; no runtime errors occurred in these successful runs. Arbitrary obstacle layouts, moving-ship avoidance, and multiplayer were not tested.
-
-## Moving decks and swimming (2026-10-03)
-
-Sailors now use `DeckWalkMode`, a walking mode that sets grounded movement relative to the supporting ship's velocity at the player's feet, including angular motion. It removes gravity and world-space damping while supported by a ship and follows the deck slope. Airborne players retain normal walking/jump physics; walking players remain unparented and collide with the ship normally.
-
-`OceanSwimMode` samples `ArcadeOcean.HeightAt`, floats the player at the moving water surface and uses swimming animation. WASD swims, Ctrl dives, releasing Ctrl resurfaces, and Space leaps from near the surface. Facing a nearby hull inherits its point velocity during the leap to help clear the rail and board. Humans no longer teleport automatically when submerged; R remains manual recovery. NPC overboard recovery remains enabled. The HUD displays swimming controls. This replaces the earlier no-swimming baseline above; sailing remains local-only.
-
-Validation: installed S&box 26.10.02 compiled without errors or warnings. Live `naval_test_swimming` passed six seconds of idle drift below 20 units on an accelerating, rolling ship, deck-relative walking, water entry, swimming displacement, wave buoyancy, leap cooldown and landing aboard from water. Physical keyboard/mouse feel and multiplayer were not tested.
-`naval_test_helm` also passed walking, occupied turning, moving-ship attachment, release, walking after release, swimming entry and manual recovery. Final compilation: zero errors/warnings.
-
-## Editable NPC ship (2026-10-03)
-
-`naval_prototype.scene` now saves a second root named **NPC ship**, including its hull, physics, helm, mast, four cannons, and **NPC captain spawn** anchor. Select its **Npc Ship Crew** component to configure Ship, Spawn Point, Target, Auto Acquire Target, Engagement Range (1000–6000), Island Clearance (350–3000), Cruising Deployment (0.2–0.75), Walk Speed (40–220), and Captain Tint. Move/rotate the ship in the editor to change its starting position. Disable the crew component for an uncrewed ship, or disable the entire object to omit it. Duplicate the ship to add another independent crew; internal station/spawn references are remapped by the editor.
-
-This supersedes `NavalPrototype.SpawnNpcShip` and `NpcShipOffset`, which were removed along with runtime ship cloning. `NpcShipCrew` creates only its walking captain outside the ship physics hierarchy and removes that actor on disable/destruction. Settings can be changed during play and are applied to the captain; edit-mode settings persist when the scene is saved. `NavalPrototype.CreateSailor` shares the current deck walking/swimming/player setup. The ship's ArcadeShip and station components remain directly editable. `naval_author_npc` is an idempotent editor conversion helper.
-
-Validation: game/editor compilation passed with zero errors/warnings; saved, closed and reopened the scene. Source inspection confirms two ships, eight cannons, two helms, two sail rigs, one ocean, one crew configuration, and no serialized runtime players. All original scene object/component GUIDs remain present. `naval_test_npc_crew` passed live parameter propagation, target-acquisition off, captain cleanup, station release and single-captain re-enable. The saved ship's captain was observed firing repeatedly in play.
-
-Final conversion check: naval_test_npc passed with all three station types used and firing continuing. Editor left outside Play mode with NPC ship selected.

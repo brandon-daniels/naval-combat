@@ -2,6 +2,75 @@
   "__guid": "558ec52e-064c-4da7-b855-3f294cae9556",
   "GameObjects": [
     {
+      "__guid": "af984610-54da-4018-a340-03281372510a",
+      "__version": 2,
+      "Name": "Beacon Island trade buoy",
+      "Enabled": true,
+      "Position": "1500,-1500,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "NetworkMode": 2,
+      "Components": [
+        {
+          "__type": "NavalCombat.VoyagePort",
+          "__guid": "bf984610-54da-4018-a340-03281372510a",
+          "__enabled": true,
+          "PortName": "Beacon Island",
+          "ProducesGoods": true,
+          "SalePrice": 18,
+          "Radius": 650,
+          "Goods": "definitions/goods/trade_goods.ngoods"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "af984610-54da-4018-a340-03281372510b",
+      "__version": 2,
+      "Name": "Twin Rocks trade buoy",
+      "Enabled": true,
+      "Position": "4700,2000,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "NetworkMode": 2,
+      "Components": [
+        {
+          "__type": "NavalCombat.VoyagePort",
+          "__guid": "bf984610-54da-4018-a340-03281372510b",
+          "__enabled": true,
+          "PortName": "Twin Rocks",
+          "ProducesGoods": false,
+          "SalePrice": 24,
+          "Radius": 650,
+          "Goods": "definitions/goods/trade_goods.ngoods"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "af984610-54da-4018-a340-03281372510c",
+      "__version": 2,
+      "Name": "Palm Island trade buoy",
+      "Enabled": true,
+      "Position": "8400,700,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "NetworkMode": 2,
+      "Components": [
+        {
+          "__type": "NavalCombat.VoyagePort",
+          "__guid": "bf984610-54da-4018-a340-03281372510c",
+          "__enabled": true,
+          "PortName": "Palm Island",
+          "ProducesGoods": false,
+          "SalePrice": 35,
+          "Radius": 650,
+          "Goods": "definitions/goods/trade_goods.ngoods"
+        }
+      ],
+      "Children": []
+    },
+    {
       "__guid": "c68734bc-9785-4a3c-847f-93f1908caac8",
       "__version": 2,
       "Flags": 0,
@@ -206,7 +275,7 @@
           "Flags": 0,
           "Ports": [],
           "GoodsCatalog": [
-            "definitions/goods/trade_goods.navalgoods"
+            "definitions/goods/trade_goods.ngoods"
           ],
           "StartingMoney": 500,
           "DefeatedCargoDropFraction": 0.75,
@@ -3244,9 +3313,9 @@
                   "__enabled": true,
                   "Flags": 0,
                   "AvailableUpgrades": [
-                    "definitions/upgrades/expanded_hold.navalupgrade",
-                    "definitions/upgrades/reinforced_hull.navalupgrade",
-                    "definitions/upgrades/improved_rigging.navalupgrade"
+                    "definitions/upgrades/expanded_hold.nupgrade",
+                    "definitions/upgrades/reinforced_hull.nupgrade",
+                    "definitions/upgrades/improved_rigging.nupgrade"
                   ],
                   "Revision": 0,
                   "OnComponentDestroy": null,
@@ -7861,40 +7930,6 @@
             "component_type": "SailRig"
           },
           "TurnRate": 55
-        },
-        {
-          "__type": "NavalCombat.NpcShipCrew",
-          "__guid": "11300374-4bf6-41f5-b5ed-b783e9199f7d",
-          "__enabled": true,
-          "Flags": 0,
-          "AutoAcquireTarget": true,
-          "CaptainTint": "0.85,0.25,0.18,1",
-          "CruisingDeployment": 0.65,
-          "EngagementRange": 1800,
-          "IslandClearance": 700,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "Ship": {
-            "_type": "component",
-            "component_id": "fba0c0a8-63db-4a34-9717-bf39bc496579",
-            "go": "494c4af7-bccd-400b-a95a-078b6b2e7872",
-            "component_type": "ArcadeShip"
-          },
-          "SpawnPoint": {
-            "_type": "gameobject",
-            "go": "0eb5e261-449c-497c-8fd3-13c824761139"
-          },
-          "Target": {
-            "_type": "component",
-            "component_id": "d19c679a-6561-4ddd-9ffe-21034bb5723b",
-            "go": "f148df84-e46a-4942-9469-92941d682f29",
-            "component_type": "ArcadeShip"
-          },
-          "WalkSpeed": 120
         }
       ],
       "Children": [

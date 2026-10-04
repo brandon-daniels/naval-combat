@@ -24,7 +24,7 @@ public sealed class ArcadeShip : Component
 	/// <summary>Only the occupied helm may submit controls; walking input never drives the ship.</summary>
 	public void SetHelmInput( ShipHelm source, float turn )
 	{
-		if ( source != Helm || !source.IsValid() || !source.IsOccupied ) return;
+		if ( source != Helm || !source.IsValid() || !source.Occupied ) return;
 		steering = Math.Clamp( turn, -1, 1 );
 	}
 
