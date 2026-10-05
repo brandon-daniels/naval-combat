@@ -18,8 +18,8 @@ public static class CannonSmokeTest
 			sailor.ReturnToDeck();
 			player.UseInputControls = false;
 			player.UseLookControls = false;
-			var cannons = sailor.Scene.GetAllComponents<ShipCannon>().Where( x => x.Ship == sailor.Ship ).ToArray();
-			Check( cannons.Length == 4, "Two cannons on each side exist" );
+			var cannons = sailor.Scene.GetAllComponents<ShipCannon>().Where( x => x.Ship == sailor.Ship && x.Enabled ).ToArray();
+			Check( cannons.Length == 2, "One cannon on each side exists" );
 			foreach ( var cannon in cannons )
 			{
 				Check( !cannon.Fire( player ), "Unoccupied cannon rejects firing" );

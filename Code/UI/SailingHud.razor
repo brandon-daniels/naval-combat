@@ -5,7 +5,9 @@
 <root>
 	<div class="mode">@(AtCannon ? "AT THE CANNON" : AtHelm ? "AT THE HELM" : AtMast ? "WORKING THE SAILS" : "ON DECK")</div>
 	<div class="hint">@(AtCannon ? "W / S - Elevation | A / D - Aim | LEFT CLICK - Fire | E - Release" : AtHelm ? "A / D - Steer | E - Release helm" : AtMast ? "A / D - Rotate sail | W - Raise | S - Lower | E - Release mast" : "WASD - Walk | MOUSE - Look | SPACE - Jump | SHIFT - Run | C - View")</div>
-	@if ( Ready ) { <div class="prompt">E - @(Player.AvailableStation is ShipCannon ? "Use cannon" : Player.AvailableStation is SailRig ? "Work the sails" : "Take the helm")</div> }
+	@if ( Player.CarriedBarrel.IsValid() ) { <div class="prompt">E - Drop barrel @(Player.WorldPosition.Distance( Player.Ship.WorldPosition ) <= 450 ? "and secure it aboard" : "")</div> }
+	else if ( Player.AvailableBarrel.IsValid() ) { <div class="prompt">E - Carry goods barrel</div> }
+	else if ( Ready ) { <div class="prompt">E - @(Player.AvailableStation is ShipCannon ? "Use cannon" : Player.AvailableStation is SailRig ? "Work the sails" : "Take the helm")</div> }
 	else if ( !AtHelm && !AtMast && !AtCannon ) { <div class="objective">Lower and align the sail at the mast, then steer at the bow wheel.</div> }
 	@if ( AtCannon ) { <div class="prompt">@CannonStatus</div> }
 	@if ( Rig.IsValid() && Rig.Wind.IsValid() ) {
@@ -30,8 +32,9 @@
 			{
 				<div class="route">@PortText( port )</div>
 			}
-			<div class="actions">1 - Invest 100 / Load ready goods (Beacon)</div>
-			<div>2 - Sell all cargo at nearest port</div>
+			<div class="actions">1 - Invest 100 at Beacon</div>
+			<div>E - Carry/drop the produced barrel aboard</div>
+			<div>2 - Deliver secured barrels at the nearest sell point</div>
 			<div>@UpgradeText( ShipUpgradeStat.CargoCapacity, 3 )</div>
 			<div>@UpgradeText( ShipUpgradeStat.HullHealth, 4 )</div>
 			<div>@UpgradeText( ShipUpgradeStat.SailingPerformance, 5 )</div>
@@ -44,7 +47,7 @@
 	[Property] public ShipPlayer Player { get; set; }
 	private PlayerVoyage Voyage => Player.IsValid() ? Player.GetComponent<PlayerVoyage>() : null;
 	private ShipHealth Hull => Player.Ship.GetComponent<ShipHealth>();
-	private string ProductionStatus => Voyage.Production.HasOutput ? "10 goods ready: return to Beacon to load" : Voyage.Production.IsProducing ? $"Production: {Voyage.Production.RemainingSeconds:0}s remaining" : "Invest at Beacon, then deliver to Palm Island";
+	private string ProductionStatus => Voyage.Production.IsProducing ? $"Production: {Voyage.Production.RemainingSeconds:0}s remaining" : Player.Scene.GetAllComponents<GoodsBarrel>().Any( x => x.OwnerId == Voyage.Identity && !x.SecuredShip.IsValid() ) ? "Goods ready at Beacon: carry the barrel aboard" : "Invest at Beacon, then deliver to Palm Island";
 	private string PortText( VoyagePort port )
 	{
 		var delta = port.WorldPosition - Player.Ship.WorldPosition;

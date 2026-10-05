@@ -21,7 +21,12 @@ public sealed class ProductionSite : Component
 	{
 		if ( GameplayAuthority.CanMutate && IsProducing && Time.Now >= CompletesAt )
 		{
-			HasOutput = true;
+			var port = Scene.GetAllComponents<VoyagePort>().FirstOrDefault( x => x.ProducesGoods );
+			var position = (port.IsValid() ? port.WorldPosition : WorldPosition) + Vector3.Up * 110;
+			GoodsBarrel.Spawn( this, position );
+			InvestorId = null;
+			CompletesAt = 0;
+			HasOutput = false;
 			Revision++;
 		}
 	}

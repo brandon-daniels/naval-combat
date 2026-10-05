@@ -36,14 +36,16 @@ public static class VoyageSmokeTest
 			await GameTask.DelaySeconds( 0.4f );
 			voyage.Production.ProductionSeconds = 0.5f;
 			Check( voyage.Execute( 1 ).Success && voyage.Wallet.Balance == 400, "Investment atomically debits 100" );
-			Check( !voyage.Production.Claim( voyage.Identity, voyage.Cargo ).Success, "Early claim rejected" );
 			await GameTask.DelaySeconds( 0.8f );
+			var barrel = sailor.Scene.GetAllComponents<GoodsBarrel>().Single( x => x.OwnerId == voyage.Identity );
+			Check( barrel.IsValid() && barrel.Quantity == 10 && voyage.Cargo.UsedCapacity == 0, "Completed production spawns one physical ten-good barrel" );
 			Check( voyage.Cargo.TryAdd( voyage.Production.OutputGoods, 20 ), "Full-hold fixture loaded" );
-			Check( !voyage.Execute( 1 ).Success && voyage.Production.HasOutput, "Full hold preserves claimable production" );
+			barrel.WorldPosition = sailor.WorldPosition + Vector3.Up * 20;
+			Check( barrel.TryPickup( sailor ) && barrel.DropOrSecure( sailor ) && !barrel.SecuredShip.IsValid(), "Full hold leaves the dropped barrel in the world" );
 			voyage.Cargo.TryRemove( voyage.Production.OutputGoods, 20 );
 			await GameTask.DelaySeconds( 0.3f );
-			Check( voyage.Execute( 1 ).Success && voyage.Cargo.UsedCapacity == 10, "Completed production loads ten goods" );
-			Check( !voyage.Production.Claim( voyage.Identity, voyage.Cargo ).Success && voyage.Cargo.UsedCapacity == 10, "Duplicate claim cannot mint goods" );
+			barrel.WorldPosition = sailor.WorldPosition + Vector3.Up * 20;
+			Check( barrel.TryPickup( sailor ) && barrel.DropOrSecure( sailor ) && barrel.SecuredShip == sailor.Ship && voyage.Cargo.UsedCapacity == 10, "Carrying and dropping aboard secures ten goods" );
 			Move( palm.WorldPosition );
 			await GameTask.DelaySeconds( 0.4f );
 			Check( voyage.Execute( 2 ).Success && voyage.Wallet.Balance == 750 && voyage.Cargo.UsedCapacity == 0, "Palm sale pays 350 and removes cargo" );
@@ -60,7 +62,8 @@ public static class VoyageSmokeTest
 			Check( voyage.Execute( 4 ).Success && voyage.Wallet.Balance == 0, "Hull upgrade costs 350" );
 			var hull = sailor.Ship.GetComponent<ShipHealth>();
 			Check( hull.MaximumHealth == 1150 && hull.Health == 1150, "Hull upgrade adds 150 maximum and current health" );
-			Log.Info( "VOYAGE TEST PASSED: invest, produce, load, sell and upgrade. Restart Play for a fresh wallet." );
+			Check( !barrel.IsValid(), "Delivery removes the sold physical barrel" );
+			Log.Info( "VOYAGE TEST PASSED: invest, spawn, carry, secure, deliver and upgrade. Restart Play for a fresh wallet." );
 		}
 		catch ( Exception e ) { Log.Error( $"VOYAGE TEST FAILED: {e.Message}" ); }
 		finally

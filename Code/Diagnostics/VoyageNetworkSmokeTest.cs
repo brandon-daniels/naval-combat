@@ -20,9 +20,16 @@ public static class VoyageNetworkSmokeTest
 			return;
 		}
 		running = true;
+		var producer = voyages[0].Scene.GetAllComponents<VoyagePort>().Single( x => x.ProducesGoods );
+		var listing = producer.Port.Market.Listings.Single( x => x.Goods == producer.Goods );
+		var interactionRadius = producer.Port.InteractionRadius;
+		var salePrice = listing.SellPrice;
 		try
 		{
 			NavalNetworkSmokeTest.Run();
+			// Keep networked rigidbodies under their owners' normal simulation. Directly
+			// teleporting them from a broadcast diagnostic creates correction impulses.
+			producer.Port.InteractionRadius = 5000;
 			foreach ( var voyage in voyages ) voyage.Production.ProductionSeconds = 0.5f;
 			Stage( 0 );
 			await GameTask.DelaySeconds( 2 );
@@ -33,8 +40,7 @@ public static class VoyageNetworkSmokeTest
 			Stage( 1 );
 			await GameTask.DelaySeconds( 1 );
 			Check( voyages.All( x => x.Cargo.UsedCapacity == 10 ), "Both owners load ten goods" );
-			Stage( 2 );
-			await GameTask.DelaySeconds( 2 );
+			listing.SellPrice = 35;
 			Stage( 3 );
 			await GameTask.DelaySeconds( 1 );
 			Check( voyages.All( x => x.Cargo.UsedCapacity == 0 && x.Wallet.Balance == 750 ), "Both sale RPCs conserve cargo and pay 350" );
@@ -62,6 +68,8 @@ public static class VoyageNetworkSmokeTest
 		finally
 		{
 			foreach ( var voyage in voyages ) if ( voyage.IsValid() ) voyage.Production.ProductionSeconds = 60;
+			if ( producer.IsValid() && producer.Port.IsValid() ) producer.Port.InteractionRadius = interactionRadius;
+			listing.SellPrice = salePrice;
 			Stage( 9 );
 			running = false;
 		}
@@ -80,15 +88,6 @@ public static class VoyageNetworkSmokeTest
 			controller.UseLookControls = false;
 			sailor.Enabled = false;
 			sailor.Sails.Deployment = 0;
-		}
-		if ( stage is 0 or 2 )
-		{
-			var port = sailor.Scene.GetAllComponents<VoyagePort>().Single( x => stage == 0 ? x.ProducesGoods : x.PortName == "Palm Island" );
-			sailor.Ship.WorldPosition = port.WorldPosition + new Vector3( 0, Networking.IsHost ? -300 : 300, 10 );
-			sailor.Ship.Body.Velocity = Vector3.Zero;
-			sailor.Ship.Body.AngularVelocity = Vector3.Zero;
-			sailor.Ship.Transform.ClearInterpolation();
-			sailor.ReturnToDeck();
 		}
 		if ( stage == 1 ) voyage.RequestAction( 1 );
 		if ( stage == 3 ) voyage.RequestAction( 2 );

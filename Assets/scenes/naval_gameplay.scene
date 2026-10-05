@@ -4,22 +4,38 @@
     {
       "__guid": "af984610-54da-4018-a340-03281372510a",
       "__version": 2,
+      "Flags": 0,
       "Name": "Beacon Island trade buoy",
-      "Enabled": true,
       "Position": "1500,-1500,0",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
       "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
       "Components": [
         {
           "__type": "NavalCombat.VoyagePort",
           "__guid": "bf984610-54da-4018-a340-03281372510a",
           "__enabled": true,
+          "Flags": 0,
+          "Goods": {
+            "Id": "409f6253-96b3-455c-9cea-d78edcfad6c8",
+            "Path": "definitions/goods/trade_goods.ngoods"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
           "PortName": "Beacon Island",
           "ProducesGoods": true,
-          "SalePrice": 18,
           "Radius": 650,
-          "Goods": "definitions/goods/trade_goods.ngoods"
+          "SalePrice": 18
         }
       ],
       "Children": []
@@ -27,22 +43,38 @@
     {
       "__guid": "af984610-54da-4018-a340-03281372510b",
       "__version": 2,
+      "Flags": 0,
       "Name": "Twin Rocks trade buoy",
-      "Enabled": true,
       "Position": "4700,2000,0",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
       "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
       "Components": [
         {
           "__type": "NavalCombat.VoyagePort",
           "__guid": "bf984610-54da-4018-a340-03281372510b",
           "__enabled": true,
+          "Flags": 0,
+          "Goods": {
+            "Id": "409f6253-96b3-455c-9cea-d78edcfad6c8",
+            "Path": "definitions/goods/trade_goods.ngoods"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
           "PortName": "Twin Rocks",
           "ProducesGoods": false,
-          "SalePrice": 24,
           "Radius": 650,
-          "Goods": "definitions/goods/trade_goods.ngoods"
+          "SalePrice": 24
         }
       ],
       "Children": []
@@ -50,22 +82,38 @@
     {
       "__guid": "af984610-54da-4018-a340-03281372510c",
       "__version": 2,
+      "Flags": 0,
       "Name": "Palm Island trade buoy",
-      "Enabled": true,
       "Position": "8400,700,0",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
       "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
       "Components": [
         {
           "__type": "NavalCombat.VoyagePort",
           "__guid": "bf984610-54da-4018-a340-03281372510c",
           "__enabled": true,
+          "Flags": 0,
+          "Goods": {
+            "Id": "409f6253-96b3-455c-9cea-d78edcfad6c8",
+            "Path": "definitions/goods/trade_goods.ngoods"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
           "PortName": "Palm Island",
           "ProducesGoods": false,
-          "SalePrice": 35,
           "Radius": 650,
-          "Goods": "definitions/goods/trade_goods.ngoods"
+          "SalePrice": 35
         }
       ],
       "Children": []
@@ -239,6 +287,7 @@
           "__guid": "d731e631-d477-4326-8957-5a79a160fada",
           "__enabled": false,
           "Flags": 0,
+          "NpcShipOffset": "-2400,1100,0",
           "Ocean": {
             "_type": "component",
             "component_id": "6881acf7-e5e0-4b99-81ff-0d7de4e29d7f",
@@ -257,6 +306,7 @@
             "go": "f148df84-e46a-4942-9469-92941d682f29",
             "component_type": "ArcadeShip"
           },
+          "SpawnNpcShip": true,
           "SpawnPoint": {
             "_type": "gameobject",
             "go": "df9df143-804a-4eea-9041-e136bf3b6007"
@@ -273,20 +323,23 @@
           "__guid": "2eb232cf-5663-4025-990a-55f334c4dcee",
           "__enabled": true,
           "Flags": 0,
-          "Ports": [],
-          "GoodsCatalog": [
-            "definitions/goods/trade_goods.ngoods"
-          ],
-          "StartingMoney": 500,
           "DefeatedCargoDropFraction": 0.75,
+          "GoodsCatalog": [
+            {
+              "Id": "409f6253-96b3-455c-9cea-d78edcfad6c8",
+              "Path": "definitions/goods/trade_goods.ngoods"
+            }
+          ],
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "SessionMinutes": 30,
+          "Ports": [],
           "RespawnCost": 0,
+          "SessionMinutes": 30,
+          "StartingMoney": 500,
           "UpgradesPersistBetweenSessions": false
         },
         {
@@ -295,27 +348,27 @@
           "__enabled": true,
           "Flags": 0,
           "MaximumPlayers": 8,
-          "SpawnSpacing": 900,
-          "ShipTemplate": {
-            "_type": "component",
-            "go": "f148df84-e46a-4942-9469-92941d682f29",
-            "component_id": "d19c679a-6561-4ddd-9ffe-21034bb5723b",
-            "component_type": "ArcadeShip"
-          },
-          "ShipSpawn": {
-            "go": "f148df84-e46a-4942-9469-92941d682f29",
-            "_type": "gameobject"
-          },
           "NpcShipTemplate": {
-            "go": "494c4af7-bccd-400b-a95a-078b6b2e7872",
-            "_type": "gameobject"
+            "_type": "gameobject",
+            "go": "494c4af7-bccd-400b-a95a-078b6b2e7872"
           },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
-          "OnComponentUpdate": null
+          "OnComponentUpdate": null,
+          "ShipSpawn": {
+            "_type": "gameobject",
+            "go": "f148df84-e46a-4942-9469-92941d682f29"
+          },
+          "ShipTemplate": {
+            "_type": "component",
+            "component_id": "d19c679a-6561-4ddd-9ffe-21034bb5723b",
+            "go": "f148df84-e46a-4942-9469-92941d682f29",
+            "component_type": "ArcadeShip"
+          },
+          "SpawnSpacing": 900
         }
       ],
       "Children": [
@@ -403,7 +456,7 @@
                   "OnComponentFixedUpdate": null,
                   "OnComponentStart": null,
                   "OnComponentUpdate": null,
-                  "Strength": 1
+                  "Strength": 11.2733345
                 }
               ],
               "Children": []
@@ -443,163 +496,11 @@
                   "Components": [],
                   "Children": [
                     {
-                      "__guid": "23935dcf-148c-4b49-97b4-3aa68e17db21",
-                      "__version": 2,
-                      "Flags": 0,
-                      "Name": "Submerged shore",
-                      "Position": "0,0,0",
-                      "Rotation": "0,0,0,1",
-                      "Scale": "1,1,1",
-                      "Tags": "",
-                      "Enabled": true,
-                      "NetworkMode": 2,
-                      "NetworkFlags": 0,
-                      "NetworkOrphaned": 0,
-                      "NetworkTransmit": true,
-                      "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "NavalCombat.IslandSurface",
-                          "__guid": "ee06d00d-ace5-45ff-bed2-4c9cff995222",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "InnerScale": 1,
-                          "LowerHeight": -180,
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "OuterScale": 1.15,
-                          "Phase": 0,
-                          "Radius": 720,
-                          "Tint": "0.55,0.43,0.27,1",
-                          "UpperHeight": 25
-                        }
-                      ],
-                      "Children": []
-                    },
-                    {
-                      "__guid": "e3ad4274-fe85-4aad-8789-0fdbdc406ab8",
-                      "__version": 2,
-                      "Flags": 0,
-                      "Name": "Sandy beach",
-                      "Position": "0,0,0",
-                      "Rotation": "0,0,0,1",
-                      "Scale": "1,1,1",
-                      "Tags": "",
-                      "Enabled": true,
-                      "NetworkMode": 2,
-                      "NetworkFlags": 0,
-                      "NetworkOrphaned": 0,
-                      "NetworkTransmit": true,
-                      "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "NavalCombat.IslandSurface",
-                          "__guid": "b5629c9c-c67c-45f8-a4d3-d3096e04831b",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "InnerScale": 0.78,
-                          "LowerHeight": 25,
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "OuterScale": 1,
-                          "Phase": 0,
-                          "Radius": 720,
-                          "Tint": "0.88,0.74,0.43,1",
-                          "UpperHeight": 150
-                        }
-                      ],
-                      "Children": []
-                    },
-                    {
-                      "__guid": "238e1a44-3b37-4542-b5a8-d36fb0a00884",
-                      "__version": 2,
-                      "Flags": 0,
-                      "Name": "Grassy slope",
-                      "Position": "0,0,0",
-                      "Rotation": "0,0,0,1",
-                      "Scale": "1,1,1",
-                      "Tags": "",
-                      "Enabled": true,
-                      "NetworkMode": 2,
-                      "NetworkFlags": 0,
-                      "NetworkOrphaned": 0,
-                      "NetworkTransmit": true,
-                      "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "NavalCombat.IslandSurface",
-                          "__guid": "18c10a45-8671-4057-babc-8155b8478caa",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "InnerScale": 0.45,
-                          "LowerHeight": 150,
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "OuterScale": 0.78,
-                          "Phase": 0,
-                          "Radius": 720,
-                          "Tint": "0.28,0.49,0.22,1",
-                          "UpperHeight": 275
-                        }
-                      ],
-                      "Children": []
-                    },
-                    {
-                      "__guid": "c24e7fff-7923-45ad-a7ac-58bdb2982821",
-                      "__version": 2,
-                      "Flags": 0,
-                      "Name": "Grassy summit",
-                      "Position": "0,0,0",
-                      "Rotation": "0,0,0,1",
-                      "Scale": "1,1,1",
-                      "Tags": "",
-                      "Enabled": true,
-                      "NetworkMode": 2,
-                      "NetworkFlags": 0,
-                      "NetworkOrphaned": 0,
-                      "NetworkTransmit": true,
-                      "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "NavalCombat.IslandSurface",
-                          "__guid": "26758217-2593-4964-b7d2-55e06229c0df",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "InnerScale": 0,
-                          "LowerHeight": 275,
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "OuterScale": 0.45,
-                          "Phase": 0,
-                          "Radius": 720,
-                          "Tint": "0.38,0.59,0.27,1",
-                          "UpperHeight": 300
-                        }
-                      ],
-                      "Children": []
-                    },
-                    {
                       "__guid": "9fb6e4eb-f8ed-4104-a048-10e28651f3f0",
                       "__version": 2,
                       "Flags": 0,
                       "Name": "Lighthouse",
-                      "Position": "0,0,440",
+                      "Position": "0,0,285.958649",
                       "Rotation": "0,0,0,1",
                       "Scale": "2.20000005,2.20000005,6",
                       "Tags": "",
@@ -671,7 +572,7 @@
                       "__version": 2,
                       "Flags": 0,
                       "Name": "Red beacon band",
-                      "Position": "0,0,500",
+                      "Position": "0,0,345.958649",
                       "Rotation": "0,0,0,1",
                       "Scale": "2.27999997,2.27999997,1.10000002",
                       "Tags": "",
@@ -743,7 +644,7 @@
                       "__version": 2,
                       "Flags": 0,
                       "Name": "Lantern",
-                      "Position": "0,0,625",
+                      "Position": "0,0,470.958649",
                       "Rotation": "0,0,0,1",
                       "Scale": "1.89999998,1.89999998,1.39999998",
                       "Tags": "",
@@ -815,7 +716,7 @@
                       "__version": 2,
                       "Flags": 0,
                       "Name": "Lantern roof",
-                      "Position": "0,0,675",
+                      "Position": "0,0,520.958618",
                       "Rotation": "0,0,0,1",
                       "Scale": "3.0999999,3.0999999,0.5",
                       "Tags": "",
@@ -878,6 +779,195 @@
                           "Static": false,
                           "Surface": null,
                           "SurfaceVelocity": "0,0,0"
+                        }
+                      ],
+                      "Children": []
+                    },
+                    {
+                      "__guid": "d9bd7f64-3a4b-48e5-b992-53af20439b07",
+                      "__version": 2,
+                      "Flags": 0,
+                      "Name": "dirt_island_large_01",
+                      "Position": "257.595947,8.15234375,-139.370789",
+                      "Rotation": "0,0,0,1",
+                      "Scale": "1,1,1.4866662",
+                      "Tags": "",
+                      "Enabled": true,
+                      "NetworkMode": 2,
+                      "NetworkFlags": 0,
+                      "NetworkOrphaned": 0,
+                      "NetworkTransmit": true,
+                      "OwnerTransfer": 1,
+                      "Components": [
+                        {
+                          "__type": "Sandbox.Prop",
+                          "__guid": "f10e03e0-ba5d-4565-93ae-589c8409a074",
+                          "__enabled": true,
+                          "Flags": 0,
+                          "BodyGroups": 18446744073709551615,
+                          "Health": 0,
+                          "IsStatic": false,
+                          "MaterialGroup": null,
+                          "Model": {
+                            "Id": "dcc72179-f0e3-4d55-a10a-7075d2b9b6c1",
+                            "Path": "lowpoly pirates/models/islands/dirt_island_large_01.vmdl"
+                          },
+                          "OnComponentDestroy": null,
+                          "OnComponentDisabled": null,
+                          "OnComponentEnabled": null,
+                          "OnComponentFixedUpdate": null,
+                          "OnComponentStart": null,
+                          "OnComponentUpdate": null,
+                          "OnGibsCreated": null,
+                          "OnPropBreak": null,
+                          "OnPropTakeDamage": null,
+                          "StartAsleep": false,
+                          "Tint": "1,1,1,1"
+                        },
+                        {
+                          "__type": "Sandbox.ModelRenderer",
+                          "__guid": "075d084d-f44f-4513-ae34-91a156dc330f",
+                          "__enabled": true,
+                          "Flags": 0,
+                          "BodyGroups": 18446744073709551615,
+                          "CreateAttachments": false,
+                          "LodOverride": null,
+                          "MaterialGroup": null,
+                          "MaterialOverride": {
+                            "Id": "f83b741f-3f09-4573-a9fc-61875a0e7d26",
+                            "Path": "lowpoly pirates/materials/pirate_palette.vmat"
+                          },
+                          "Materials": null,
+                          "Model": {
+                            "Id": "dcc72179-f0e3-4d55-a10a-7075d2b9b6c1",
+                            "Path": "lowpoly pirates/models/islands/dirt_island_large_01.vmdl"
+                          },
+                          "OnComponentDestroy": null,
+                          "OnComponentDisabled": null,
+                          "OnComponentEnabled": null,
+                          "OnComponentFixedUpdate": null,
+                          "OnComponentStart": null,
+                          "OnComponentUpdate": null,
+                          "RenderOptions": {
+                            "GameLayer": true,
+                            "OverlayLayer": false,
+                            "BloomLayer": false,
+                            "AfterUILayer": false
+                          },
+                          "RenderType": "On",
+                          "Tint": "1,1,1,1"
+                        },
+                        {
+                          "__type": "Sandbox.ModelCollider",
+                          "__guid": "fd3d6861-ce19-48ae-bb07-100f1453a0ce",
+                          "__enabled": true,
+                          "Flags": 0,
+                          "ColliderFlags": 0,
+                          "Elasticity": null,
+                          "Friction": null,
+                          "IsTrigger": false,
+                          "Model": {
+                            "Id": "dcc72179-f0e3-4d55-a10a-7075d2b9b6c1",
+                            "Path": "lowpoly pirates/models/islands/dirt_island_large_01.vmdl"
+                          },
+                          "OnComponentDestroy": null,
+                          "OnComponentDisabled": null,
+                          "OnComponentEnabled": null,
+                          "OnComponentFixedUpdate": null,
+                          "OnComponentStart": null,
+                          "OnComponentUpdate": null,
+                          "OnObjectTriggerEnter": null,
+                          "OnObjectTriggerExit": null,
+                          "OnTriggerEnter": null,
+                          "OnTriggerExit": null,
+                          "RollingResistance": null,
+                          "Static": false,
+                          "Surface": null,
+                          "SurfaceVelocity": "0,0,0"
+                        },
+                        {
+                          "__type": "Sandbox.Rigidbody",
+                          "__guid": "58691f5d-8190-4fa1-8696-bc66c303e92c",
+                          "__enabled": false,
+                          "Flags": 0,
+                          "AngularDamping": 0,
+                          "EnableImpactDamage": false,
+                          "EnhancedCcd": false,
+                          "Gravity": false,
+                          "GravityScale": 1,
+                          "ImpactDamage": 0,
+                          "LinearDamping": 0,
+                          "Locking": {
+                            "X": false,
+                            "Y": false,
+                            "Z": false,
+                            "Pitch": false,
+                            "Yaw": false,
+                            "Roll": false
+                          },
+                          "MassCenterOverride": "0,0,0",
+                          "MassOverride": 0,
+                          "MinImpactDamageSpeed": 500,
+                          "MotionEnabled": true,
+                          "OnComponentDestroy": null,
+                          "OnComponentDisabled": null,
+                          "OnComponentEnabled": null,
+                          "OnComponentFixedUpdate": null,
+                          "OnComponentStart": null,
+                          "OnComponentUpdate": null,
+                          "OverrideMassCenter": false,
+                          "RigidbodyFlags": 0,
+                          "SleepThreshold": 2,
+                          "StartAsleep": false
+                        }
+                      ],
+                      "Children": []
+                    },
+                    {
+                      "__guid": "e6b0e86c-5533-4d80-8ccb-19b5fb68f6d4",
+                      "__version": 2,
+                      "Flags": 0,
+                      "Name": "barrel",
+                      "Position": "-6886.06104,-2796.3208,255.404007",
+                      "Rotation": "-0.000286132097,-8.95857811E-05,0.960515141,-0.278227508",
+                      "Scale": "1,1,1",
+                      "Tags": "",
+                      "Enabled": true,
+                      "NetworkMode": 2,
+                      "NetworkFlags": 0,
+                      "NetworkOrphaned": 0,
+                      "NetworkTransmit": true,
+                      "OwnerTransfer": 1,
+                      "Components": [
+                        {
+                          "__type": "Sandbox.ModelRenderer",
+                          "__guid": "6f3d287f-55ce-4b44-ba4b-2931c71d1d86",
+                          "__enabled": true,
+                          "Flags": 0,
+                          "BodyGroups": 18446744073709551615,
+                          "CreateAttachments": false,
+                          "LodOverride": null,
+                          "MaterialGroup": null,
+                          "MaterialOverride": null,
+                          "Materials": null,
+                          "Model": {
+                            "Id": "4e3bb435-5f26-43f3-bbb8-3fc40d211930",
+                            "Path": "lowpoly pirates/models/barrel.vmdl"
+                          },
+                          "OnComponentDestroy": null,
+                          "OnComponentDisabled": null,
+                          "OnComponentEnabled": null,
+                          "OnComponentFixedUpdate": null,
+                          "OnComponentStart": null,
+                          "OnComponentUpdate": null,
+                          "RenderOptions": {
+                            "GameLayer": true,
+                            "OverlayLayer": false,
+                            "BloomLayer": false,
+                            "AfterUILayer": false
+                          },
+                          "RenderType": "On",
+                          "Tint": "1,1,1,1"
                         }
                       ],
                       "Children": []
@@ -3282,8 +3372,6 @@
                   "__enabled": true,
                   "Flags": 0,
                   "Capacity": 20,
-                  "UsedCapacity": 0,
-                  "Revision": 0,
                   "OnComponentDestroy": null,
                   "OnComponentDisabled": null,
                   "OnComponentEnabled": null,
@@ -3297,9 +3385,6 @@
                   "__enabled": true,
                   "Flags": 0,
                   "MaximumHealth": 1000,
-                  "Health": 0,
-                  "IsDefeated": false,
-                  "Revision": 0,
                   "OnComponentDestroy": null,
                   "OnComponentDisabled": null,
                   "OnComponentEnabled": null,
@@ -3313,11 +3398,19 @@
                   "__enabled": true,
                   "Flags": 0,
                   "AvailableUpgrades": [
-                    "definitions/upgrades/expanded_hold.nupgrade",
-                    "definitions/upgrades/reinforced_hull.nupgrade",
-                    "definitions/upgrades/improved_rigging.nupgrade"
+                    {
+                      "Id": "b4021035-9b43-49d0-bd8d-0658ae2cf9e1",
+                      "Path": "definitions/upgrades/expanded_hold.nupgrade"
+                    },
+                    {
+                      "Id": "0714f095-2801-495d-b6bf-c46e22316980",
+                      "Path": "definitions/upgrades/reinforced_hull.nupgrade"
+                    },
+                    {
+                      "Id": "21aaf1e4-7e00-4d4e-9248-c93e7bf3dd80",
+                      "Path": "definitions/upgrades/improved_rigging.nupgrade"
+                    }
                   ],
-                  "Revision": 0,
                   "OnComponentDestroy": null,
                   "OnComponentDisabled": null,
                   "OnComponentEnabled": null,
@@ -12432,6 +12525,55 @@
           "Children": []
         }
       ]
+    },
+    {
+      "__guid": "2649ee9d-3990-437a-a31b-440c36ce58b0",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "barrel",
+      "Position": "2893.91553,-1527.19202,134.464722",
+      "Rotation": "-0.000437438488,-0.000133186579,0.960519016,-0.278213799",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "123584e5-fe0d-40c5-856a-95df192cf2a6",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "4e3bb435-5f26-43f3-bbb8-3fc40d211930",
+            "Path": "lowpoly pirates/models/barrel.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {
@@ -12460,7 +12602,7 @@
     "GameObjectSystems": {
       "Sandbox.Clutter.ClutterGridSystem": {
         "Storage": {
-          "$blob": "7a4710d9-e3da-4743-b1a6-15e56053431c",
+          "$blob": "64db792e-5935-8fbc-8cfa-050cd49fa7fd",
           "$refs": []
         }
       },

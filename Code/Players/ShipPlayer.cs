@@ -9,6 +9,10 @@ public sealed class ShipPlayer : Component
 	[Property] public ArcadeShip Ship { get; set; }
 	[Property] public GameObject SpawnPoint { get; set; }
 	[Property] public bool IsNpc { get; set; }
+	[Property, Group( "Camera" )] public Vector3 OnFootCameraOffset { get; set; } = new( 280, 24, 90 );
+	[Property, Group( "Camera" )] public Vector3 StationCameraOffset { get; set; } = new( 420, 24, 150 );
+	[Property, Group( "Camera" )] public Vector3 HelmCameraOffset { get; set; } = new( 560, 24, 280 );
+	[Sync( SyncFlags.FromHost )] public GoodsBarrel CarriedBarrel { get; private set; }
 	public bool IsAtHelm => Helm.IsValid() && Helm.Occupant == Controller;
 	public bool CanUseHelm => Controller.IsValid() && Helm.IsValid() && Helm.CanEnter( Controller );
 	public bool IsAtMast => Sails.IsValid() && Sails.Occupant == Controller;
@@ -18,6 +22,10 @@ public sealed class ShipPlayer : Component
 		.Where( x => x.Ship == Ship && x.CanEnter( Controller ) )
 		.OrderBy( x => (WorldPosition - x.SeatPosition.WorldPosition).Length ).FirstOrDefault();
 	private bool inheritVelocity;
+	public GoodsBarrel AvailableBarrel => CurrentStation.IsValid() || CarriedBarrel.IsValid() ? null : Scene.GetAllComponents<GoodsBarrel>()
+		.Where( x => x.CanPickup( this ) ).OrderBy( x => x.WorldPosition.Distance( WorldPosition ) ).FirstOrDefault();
+	public bool IdentityMatches( string identity ) => GetComponent<PlayerVoyage>() is { } voyage && voyage.Identity == identity;
+	internal void SetCarriedBarrel( GoodsBarrel barrel ) => CarriedBarrel = barrel;
 
 	public void InheritDeckVelocity() => inheritVelocity = true;
 
@@ -29,13 +37,36 @@ public sealed class ShipPlayer : Component
 
 	public void ToggleStation()
 	{
-		if ( CurrentStation.IsValid() ) CurrentStation.Release( Controller );
+		if ( CarriedBarrel.IsValid() ) RequestBarrelInteraction( CarriedBarrel );
+		else if ( AvailableBarrel is { } barrel ) RequestBarrelInteraction( barrel );
+		else if ( CurrentStation.IsValid() ) CurrentStation.Release( Controller );
 		else AvailableStation?.TryTake( Controller );
+	}
+
+	private void RequestBarrelInteraction( GoodsBarrel barrel )
+	{
+		if ( Networking.IsActive ) RequestBarrelFromOwner( barrel );
+		else InteractWithBarrel( barrel );
+	}
+
+	[Rpc.Host]
+	private void RequestBarrelFromOwner( GoodsBarrel barrel )
+	{
+		if ( Rpc.Caller != Network.Owner || Ship.Network.Owner != Rpc.Caller ) return;
+		InteractWithBarrel( barrel );
+	}
+
+	private void InteractWithBarrel( GoodsBarrel barrel )
+	{
+		if ( !barrel.IsValid() ) return;
+		if ( CarriedBarrel == barrel ) barrel.DropOrSecure( this );
+		else barrel.TryPickup( this );
 	}
 
 	protected override void OnUpdate()
 	{
 		if ( IsNpc || IsProxy || !Controller.IsValid() ) return;
+		Controller.CameraOffset = IsAtHelm ? HelmCameraOffset : CurrentStation.IsValid() ? StationCameraOffset : OnFootCameraOffset;
 		if ( Input.Pressed( "Use" ) ) ToggleStation();
 		if ( Input.Pressed( "Reload" ) ) ReturnToDeck();
 

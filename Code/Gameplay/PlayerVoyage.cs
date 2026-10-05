@@ -8,7 +8,7 @@ public sealed class PlayerVoyage : Component
 	[Property] public ShipPlayer Sailor { get; set; }
 	[Property] public PlayerWallet Wallet { get; set; }
 	[Property] public ProductionSite Production { get; set; }
-	[Property] public string PlayerId { get; set; }
+	[Property, Sync( SyncFlags.FromHost )] public string PlayerId { get; set; }
 	[Sync( SyncFlags.FromHost )] public string Feedback { get; private set; } = "Sail to the gold buoy at Beacon Island.";
 	public CargoHold Cargo => Sailor.Ship.GetComponent<CargoHold>();
 	public ShipUpgradeManager Upgrades => Sailor.Ship.GetComponent<ShipUpgradeManager>();
@@ -52,13 +52,16 @@ public sealed class PlayerVoyage : Component
 		TransactionResult result;
 		if ( action == 1 && port.ProducesGoods )
 		{
-			result = Production.HasOutput ? Production.Claim( Identity, Cargo ) : Production.Invest( Identity, Wallet );
-			Feedback = result.Success ? (Production.HasOutput || Production.IsProducing ? "Production started. Return in 60 seconds to load." : "Loaded 10 Trade Goods. Sell at Palm Island for 350.") : Explain( result.Failure );
+			result = Production.Invest( Identity, Wallet );
+			Feedback = result.Success ? "Production started. Return in 60 seconds to collect the barrel." : Explain( result.Failure );
 		}
 		else if ( action == 2 )
 		{
-			result = port.Port.Sell( Sailor.Ship.GameObject, Wallet, Cargo, Production.OutputGoods, Cargo.GetQuantity( Production.OutputGoods ) );
-			Feedback = result.Success ? $"Sold {result.Amount} goods for {result.TotalPrice}." : Explain( result.Failure );
+			var barrels = Scene.GetAllComponents<GoodsBarrel>().Where( x => x.SecuredShip == Sailor.Ship && x.Goods == Production.OutputGoods ).ToArray();
+			var quantity = barrels.Sum( x => x.Quantity );
+			result = port.Port.Sell( Sailor.Ship.GameObject, Wallet, Cargo, Production.OutputGoods, quantity );
+			if ( result.Success ) foreach ( var barrel in barrels ) barrel.RemoveAfterSale();
+			Feedback = result.Success ? $"Delivered {result.Amount} goods for {result.TotalPrice}." : Explain( result.Failure );
 		}
 		else if ( action >= 3 && action <= 5 )
 		{

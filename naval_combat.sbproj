@@ -5,7 +5,7 @@
   "Ident": "naval_combat",
   "Schema": 1,
   "IncludeSourceFiles": false,
-  "Resources": "definitions/**",
+  "Resources": "/definitions/goods/*.ngoods_c\n/definitions/upgrades/*.nupgrade_c",
   "PackageReferences": [],
   "EditorReferences": null,
   "Mounts": null,
