@@ -17,13 +17,6 @@ public sealed class VoyagePort : Component
 		Port.InteractionRadius = Radius;
 		Port.Market = GameObject.AddComponent<IslandMarket>();
 		Port.Market.Listings.Add( new MarketListing { Goods = Goods, SellPrice = SalePrice, BuyPrice = 0 } );
-		var buoy = new GameObject( GameObject, true, "Trade buoy" );
-		buoy.NetworkMode = NetworkMode.Never;
-		buoy.LocalPosition = Vector3.Up * 70;
-		buoy.LocalScale = new Vector3( 1.5f, 1.5f, 4 );
-		var model = buoy.AddComponent<ModelRenderer>();
-		model.Model = Model.Load( "models/dev/box.vmdl" );
-		model.Tint = ProducesGoods ? new Color( 1, 0.7f, 0.2f ) : new Color( 0.2f, 0.9f, 0.65f );
 	}
 
 	public bool CanTrade( ShipPlayer sailor ) => sailor.IsValid() && sailor.Ship.IsValid()

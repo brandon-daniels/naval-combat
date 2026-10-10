@@ -5,6 +5,8 @@ namespace NavalCombat;
 /// <summary>Rotating square sail and local rigging station; lowered cloth catches wind.</summary>
 public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 {
+	private const string AuthoredSailModel = "models/reference_ship/reference_ship_sails.vmdl";
+	private const float AuthoredSailTop = 9.1f;
 	[Property] public SailingWind Wind { get; set; }
 	[Property] public GameObject Yard { get; set; }
 	[Property] public GameObject WindArrow { get; set; }
@@ -36,6 +38,8 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 	private Vertex[] vertices;
 	private Mesh mesh;
 	private GameObject cloth;
+	private GameObject authoredSail;
+	private float RigScale => Ship.IsValid() ? Math.Max( 1, Ship.ShipModelScale ) / 24.4f : 1;
 
 	public void Adjust( PlayerController source, float rotation, float lower, float delta )
 	{
@@ -53,6 +57,13 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 
 	private void BuildCloth()
 	{
+		if ( EnsureAuthoredSail() )
+		{
+			if ( cloth.IsValid() ) cloth.Destroy();
+			mesh = null;
+			UpdateAuthoredSail();
+			return;
+		}
 		if ( !Yard.IsValid() ) return;
 		if ( cloth.IsValid() ) cloth.Destroy();
 		cloth = new GameObject( Yard, true, "Sail canvas" );
@@ -86,12 +97,54 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 
 	protected override void OnUpdate()
 	{
-		if ( Yard.IsValid() ) Yard.LocalRotation = Rotation.FromYaw( SailAngle );
+		if ( EnsureAuthoredSail() )
+		{
+			UpdateAuthoredSail();
+			return;
+		}
+		if ( Yard.IsValid() )
+		{
+			Yard.LocalRotation = Rotation.FromYaw( SailAngle );
+			Yard.LocalScale = Vector3.One * RigScale;
+		}
 		if ( WindArrow.IsValid() && Wind.IsValid() ) WindArrow.WorldRotation = Rotation.LookAt( Wind.Direction );
 		if ( LowerBoom.IsValid() ) LowerBoom.LocalPosition = new Vector3( 0, 0, 230 - (8 + Deployment * 135) );
 		if ( mesh is null ) return;
 		UpdateCloth();
 		mesh.SetVertexBufferData<Vertex>( vertices );
+	}
+
+	private bool EnsureAuthoredSail()
+	{
+		if ( authoredSail.IsValid() ) return true;
+		if ( !Ship.IsValid() || !Ship.WalkableModelObject.IsValid() ) return false;
+		var model = Model.Load( AuthoredSailModel );
+		if ( model is null ) return false;
+		authoredSail = Ship.WalkableModelObject.GetAllObjects( true )
+			.FirstOrDefault( child => child.Name == "Reference ship dynamic sail" );
+		if ( !authoredSail.IsValid() )
+		{
+			authoredSail = new GameObject( Ship.WalkableModelObject, true, "Reference ship dynamic sail" );
+			authoredSail.NetworkMode = NetworkMode.Never;
+			authoredSail.Flags |= GameObjectFlags.NotSaved;
+			var renderer = authoredSail.AddComponent<ModelRenderer>();
+			renderer.Flags |= ComponentFlags.NotSaved | ComponentFlags.NotNetworked;
+			renderer.Model = model;
+		}
+		return true;
+	}
+
+	private void UpdateAuthoredSail()
+	{
+		if ( !authoredSail.IsValid() ) return;
+		authoredSail.Enabled = Deployment > 0.02f;
+		if ( !authoredSail.Enabled ) return;
+		float deployedScale = Math.Clamp( Deployment, 0.04f, 1.0f );
+		var rotation = Rotation.FromYaw( SailAngle );
+		var mast = new Vector3( 0, 1.65f, 0 );
+		authoredSail.LocalPosition = mast - rotation * mast + new Vector3( 0, 0, AuthoredSailTop * (1 - deployedScale) );
+		authoredSail.LocalRotation = Rotation.FromYaw( SailAngle );
+		authoredSail.LocalScale = new Vector3( 1, 1, deployedScale );
 	}
 
 	private void UpdateCloth()
@@ -116,6 +169,7 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 	protected override void OnDestroy()
 	{
 		if ( cloth.IsValid() ) cloth.Destroy();
+		if ( authoredSail.IsValid() ) authoredSail.Destroy();
 		mesh = null;
 	}
 }

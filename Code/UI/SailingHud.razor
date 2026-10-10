@@ -3,13 +3,20 @@
 @namespace NavalCombat
 @inherits PanelComponent
 <root>
+	@if ( !PlayerReady )
+	{
+		<div class="mode">Joining voyage...</div>
+	}
+	else
+	{
 	<div class="mode">@(AtCannon ? "AT THE CANNON" : AtHelm ? "AT THE HELM" : AtMast ? "WORKING THE SAILS" : "ON DECK")</div>
-	<div class="hint">@(AtCannon ? "W / S - Elevation | A / D - Aim | LEFT CLICK - Fire | E - Release" : AtHelm ? "A / D - Steer | E - Release helm" : AtMast ? "A / D - Rotate sail | W - Raise | S - Lower | E - Release mast" : "WASD - Walk | MOUSE - Look | SPACE - Jump | SHIFT - Run | C - View")</div>
+	<div class="hint">@(AtCannon ? "W / S - Elevation | A / D - Aim | LEFT CLICK - Fire | E - Release" : AtHelm ? "A / D - Turn wheel (it holds position) | E - Release helm" : AtMast ? "A / D - Rotate sail | W - Raise | S - Lower | E - Release mast" : "WASD - Walk | MOUSE - Look | SPACE - Jump | SHIFT - Run | C - View")</div>
 	@if ( Player.CarriedBarrel.IsValid() ) { <div class="prompt">E - Drop barrel @(Player.WorldPosition.Distance( Player.Ship.WorldPosition ) <= 450 ? "and secure it aboard" : "")</div> }
 	else if ( Player.AvailableBarrel.IsValid() ) { <div class="prompt">E - Carry goods barrel</div> }
 	else if ( Ready ) { <div class="prompt">E - @(Player.AvailableStation is ShipCannon ? "Use cannon" : Player.AvailableStation is SailRig ? "Work the sails" : "Take the helm")</div> }
 	else if ( !AtHelm && !AtMast && !AtCannon ) { <div class="objective">Lower and align the sail at the mast, then steer at the bow wheel.</div> }
 	@if ( AtCannon ) { <div class="prompt">@CannonStatus</div> }
+	@if ( AtHelm ) { <div class="prompt">@RudderStatus</div> }
 	@if ( Rig.IsValid() && Rig.Wind.IsValid() ) {
 		<div class="wind">
 			<div class="wind-title">WIND BLOWS TOWARD</div>
@@ -20,7 +27,7 @@
 		</div>
 	}
 	<div class="recovery">R - Return to deck</div>
-	@if ( Voyage.IsValid() )
+	@if ( VoyageReady )
 	{
 		<div class="voyage">
 			<div class="voyage-title">THE FIRST VOYAGE</div>
@@ -42,10 +49,14 @@
 			<div class="route">Trade near a buoy with sail raised and speed below 100.</div>
 		</div>
 	}
+	}
 </root>
 @code {
 	[Property] public ShipPlayer Player { get; set; }
+	private bool PlayerReady => Player.IsValid() && Player.Ship.IsValid() && Player.Controller.IsValid() && Player.Ship.Body.IsValid();
 	private PlayerVoyage Voyage => Player.IsValid() ? Player.GetComponent<PlayerVoyage>() : null;
+	private bool VoyageReady => PlayerReady && Voyage.IsValid() && Voyage.Sailor.IsValid() && Voyage.Sailor.Ship.IsValid()
+		&& Voyage.Wallet.IsValid() && Voyage.Production.IsValid() && Voyage.Cargo.IsValid() && Voyage.Upgrades.IsValid() && Hull.IsValid();
 	private ShipHealth Hull => Player.Ship.GetComponent<ShipHealth>();
 	private string ProductionStatus => Voyage.Production.IsProducing ? $"Production: {Voyage.Production.RemainingSeconds:0}s remaining" : Player.Scene.GetAllComponents<GoodsBarrel>().Any( x => x.OwnerId == Voyage.Identity && !x.SecuredShip.IsValid() ) ? "Goods ready at Beacon: carry the barrel aboard" : "Invest at Beacon, then deliver to Palm Island";
 	private string PortText( VoyagePort port )
@@ -65,6 +76,7 @@
 	private SailRig Rig => Player.IsValid() ? Player.Sails : null;
 	private bool AtCannon => Player.IsValid() && Player.ActiveCannon.IsValid();
 	private string CannonStatus => AtCannon ? $"{(Player.ActiveCannon.ReloadRemaining > 0 ? "RELOADING" : "READY")} | Elevation {Player.ActiveCannon.Elevation:0} | Aim {Player.ActiveCannon.Yaw:0}" : "";
+	private string RudderStatus => $"Rudder {System.MathF.Abs( Player.Ship.Rudder ) * 100:0}% {(Player.Ship.Rudder > 0.02f ? "PORT" : Player.Ship.Rudder < -0.02f ? "STARBOARD" : "CENTERED")}";
 	private bool AtHelm => Player.IsValid() && Player.IsAtHelm;
 	private bool AtMast => Player.IsValid() && Player.IsAtMast;
 	private bool Ready => Player.IsValid() && Player.AvailableStation.IsValid();
@@ -72,7 +84,7 @@
 	private int Catch => Rig.IsValid() ? (int)(Rig.Alignment * 100) : 0;
 	private int Power => Rig.IsValid() ? (int)(Rig.DriveFraction * 100) : 0;
 	private int Trim => Rig.IsValid() ? (int)Rig.SailAngle : 0;
-	private int WindAngle => Rig.IsValid() && Rig.Wind.IsValid() ? (int)(Rig.Wind.Heading - Rig.Ship.WorldRotation.Angles().yaw) : 0;
+	private int WindAngle => Rig.IsValid() && Rig.Wind.IsValid() && Rig.Ship.IsValid() ? (int)(Rig.Wind.Heading - Rig.Ship.WorldRotation.Angles().yaw) : 0;
 	private string ArrowStyle => $"transform: rotate({-WindAngle}deg);";
-	protected override int BuildHash() => System.HashCode.Combine( System.HashCode.Combine( AtHelm, AtMast, AtCannon, CannonStatus ), Ready, Deployment, Catch, Power, Trim, WindAngle, (int)(Time.Now * 5) );
+	protected override int BuildHash() => !PlayerReady ? 0 : System.HashCode.Combine( System.HashCode.Combine( AtHelm, AtMast, AtCannon, CannonStatus, RudderStatus ), Ready, Deployment, Catch, Power, Trim, WindAngle, (int)(Time.Now * 5) );
 }

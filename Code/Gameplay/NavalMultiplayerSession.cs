@@ -25,6 +25,7 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 	{
 		public GameObject Ship { get; init; }
 		public GameObject Player { get; init; }
+		public string VoyageIdentity { get; init; }
 	}
 
 	protected override void OnStart()
@@ -85,32 +86,58 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 			{
 				preview.Ship.GameObject.NetworkSpawn( connection );
 				preview.GameObject.NetworkSpawn( connection );
-				slots[connection.Id] = new PlayerSlot { Ship = preview.Ship.GameObject, Player = preview.GameObject };
+				slots[connection.Id] = CreateSlot( preview );
 				localPreviewSpawned = false;
 				return;
 			}
 		}
 
 		if ( slots.ContainsKey( connection.Id ) ) return;
-		if ( Scene.GetAllComponents<ShipPlayer>().Any( x => !x.IsNpc && x.Network.Owner == connection ) ) return;
+		var existing = Scene.GetAllComponents<ShipPlayer>().FirstOrDefault( x => !x.IsNpc && x.Network.Owner == connection );
+		if ( existing.IsValid() )
+		{
+			slots[connection.Id] = CreateSlot( existing );
+			return;
+		}
 		SpawnPlayer( connection );
 	}
 
 	public void OnDisconnected( Connection connection )
 	{
+		if ( !GameplayAuthority.CanMutate ) return;
 		if ( slots.Remove( connection.Id, out var slot ) )
 		{
+			RemoveVoyageCargo( slot.VoyageIdentity );
 			if ( slot.Player.IsValid() ) slot.Player.Destroy();
 			if ( slot.Ship.IsValid() ) slot.Ship.Destroy();
 		}
 
 		foreach ( var player in Scene.GetAllComponents<ShipPlayer>().Where( x => !x.IsNpc && x.Network.Owner == connection ).ToArray() )
 		{
+			RemoveVoyageCargo( player.GetComponent<PlayerVoyage>()?.Identity );
 			var ship = player.Ship;
 			player.GameObject.Destroy();
 			if ( ship.IsValid() ) ship.GameObject.Destroy();
 		}
 	}
+
+	/// <summary>Disconnect resets a voyage, including its independently networked barrels.</summary>
+	internal void RemoveVoyageCargo( string identity )
+	{
+		if ( !GameplayAuthority.CanMutate || string.IsNullOrWhiteSpace( identity ) ) return;
+		foreach ( var barrel in Scene.GetAllComponents<GoodsBarrel>().Where( x => x.OwnerId == identity ).ToArray() )
+		{
+			barrel.GameObject.Destroy();
+		}
+	}
+
+	private static PlayerSlot CreateSlot( ShipPlayer player ) => new()
+	{
+		Ship = player.Ship?.GameObject,
+		Player = player.GameObject,
+		// Keep this even if the engine destroys the owned sailor before the disconnect callback.
+		VoyageIdentity = player.GetComponent<PlayerVoyage>()?.Identity
+	};
 
 	public void OnBecameHost( Connection previousHost )
 	{
@@ -154,7 +181,7 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 			sailor.GameObject.NetworkSpawn( owner );
 		}
 
-		if ( owner is not null ) slots[owner.Id] = new PlayerSlot { Ship = shipObject, Player = sailor.GameObject };
+		if ( owner is not null ) slots[owner.Id] = CreateSlot( sailor );
 	}
 
 	private void RebuildSlots()
@@ -163,7 +190,7 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 		foreach ( var player in Scene.GetAllComponents<ShipPlayer>().Where( x => !x.IsNpc && x.Network.Owner is not null ) )
 		{
 			var owner = player.Network.Owner;
-			slots[owner.Id] = new PlayerSlot { Ship = player.Ship?.GameObject, Player = player.GameObject };
+			slots[owner.Id] = CreateSlot( player );
 		}
 	}
 

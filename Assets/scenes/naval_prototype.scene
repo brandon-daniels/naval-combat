@@ -3057,32 +3057,6 @@
               "OwnerTransfer": 1,
               "Components": [
                 {
-                  "__type": "Sandbox.BoxCollider",
-                  "__guid": "f73dbbb1-179a-4121-9c17-15f0d8ea01e7",
-                  "__enabled": true,
-                  "Flags": 0,
-                  "Center": "0,0,0",
-                  "ColliderFlags": 0,
-                  "Elasticity": null,
-                  "Friction": null,
-                  "IsTrigger": false,
-                  "OnComponentDestroy": null,
-                  "OnComponentDisabled": null,
-                  "OnComponentEnabled": null,
-                  "OnComponentFixedUpdate": null,
-                  "OnComponentStart": null,
-                  "OnComponentUpdate": null,
-                  "OnObjectTriggerEnter": null,
-                  "OnObjectTriggerExit": null,
-                  "OnTriggerEnter": null,
-                  "OnTriggerExit": null,
-                  "RollingResistance": null,
-                  "Scale": "520,240,52",
-                  "Static": false,
-                  "Surface": null,
-                  "SurfaceVelocity": "0,0,0"
-                },
-                {
                   "__type": "Sandbox.Rigidbody",
                   "__guid": "a6b7e837-a168-4f10-84f4-9f533e5c2eb1",
                   "__enabled": true,
@@ -3161,13 +3135,13 @@
               ],
               "Children": [
                 {
-                  "__guid": "3e7e48d1-0062-4662-8fc5-edd266a11d15",
+                  "__guid": "6c3b4882-ad67-410d-bba0-b6f6b6d9e7fb",
                   "__version": 2,
                   "Flags": 0,
-                  "Name": "Hull",
-                  "Position": "0,0,0",
-                  "Rotation": "0,0,0,1",
-                  "Scale": "10.3999996,4.80000019,1.03999996",
+                  "Name": "Reference ship visual",
+                  "Position": "0,0,-90",
+                  "Rotation": "0,0,-0.707106769,0.707106769",
+                  "Scale": "48.7999992,48.7999992,48.7999992",
                   "Tags": "",
                   "Enabled": true,
                   "NetworkMode": 2,
@@ -3178,7 +3152,7 @@
                   "Components": [
                     {
                       "__type": "Sandbox.ModelRenderer",
-                      "__guid": "8c5dd173-bed3-4a88-a8ac-fc2ca5333d56",
+                      "__guid": "2857e533-4879-4fb1-8bde-e034dbd0bcdf",
                       "__enabled": true,
                       "Flags": 0,
                       "BodyGroups": 18446744073709551615,
@@ -3187,7 +3161,7 @@
                       "MaterialGroup": null,
                       "MaterialOverride": null,
                       "Materials": null,
-                      "Model": "models/dev/box.vmdl",
+                      "Model": "models/reference_ship/reference_ship.vmdl",
                       "OnComponentDestroy": null,
                       "OnComponentDisabled": null,
                       "OnComponentEnabled": null,
@@ -3201,439 +3175,16 @@
                         "AfterUILayer": false
                       },
                       "RenderType": "On",
-                      "Tint": "0.22,0.11,0.055,1"
-                    }
-                  ],
-                  "Children": []
-                },
-                {
-                  "__guid": "54b64bf7-2fb3-40ee-a55d-6f9d1804f161",
-                  "__version": 2,
-                  "Flags": 0,
-                  "Name": "Deck",
-                  "Position": "0,0,30",
-                  "Rotation": "0,0,0,1",
-                  "Scale": "10.1999998,4.67999983,0.200000003",
-                  "Tags": "",
-                  "Enabled": true,
-                  "NetworkMode": 2,
-                  "NetworkFlags": 0,
-                  "NetworkOrphaned": 0,
-                  "NetworkTransmit": true,
-                  "OwnerTransfer": 1,
-                  "Components": [
-                    {
-                      "__type": "Sandbox.ModelRenderer",
-                      "__guid": "63bbd3d1-d12c-41aa-b0fb-036d248f6d8e",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "BodyGroups": 18446744073709551615,
-                      "CreateAttachments": false,
-                      "LodOverride": null,
-                      "MaterialGroup": null,
-                      "MaterialOverride": null,
-                      "Materials": null,
-                      "Model": "models/dev/box.vmdl",
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "RenderOptions": {
-                        "GameLayer": true,
-                        "OverlayLayer": false,
-                        "BloomLayer": false,
-                        "AfterUILayer": false
-                      },
-                      "RenderType": "On",
-                      "Tint": "0.65,0.4,0.19,1"
+                      "Tint": "1,1,1,1"
                     },
                     {
-                      "__type": "Sandbox.BoxCollider",
-                      "__guid": "f73f13ad-9f47-433c-837c-32d7766a8549",
+                      "__type": "Sandbox.ModelCollider",
+                      "__guid": "b8ef7cba-d0ad-412a-a4e4-6893b5046178",
                       "__enabled": true,
                       "Flags": 0,
-                      "Center": "0,0,0",
-                      "ColliderFlags": 0,
-                      "Elasticity": null,
-                      "Friction": null,
-                      "IsTrigger": false,
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "OnObjectTriggerEnter": null,
-                      "OnObjectTriggerExit": null,
-                      "OnTriggerEnter": null,
-                      "OnTriggerExit": null,
-                      "RollingResistance": null,
-                      "Scale": "50,50,50",
+                      "Model": "models/reference_ship/reference_ship.vmdl",
                       "Static": false,
-                      "Surface": null,
-                      "SurfaceVelocity": "0,0,0"
-                    }
-                  ],
-                  "Children": []
-                },
-                {
-                  "__guid": "09e637d6-914f-4a7c-ab78-884092a436a0",
-                  "__version": 2,
-                  "Flags": 0,
-                  "Name": "Cabin",
-                  "Position": "-190,0,70",
-                  "Rotation": "0,0,0,1",
-                  "Scale": "1.79999995,2,1.39999998",
-                  "Tags": "",
-                  "Enabled": true,
-                  "NetworkMode": 2,
-                  "NetworkFlags": 0,
-                  "NetworkOrphaned": 0,
-                  "NetworkTransmit": true,
-                  "OwnerTransfer": 1,
-                  "Components": [
-                    {
-                      "__type": "Sandbox.ModelRenderer",
-                      "__guid": "6b81fd0e-3920-49e2-83cb-20ce5deb72d0",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "BodyGroups": 18446744073709551615,
-                      "CreateAttachments": false,
-                      "LodOverride": null,
-                      "MaterialGroup": null,
-                      "MaterialOverride": null,
-                      "Materials": null,
-                      "Model": "models/dev/box.vmdl",
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "RenderOptions": {
-                        "GameLayer": true,
-                        "OverlayLayer": false,
-                        "BloomLayer": false,
-                        "AfterUILayer": false
-                      },
-                      "RenderType": "On",
-                      "Tint": "0.75,0.71,0.56,1"
-                    },
-                    {
-                      "__type": "Sandbox.BoxCollider",
-                      "__guid": "49d448cb-1b79-4ca1-a101-4f81fe20132d",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "Center": "0,0,0",
-                      "ColliderFlags": 0,
-                      "Elasticity": null,
-                      "Friction": null,
-                      "IsTrigger": false,
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "OnObjectTriggerEnter": null,
-                      "OnObjectTriggerExit": null,
-                      "OnTriggerEnter": null,
-                      "OnTriggerExit": null,
-                      "RollingResistance": null,
-                      "Scale": "50,50,50",
-                      "Static": false,
-                      "Surface": null,
-                      "SurfaceVelocity": "0,0,0"
-                    }
-                  ],
-                  "Children": []
-                },
-                {
-                  "__guid": "22e1416b-8cdb-41c6-b6a5-7ad3a59b7bde",
-                  "__version": 2,
-                  "Flags": 0,
-                  "Name": "Port rail",
-                  "Position": "0,115,57",
-                  "Rotation": "0,0,0,1",
-                  "Scale": "10.1999998,0.159999996,0.879999995",
-                  "Tags": "",
-                  "Enabled": true,
-                  "NetworkMode": 2,
-                  "NetworkFlags": 0,
-                  "NetworkOrphaned": 0,
-                  "NetworkTransmit": true,
-                  "OwnerTransfer": 1,
-                  "Components": [
-                    {
-                      "__type": "Sandbox.ModelRenderer",
-                      "__guid": "c9e3925d-676d-474a-97b7-d8c47911b3b8",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "BodyGroups": 18446744073709551615,
-                      "CreateAttachments": false,
-                      "LodOverride": null,
-                      "MaterialGroup": null,
-                      "MaterialOverride": null,
-                      "Materials": null,
-                      "Model": "models/dev/box.vmdl",
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "RenderOptions": {
-                        "GameLayer": true,
-                        "OverlayLayer": false,
-                        "BloomLayer": false,
-                        "AfterUILayer": false
-                      },
-                      "RenderType": "On",
-                      "Tint": "0.32,0.18,0.08,1"
-                    },
-                    {
-                      "__type": "Sandbox.BoxCollider",
-                      "__guid": "9915bce7-9a96-4595-a18d-5e7560eb54ed",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "Center": "0,0,0",
-                      "ColliderFlags": 0,
-                      "Elasticity": null,
-                      "Friction": null,
-                      "IsTrigger": false,
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "OnObjectTriggerEnter": null,
-                      "OnObjectTriggerExit": null,
-                      "OnTriggerEnter": null,
-                      "OnTriggerExit": null,
-                      "RollingResistance": null,
-                      "Scale": "50,50,50",
-                      "Static": false,
-                      "Surface": null,
-                      "SurfaceVelocity": "0,0,0"
-                    }
-                  ],
-                  "Children": []
-                },
-                {
-                  "__guid": "45210efd-ceb1-45f7-9536-04ba079fde64",
-                  "__version": 2,
-                  "Flags": 0,
-                  "Name": "Starboard rail",
-                  "Position": "0,-115,57",
-                  "Rotation": "0,0,0,1",
-                  "Scale": "10.1999998,0.159999996,0.879999995",
-                  "Tags": "",
-                  "Enabled": true,
-                  "NetworkMode": 2,
-                  "NetworkFlags": 0,
-                  "NetworkOrphaned": 0,
-                  "NetworkTransmit": true,
-                  "OwnerTransfer": 1,
-                  "Components": [
-                    {
-                      "__type": "Sandbox.ModelRenderer",
-                      "__guid": "24ab5600-67dc-42d6-88a4-4a381d65f4c9",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "BodyGroups": 18446744073709551615,
-                      "CreateAttachments": false,
-                      "LodOverride": null,
-                      "MaterialGroup": null,
-                      "MaterialOverride": null,
-                      "Materials": null,
-                      "Model": "models/dev/box.vmdl",
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "RenderOptions": {
-                        "GameLayer": true,
-                        "OverlayLayer": false,
-                        "BloomLayer": false,
-                        "AfterUILayer": false
-                      },
-                      "RenderType": "On",
-                      "Tint": "0.32,0.18,0.08,1"
-                    },
-                    {
-                      "__type": "Sandbox.BoxCollider",
-                      "__guid": "52298cc3-63cc-45d5-b7f5-f24577c4b451",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "Center": "0,0,0",
-                      "ColliderFlags": 0,
-                      "Elasticity": null,
-                      "Friction": null,
-                      "IsTrigger": false,
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "OnObjectTriggerEnter": null,
-                      "OnObjectTriggerExit": null,
-                      "OnTriggerEnter": null,
-                      "OnTriggerExit": null,
-                      "RollingResistance": null,
-                      "Scale": "50,50,50",
-                      "Static": false,
-                      "Surface": null,
-                      "SurfaceVelocity": "0,0,0"
-                    }
-                  ],
-                  "Children": []
-                },
-                {
-                  "__guid": "49c1611c-5be9-40a1-b448-ceac0225e4e5",
-                  "__version": 2,
-                  "Flags": 0,
-                  "Name": "Bow rail",
-                  "Position": "251,0,57",
-                  "Rotation": "0,0,0,1",
-                  "Scale": "0.159999996,4.48000002,0.879999995",
-                  "Tags": "",
-                  "Enabled": true,
-                  "NetworkMode": 2,
-                  "NetworkFlags": 0,
-                  "NetworkOrphaned": 0,
-                  "NetworkTransmit": true,
-                  "OwnerTransfer": 1,
-                  "Components": [
-                    {
-                      "__type": "Sandbox.ModelRenderer",
-                      "__guid": "1de3de42-89d3-4043-8fb4-d21973cdc3fe",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "BodyGroups": 18446744073709551615,
-                      "CreateAttachments": false,
-                      "LodOverride": null,
-                      "MaterialGroup": null,
-                      "MaterialOverride": null,
-                      "Materials": null,
-                      "Model": "models/dev/box.vmdl",
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "RenderOptions": {
-                        "GameLayer": true,
-                        "OverlayLayer": false,
-                        "BloomLayer": false,
-                        "AfterUILayer": false
-                      },
-                      "RenderType": "On",
-                      "Tint": "0.32,0.18,0.08,1"
-                    },
-                    {
-                      "__type": "Sandbox.BoxCollider",
-                      "__guid": "9921f8ce-b3b0-4c5b-bd5c-ac48ee8af407",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "Center": "0,0,0",
-                      "ColliderFlags": 0,
-                      "Elasticity": null,
-                      "Friction": null,
-                      "IsTrigger": false,
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "OnObjectTriggerEnter": null,
-                      "OnObjectTriggerExit": null,
-                      "OnTriggerEnter": null,
-                      "OnTriggerExit": null,
-                      "RollingResistance": null,
-                      "Scale": "50,50,50",
-                      "Static": false,
-                      "Surface": null,
-                      "SurfaceVelocity": "0,0,0"
-                    }
-                  ],
-                  "Children": []
-                },
-                {
-                  "__guid": "803e1208-0d4f-4900-8506-fd8d739f60ea",
-                  "__version": 2,
-                  "Flags": 0,
-                  "Name": "Stern rail",
-                  "Position": "-251,0,57",
-                  "Rotation": "0,0,0,1",
-                  "Scale": "0.159999996,4.48000002,0.879999995",
-                  "Tags": "",
-                  "Enabled": true,
-                  "NetworkMode": 2,
-                  "NetworkFlags": 0,
-                  "NetworkOrphaned": 0,
-                  "NetworkTransmit": true,
-                  "OwnerTransfer": 1,
-                  "Components": [
-                    {
-                      "__type": "Sandbox.ModelRenderer",
-                      "__guid": "9656c91e-af89-425a-9bbe-ce3d1ae9b755",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "BodyGroups": 18446744073709551615,
-                      "CreateAttachments": false,
-                      "LodOverride": null,
-                      "MaterialGroup": null,
-                      "MaterialOverride": null,
-                      "Materials": null,
-                      "Model": "models/dev/box.vmdl",
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "RenderOptions": {
-                        "GameLayer": true,
-                        "OverlayLayer": false,
-                        "BloomLayer": false,
-                        "AfterUILayer": false
-                      },
-                      "RenderType": "On",
-                      "Tint": "0.32,0.18,0.08,1"
-                    },
-                    {
-                      "__type": "Sandbox.BoxCollider",
-                      "__guid": "c46eb5a3-c29c-4bb5-906d-2d975c8c2a2d",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "Center": "0,0,0",
-                      "ColliderFlags": 0,
-                      "Elasticity": null,
-                      "Friction": null,
-                      "IsTrigger": false,
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "OnObjectTriggerEnter": null,
-                      "OnObjectTriggerExit": null,
-                      "OnTriggerEnter": null,
-                      "OnTriggerExit": null,
-                      "RollingResistance": null,
-                      "Scale": "50,50,50",
-                      "Static": false,
-                      "Surface": null,
-                      "SurfaceVelocity": "0,0,0"
+                      "IsTrigger": false
                     }
                   ],
                   "Children": []
@@ -3643,8 +3194,8 @@
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Bow helm",
-                  "Position": "170,0,35",
-                  "Rotation": "0,0,0,1",
+                  "Position": "-290,-80,73",
+                  "Rotation": "0,0,1,0",
                   "Scale": "1,1,1",
                   "Tags": "",
                   "Enabled": true,
@@ -3701,32 +3252,6 @@
                       "TooltipTitle": "Take the helm",
                       "UseDistance": 75,
                       "YawRange": "-120,120"
-                    },
-                    {
-                      "__type": "Sandbox.BoxCollider",
-                      "__guid": "231cdd36-c870-48e4-90f2-6bb8ccbe23cb",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "Center": "6,0,28",
-                      "ColliderFlags": 0,
-                      "Elasticity": null,
-                      "Friction": null,
-                      "IsTrigger": false,
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "OnObjectTriggerEnter": null,
-                      "OnObjectTriggerExit": null,
-                      "OnTriggerEnter": null,
-                      "OnTriggerExit": null,
-                      "RollingResistance": null,
-                      "Scale": "16,44,56",
-                      "Static": false,
-                      "Surface": null,
-                      "SurfaceVelocity": "0,0,0"
                     }
                   ],
                   "Children": [
@@ -3771,7 +3296,7 @@
                       "__version": 2,
                       "Flags": 0,
                       "Name": "Helm exit",
-                      "Position": "-80,0,6",
+                      "Position": "-34,0,6",
                       "Rotation": "0,0,0,1",
                       "Scale": "1,1,1",
                       "Tags": "",
@@ -3799,35 +3324,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "487b55fe-81d7-4e30-8372-8f8cc6b219da",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.25,0.14,0.07,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -3845,35 +3342,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "65163f17-aece-48f0-9b70-dc2ad95a6c27",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.95,0.64,0.18,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -3891,35 +3360,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "26612e2b-1bed-458c-8d68-7ac38039972e",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.95,0.64,0.18,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -3937,35 +3378,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "0ef93630-1d12-4dbd-8c3f-78609054966d",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.95,0.64,0.18,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -3983,35 +3396,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "ced9faf8-6b03-4379-a5a7-1f40033f1c8c",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.95,0.64,0.18,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -4029,35 +3414,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "506fc8e9-6122-49c0-b3b7-20f5ebd6dc7c",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.95,0.64,0.18,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -4075,35 +3432,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "2f5ea2e3-6eb6-471b-9e95-12592059b5f0",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.95,0.64,0.18,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -4121,35 +3450,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "df664387-8dd9-4fc3-a22b-099af93633aa",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.95,0.64,0.18,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -4167,35 +3468,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "0ef3455d-9039-40c3-951c-2561d896d096",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.95,0.64,0.18,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -4213,35 +3486,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "0e468a26-efa6-45cf-b895-c868bb9028b7",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.95,0.64,0.18,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -4259,35 +3504,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "6f74de4d-4e7c-49b8-9288-559fd1d4c439",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.95,0.64,0.18,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -4333,7 +3550,7 @@
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Mast and sail controls",
-                  "Position": "-20,50,35",
+                  "Position": "80,0,73",
                   "Rotation": "0,0,0,1",
                   "Scale": "1,1,1",
                   "Tags": "",
@@ -4405,32 +3622,6 @@
                         "go": "190ec4bd-ed2e-42bc-ab63-500bfae982f1"
                       },
                       "YawRange": "-120,120"
-                    },
-                    {
-                      "__type": "Sandbox.BoxCollider",
-                      "__guid": "5097bf40-7bfb-4494-b10f-806fe1d1083b",
-                      "__enabled": true,
-                      "Flags": 0,
-                      "Center": "0,0,130",
-                      "ColliderFlags": 0,
-                      "Elasticity": null,
-                      "Friction": null,
-                      "IsTrigger": false,
-                      "OnComponentDestroy": null,
-                      "OnComponentDisabled": null,
-                      "OnComponentEnabled": null,
-                      "OnComponentFixedUpdate": null,
-                      "OnComponentStart": null,
-                      "OnComponentUpdate": null,
-                      "OnObjectTriggerEnter": null,
-                      "OnObjectTriggerExit": null,
-                      "OnTriggerEnter": null,
-                      "OnTriggerExit": null,
-                      "RollingResistance": null,
-                      "Scale": "14,14,260",
-                      "Static": false,
-                      "Surface": null,
-                      "SurfaceVelocity": "0,0,0"
                     }
                   ],
                   "Children": [
@@ -4503,35 +3694,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "f32f08e8-93f2-4300-b53b-7a7398d50158",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.3,0.17,0.08,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -4549,35 +3712,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "03b43fe3-0201-44c8-973d-f933f75d421c",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.95,0.64,0.18,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -4612,35 +3747,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "ac879340-7717-4603-bb45-fb5794e5199e",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.3,0.17,0.08,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -4658,35 +3765,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "e9c5ad92-78e1-4d63-a3bc-c163fcfeb1cb",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.3,0.17,0.08,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         }
                       ]
@@ -4723,35 +3802,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "73c706ad-1e9e-4497-b589-248959359613",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "1,0.52,0.1,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -4769,35 +3820,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "cb9129e1-40cd-490f-af94-68f77ac31d55",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "1,0.52,0.1,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -4815,35 +3838,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "9b871d92-0eac-4e1e-960e-2418a8849958",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "1,0.52,0.1,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         }
                       ]
@@ -4855,7 +3850,7 @@
                   "__version": 2,
                   "Flags": 0,
                   "Name": "Deck spawn",
-                  "Position": "-65,0,40",
+                  "Position": "-200,-85,95",
                   "Rotation": "0,0,0,1",
                   "Scale": "1,1,1",
                   "Tags": "",
@@ -5031,35 +4026,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "46752d07-4452-4899-beba-98bca6b479ab",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.35,0.19,0.08,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -5077,35 +4044,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "93035dfb-2d3a-4d4c-ad78-c6f4dd68a24e",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.15,0.17,0.19,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -5140,35 +4079,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "ed13b2bc-c47a-47d8-a285-a5887e2eac91",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5186,35 +4097,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "dee0401c-98cf-4d83-82cb-5b6fd93668d6",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5232,35 +4115,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "3414976f-bcb8-48ec-b560-d284a4f4b8a2",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5278,35 +4133,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "e38aab9b-1b19-4506-9c8e-4fa4e2e65575",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5324,35 +4151,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "be4dd907-44e9-4600-bf56-49e0db6ba5fc",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5370,35 +4169,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "02188ade-930b-428b-8c21-95d19ae10a6a",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5416,35 +4187,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "4075db43-5951-47ae-ba4b-b8761f9b4e6f",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5462,35 +4205,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "c6d72939-244d-49ab-836e-f6fc2ee0ee35",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5508,35 +4223,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "e1fd21b4-7a0a-4247-a17a-dd8ff9435944",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.09,0.1,0.12,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5724,35 +4411,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "e894e0ff-7898-4cb6-8a1f-9103b25d5f71",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.35,0.19,0.08,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -5770,35 +4429,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "ed083b2b-a615-4c2d-b67b-b8b7e174a007",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.15,0.17,0.19,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -5833,35 +4464,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "3599fc20-4a6e-46ad-bffe-04327f55ec91",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5879,35 +4482,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "e22784a9-5ec0-46a0-a278-9a41bff0fa0c",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5925,35 +4500,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "1d227c2c-d6db-46dd-94f3-04d2a925ce16",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -5971,35 +4518,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "a011f071-d9cf-43f0-a472-e88b404c40ea",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6017,35 +4536,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "4f101a0f-3f37-446f-b48b-a17056b519b3",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6063,35 +4554,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "3bf63aca-7169-4572-b9f1-ec35f084c426",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6109,35 +4572,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "b8ae08e5-6f9e-436b-af97-3e298ade980f",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6155,35 +4590,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "acbb03a5-f429-4309-83af-adc8843c84b3",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6201,35 +4608,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "b0344113-0164-420d-b90b-aa52c6c4e2ff",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.09,0.1,0.12,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6417,35 +4796,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "a7e588e3-5290-40fa-b740-37c2c438a321",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.35,0.19,0.08,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -6463,35 +4814,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "bfd5c3a2-b6a5-49cc-912f-72c71b199add",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.15,0.17,0.19,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -6526,35 +4849,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "986c2952-a26e-4b47-9361-87c4225a2631",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6572,35 +4867,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "1d8d4b13-8be6-488c-8a0a-58373d1c535e",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6618,35 +4885,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "83fb8407-1af7-4c84-9ba7-ff71196b5ec0",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6664,35 +4903,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "1d1e7a2c-2792-4937-8930-98f4270cff45",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6710,35 +4921,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "c6dc6491-c95f-4782-a12f-1500b22731b5",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6756,35 +4939,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "fdea2252-fc57-49c5-85aa-21134b97b98f",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6802,35 +4957,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "b39e6b4d-39ed-4bf7-bbdb-f2ee3bf7c529",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6848,35 +4975,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "f27bab87-613b-4313-82ff-737f0f01c59d",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -6894,35 +4993,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "9e468fa0-6cb0-4588-a394-909eba2b3d5d",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.09,0.1,0.12,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -7110,35 +5181,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "1e354a29-a0c6-4ab0-845f-d203c07651aa",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.35,0.19,0.08,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -7156,35 +5199,7 @@
                       "NetworkOrphaned": 0,
                       "NetworkTransmit": true,
                       "OwnerTransfer": 1,
-                      "Components": [
-                        {
-                          "__type": "Sandbox.ModelRenderer",
-                          "__guid": "ff621c88-45d0-4bdf-bfa2-e5ac3eac268a",
-                          "__enabled": true,
-                          "Flags": 0,
-                          "BodyGroups": 18446744073709551615,
-                          "CreateAttachments": false,
-                          "LodOverride": null,
-                          "MaterialGroup": null,
-                          "MaterialOverride": null,
-                          "Materials": null,
-                          "Model": "models/dev/box.vmdl",
-                          "OnComponentDestroy": null,
-                          "OnComponentDisabled": null,
-                          "OnComponentEnabled": null,
-                          "OnComponentFixedUpdate": null,
-                          "OnComponentStart": null,
-                          "OnComponentUpdate": null,
-                          "RenderOptions": {
-                            "GameLayer": true,
-                            "OverlayLayer": false,
-                            "BloomLayer": false,
-                            "AfterUILayer": false
-                          },
-                          "RenderType": "On",
-                          "Tint": "0.15,0.17,0.19,1"
-                        }
-                      ],
+                      "Components": [],
                       "Children": []
                     },
                     {
@@ -7219,35 +5234,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "5c72a790-ef91-4a9a-a677-4d99b09163c6",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -7265,35 +5252,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "7834efc6-6be9-4ec5-8d8b-7bbbe4e86a16",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -7311,35 +5270,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "f40a19ec-b0fb-4741-b2ba-83e27463d641",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -7357,35 +5288,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "493ca510-4bb1-4dec-9319-b56fdc4d41bf",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -7403,35 +5306,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "49ae40d9-671a-47b0-b0aa-149c22b08198",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -7449,35 +5324,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "99bebdd4-bc32-4a52-9a02-d316f5e3f1b5",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -7495,35 +5342,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "f878b909-c4ed-4dbb-a254-569ff2594c74",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -7541,35 +5360,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "46fcf2d0-7553-408e-b7ec-9731faf8a7e9",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.12,0.15,0.18,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {
@@ -7587,35 +5378,7 @@
                           "NetworkOrphaned": 0,
                           "NetworkTransmit": true,
                           "OwnerTransfer": 1,
-                          "Components": [
-                            {
-                              "__type": "Sandbox.ModelRenderer",
-                              "__guid": "d57a9ff2-2064-4d23-83ae-84d057280696",
-                              "__enabled": true,
-                              "Flags": 0,
-                              "BodyGroups": 18446744073709551615,
-                              "CreateAttachments": false,
-                              "LodOverride": null,
-                              "MaterialGroup": null,
-                              "MaterialOverride": null,
-                              "Materials": null,
-                              "Model": "models/dev/box.vmdl",
-                              "OnComponentDestroy": null,
-                              "OnComponentDisabled": null,
-                              "OnComponentEnabled": null,
-                              "OnComponentFixedUpdate": null,
-                              "OnComponentStart": null,
-                              "OnComponentUpdate": null,
-                              "RenderOptions": {
-                                "GameLayer": true,
-                                "OverlayLayer": false,
-                                "BloomLayer": false,
-                                "AfterUILayer": false
-                              },
-                              "RenderType": "On",
-                              "Tint": "0.09,0.1,0.12,1"
-                            }
-                          ],
+                          "Components": [],
                           "Children": []
                         },
                         {

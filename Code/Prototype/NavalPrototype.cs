@@ -105,11 +105,14 @@ public sealed class NavalPrototype : Component
 		playerObject.AddComponent<SitMoveMode>();
 		var player = playerObject.AddComponent<PlayerController>();
 		player.Renderer = renderer;
+		player.BodyRadius = 16;
+		player.BodyHeight = 72;
+		player.DuckedHeight = 44;
 		player.BodyMass = 80;
 		player.WalkSpeed = 120;
 		player.RunSpeed = 220;
 		player.ThirdPerson = true;
-		player.CameraOffset = new Vector3( 280, 24, 90 );
+		player.CameraOffset = new Vector3( 280, 24, 48 );
 		player.EyeAngles = new Angles( 15, ship.WorldRotation.Angles().yaw, 0 );
 		player.ToggleCameraModeButton = "View";
 		player.EnablePressing = false; // ShipPlayer owns the E toggle, including release while looking at the wheel.

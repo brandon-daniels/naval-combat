@@ -8,7 +8,7 @@ public static class SailingSmokeTest
 	public static async Task Run()
 	{
 		if ( !Game.IsEditor || Networking.IsActive || running ) return;
-		var sailor = Game.ActiveScene?.GetAllComponents<ShipPlayer>().FirstOrDefault();
+		var sailor = Game.ActiveScene?.GetAllComponents<ShipPlayer>().FirstOrDefault( x => !x.IsNpc );
 		if ( !sailor.IsValid() || sailor.Scene.IsEditor ) return;
 		running = true;
 		var rig = sailor.Sails;
@@ -24,7 +24,21 @@ public static class SailingSmokeTest
 			await GameTask.DelaySeconds( 1 );
 			rig.Adjust( player, 1, 1, 0.1f );
 			Check( rig.Deployment == 0, "Remote sail controls rejected" );
-			Check( rig.TryTake( player ), "Mast reachable from deck" );
+			player.WorldPosition = rig.SeatPosition.WorldPosition - rig.WorldRotation.Forward * 25 + Vector3.Up * 70;
+			player.WishVelocity = Vector3.Zero;
+			player.Body.Velocity = rig.Ship.Body.GetVelocityAtPoint( player.WorldPosition );
+			for ( int i = 0; i < 40 && !sailor.IsAtMast; i++ )
+			{
+				await GameTask.DelaySeconds( 0.1f );
+				if ( player.IsOnGround )
+				{
+					player.WorldPosition = rig.SeatPosition.WorldPosition - rig.WorldRotation.Forward * 25 + Vector3.Up * 5;
+					player.Body.Velocity = rig.Ship.Body.GetVelocityAtPoint( player.WorldPosition );
+				}
+				rig.TryTake( player );
+			}
+			if ( !sailor.IsAtMast ) Log.Info( $"SAIL TEST: grounded={player.IsOnGround}, distance={(player.WorldPosition - rig.SeatPosition.WorldPosition).Length:0.0}, occupied={rig.Occupied}, body={player.Body.Enabled}" );
+			Check( sailor.IsAtMast, "Mast reachable from deck" );
 			await GameTask.DelaySeconds( 0.3f );
 			Check( sailor.IsAtMast && !player.Body.Enabled, "Mast attaches player" );
 			float before = rig.SailAngle;
@@ -46,8 +60,20 @@ public static class SailingSmokeTest
 			await GameTask.DelaySeconds( 2 );
 			Check( (rig.Ship.WorldPosition - start).WithZ( 0 ).Length > 100, "Unattended sail propels ship" );
 			sailor.ReturnToDeck();
-			await GameTask.DelaySeconds( 0.5f );
-			Check( rig.TryTake( player ), "Mast can be retaken while sailing" );
+			player.WorldPosition = rig.SeatPosition.WorldPosition - rig.WorldRotation.Forward * 25 + Vector3.Up * 70;
+			player.WishVelocity = Vector3.Zero;
+			player.Body.Velocity = rig.Ship.Body.GetVelocityAtPoint( player.WorldPosition );
+			for ( int i = 0; i < 40 && !sailor.IsAtMast; i++ )
+			{
+				await GameTask.DelaySeconds( 0.1f );
+				if ( player.IsOnGround )
+				{
+					player.WorldPosition = rig.SeatPosition.WorldPosition - rig.WorldRotation.Forward * 25 + Vector3.Up * 5;
+					player.Body.Velocity = rig.Ship.Body.GetVelocityAtPoint( player.WorldPosition );
+				}
+				rig.TryTake( player );
+			}
+			Check( sailor.IsAtMast, "Mast can be retaken while sailing" );
 			for ( int i = 0; i < 30; i++ ) rig.Adjust( player, 0, -1, 0.1f );
 			Check( rig.Deployment == 0 && rig.DriveFraction == 0, "Raising sail removes propulsion" );
 			Log.Info( "SAIL TEST PASSED" );

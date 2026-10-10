@@ -109,7 +109,7 @@ public sealed class ShipNpc : Component
 		{
 			UsedHelm = true;
 			Activity = !windAvailable ? "Waiting for wind" : sailing ? NavigationStatus : "Turning broadside";
-			ship.SetHelmInput( ship.Helm, navigable ? Math.Clamp( headingError / 25, -1, 1 ) : 0 );
+			ship.SetHelmTarget( ship.Helm, navigable ? Math.Clamp( headingError / 25, -1, 1 ) : 0 );
 		}
 		else if ( destination is ShipCannon gun )
 		{
@@ -172,8 +172,9 @@ public sealed class ShipNpc : Component
 		var ship = Sailor.Ship;
 		var local = ship.WorldRotation.Inverse * (WorldPosition - ship.WorldPosition);
 		var seat = ship.WorldRotation.Inverse * (destination.SeatPosition.WorldPosition - ship.WorldPosition);
-		var waypoint = Math.Abs( local.x - seat.x ) > 35 ? new Vector3( seat.x, 0, seat.z ) : seat;
-		if ( Math.Abs( local.y ) > 18 && Math.Abs( local.x - seat.x ) > 35 ) waypoint = new Vector3( local.x, 0, seat.z );
+		float aisle = local.x < 45 || seat.x < 45 ? -85 : 0;
+		var waypoint = Math.Abs( local.x - seat.x ) > 35 ? new Vector3( seat.x, aisle, seat.z ) : seat;
+		if ( Math.Abs( local.y - aisle ) > 18 && Math.Abs( local.x - seat.x ) > 35 ) waypoint = new Vector3( local.x, aisle, seat.z );
 		var direction = (ship.WorldPosition + ship.WorldRotation * waypoint - WorldPosition).WithZ( 0 );
 		player.WishVelocity = direction.Normal * Math.Min( 120, direction.Length * 4 );
 		if ( direction.Length > 5 ) player.EyeAngles = new Angles( 0, Heading( direction ), 0 );

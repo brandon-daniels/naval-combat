@@ -112,10 +112,12 @@ These are tuning baselines, not promises of final balance. Economy values remain
 - ✅ Two-instance check confirms one owned ship and character per connected player
 - 🟡 Define authority for hull physics, stations, sails, cannons, projectiles, and NPC ships (player hulls are owner-simulated; station occupancy and cannon acceptance are host-validated; NPC authority remains)
 - 🟡 Synchronize ship motion and station occupancy with usable remote interpolation (network objects and synchronized occupancy/sail/cannon state are implemented; remote feel remains to be tuned)
-- 🟡 Handle join, leave, reconnect, owner loss, and ship cleanup (join, disconnect cleanup, and host slot rebuilding exist; reconnect/host migration need live verification)
+- 🟡 Handle join, leave, reconnect, owner loss, and ship cleanup (join, ship/sailor cleanup, departing-voyage barrel cleanup, and host slot rebuilding exist; reconnect/host migration need live verification)
 - 🟡 `naval_test_network_shell` and the non-teleporting `naval_test_voyage_network` pass with two players; physical remote sailing, interpolation tuning, reconnect, and host migration remain
 
 Exit criteria: two players can join, board only permitted stations, sail, observe each other, and fire without valuable state being client-controlled.
+
+Disconnect currently ends that player's voyage: its ship, sailor, production, wallet, upgrades, and produced barrels are discarded; reconnect starts fresh. `naval_test_voyage_cleanup` checks barrel cleanup in local editor Play, and `naval_test_network_shell` checks for orphaned ships and cargo after a real disconnect. The cleanup change compiles but still needs live editor and two-instance validation. Historical voyage-test passes predate the physical barrel flow; those diagnostics need updating before reuse.
 
 The integrated scene now uses `NavalMultiplayerSession` instead of the local prototype bootstrap. It keeps the authored player ship as a disabled template, clones one ship and sailor for each connection, assigns both to that connection, and creates camera/HUD presentation locally. Ship movement, sail trim, and cannon aim are owner-simulated for responsiveness. The host owns station occupancy decisions and cannon-fire acceptance; cannonballs are host-spawned network objects. Run the scene as host, choose **Join via new instance**, then run `naval_test_network_shell` on the host to inspect connection-to-ship ownership before performing the physical station and firing checks.
 

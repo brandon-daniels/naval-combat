@@ -9,9 +9,9 @@ public sealed class ShipPlayer : Component
 	[Property] public ArcadeShip Ship { get; set; }
 	[Property] public GameObject SpawnPoint { get; set; }
 	[Property] public bool IsNpc { get; set; }
-	[Property, Group( "Camera" )] public Vector3 OnFootCameraOffset { get; set; } = new( 280, 24, 90 );
-	[Property, Group( "Camera" )] public Vector3 StationCameraOffset { get; set; } = new( 420, 24, 150 );
-	[Property, Group( "Camera" )] public Vector3 HelmCameraOffset { get; set; } = new( 560, 24, 280 );
+	[Property, Group( "Camera" )] public Vector3 OnFootCameraOffset { get; set; } = new( 280, 24, 48 );
+	[Property, Group( "Camera" )] public Vector3 StationCameraOffset { get; set; } = new( 420, 24, 72 );
+	[Property, Group( "Camera" )] public Vector3 HelmCameraOffset { get; set; } = new( 560, 24, 96 );
 	[Sync( SyncFlags.FromHost )] public GoodsBarrel CarriedBarrel { get; private set; }
 	public bool IsAtHelm => Helm.IsValid() && Helm.Occupant == Controller;
 	public bool CanUseHelm => Controller.IsValid() && Helm.IsValid() && Helm.CanEnter( Controller );
@@ -43,7 +43,7 @@ public sealed class ShipPlayer : Component
 		else AvailableStation?.TryTake( Controller );
 	}
 
-	private void RequestBarrelInteraction( GoodsBarrel barrel )
+	internal void RequestBarrelInteraction( GoodsBarrel barrel )
 	{
 		if ( Networking.IsActive ) RequestBarrelFromOwner( barrel );
 		else InteractWithBarrel( barrel );
@@ -79,7 +79,7 @@ public sealed class ShipPlayer : Component
 		{
 			float forward = (Input.Down( "Forward" ) ? 1 : 0) - (Input.Down( "Backward" ) ? 1 : 0);
 			float turn = (Input.Down( "Left" ) ? 1 : 0) - (Input.Down( "Right" ) ? 1 : 0);
-			if ( IsAtHelm ) Ship.SetHelmInput( Helm, turn );
+			if ( IsAtHelm ) Ship.SetHelmInput( Helm, turn, Time.Delta );
 			else Sails.Adjust( Controller, turn, -forward, Time.Delta );
 		}
 	}

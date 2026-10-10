@@ -18,6 +18,11 @@ public sealed class OceanSwimMode : MoveMode
 		if ( !Ocean.IsValid() || jumpLockout > 0 || controller.IsOnGround ) return -100;
 		var sailor = GetComponent<ShipPlayer>();
 		if ( sailor.IsValid() && sailor.CurrentStation.IsValid() ) return -100;
+		// The ocean field passes under the vessel, but the enclosed hold is dry.
+		foreach ( var ship in Scene.GetAllComponents<ArcadeShip>() )
+		{
+			if ( ship.Active && ship.ContainsCargoInterior( WorldPosition ) ) return -100;
+		}
 		float depth = Ocean.HeightAt( WorldPosition, Time.Now ) - WorldPosition.z;
 		return depth > (controller.IsSwimming ? 18 : 30) ? 20 : -100;
 	}

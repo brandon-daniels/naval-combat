@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace NavalCombat;
 
@@ -93,6 +94,28 @@ public sealed class ArcadeOcean : Component, Component.ExecuteInEditor
 	private void UpdateMaterial()
 	{
 		if ( !renderer.IsValid() || !renderer.SceneObject.IsValid() ) return;
+		// Mask the eight closest enclosed holds, including other players' vessels.
+		var target = FollowTarget.IsValid() ? FollowTarget.WorldPosition : WorldPosition;
+		var ships = Scene.GetAllComponents<ArcadeShip>().Where( ship => ship.Active && ship.WalkableModelReady )
+			.OrderBy( ship => (ship.WorldPosition - target).LengthSquared ).Take( 8 ).ToArray();
+		for ( int i = 0; i < 8; i++ )
+		{
+			var bounds = Vector4.Zero;
+			var axis = Vector4.Zero;
+			if ( i < ships.Length )
+			{
+				var ship = ships[i];
+				float scale = ship.ShipModelScale;
+				var center = ship.WorldTransform.PointToWorld( new Vector3( -1.15f * scale, 0, 0 ) );
+				var forward = ship.WorldRotation.Forward.WithZ( 0 ).Normal;
+				bounds = new Vector4( center.x, center.y, 6.18f * scale, 1.8f * scale );
+				axis = new Vector4( forward.x, forward.y, ship.WorldPosition.z + ship.ShipModelVerticalOffset + 0.72f * scale,
+					ship.WorldPosition.z + ship.ShipModelVerticalOffset + 3.34f * scale );
+			}
+			renderer.SceneObject.Attributes.Set( $"HoldBounds{i}", bounds );
+			renderer.SceneObject.Attributes.Set( $"HoldAxis{i}", axis );
+		}
+		renderer.SceneObject.Attributes.Set( "OceanSeaLevel", SeaLevel );
 		renderer.SceneObject.Attributes.Set( "OceanTime", Time.Now );
 		renderer.SceneObject.Attributes.Set( "OceanWaveHeight", WaveHeight );
 		renderer.SceneObject.Attributes.Set( "OceanFoamStrength", Math.Max( 0, FoamStrength ) );

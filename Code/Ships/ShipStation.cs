@@ -17,8 +17,14 @@ public abstract class ShipStation : BaseChair
 		if ( !player.IsProxy && !player.Body.Enabled ) return false;
 		if ( !SeatPosition.IsValid() || (player.WorldPosition - SeatPosition.WorldPosition).Length > UseDistance ) return false;
 		var target = WorldPosition + WorldRotation.Up * 45;
-		var trace = Scene.Trace.Ray( player.EyePosition, target ).IgnoreGameObjectHierarchy( player.GameObject ).Run();
-		return !trace.Hit || trace.GameObject == GameObject || trace.GameObject.IsDescendant( GameObject );
+		// The authored hull now has detailed deck, rail and interior collision. Do
+		// not let parts of the player's own ship occlude its station interaction;
+		// distance and grounded checks still prevent remote use.
+		var trace = Scene.Trace.Ray( player.EyePosition, target )
+			.IgnoreGameObjectHierarchy( player.GameObject )
+			.IgnoreGameObjectHierarchy( Ship.GameObject )
+			.Run();
+		return !trace.Hit;
 	}
 
 	public bool TryTake( PlayerController player )

@@ -42,9 +42,35 @@ VS
 PS
 {
 	#include "common/pixel.hlsl"
+	float g_flSeaLevel < Attribute( "OceanSeaLevel" ); Default( 0 ); >;
 	float g_flOceanTime < Attribute( "OceanTime" ); Default( 0 ); >;
 	float g_flWaveHeight < Attribute( "OceanWaveHeight" ); Default( 55 ); >;
 	float g_flFoamStrength < Attribute( "OceanFoamStrength" ); Default( 1 ); >;
+
+	float4 g_vHoldBounds0 < Attribute( "HoldBounds0" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldAxis0 < Attribute( "HoldAxis0" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldBounds1 < Attribute( "HoldBounds1" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldAxis1 < Attribute( "HoldAxis1" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldBounds2 < Attribute( "HoldBounds2" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldAxis2 < Attribute( "HoldAxis2" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldBounds3 < Attribute( "HoldBounds3" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldAxis3 < Attribute( "HoldAxis3" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldBounds4 < Attribute( "HoldBounds4" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldAxis4 < Attribute( "HoldAxis4" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldBounds5 < Attribute( "HoldBounds5" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldAxis5 < Attribute( "HoldAxis5" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldBounds6 < Attribute( "HoldBounds6" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldAxis6 < Attribute( "HoldAxis6" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldBounds7 < Attribute( "HoldBounds7" ); Default4( 0, 0, 0, 0 ); >;
+	float4 g_vHoldAxis7 < Attribute( "HoldAxis7" ); Default4( 0, 0, 0, 0 ); >;
+
+	void ClipHold( float2 p, float height, float4 bounds, float4 axis )
+	{
+		float2 delta = p - bounds.xy;
+		float along = abs( dot( delta, axis.xy ) );
+		float across = abs( dot( delta, float2( -axis.y, axis.x ) ) );
+		if ( bounds.z > 0 && along < bounds.z && across < bounds.w && height > axis.z && height < axis.w ) discard;
+	}
 
 	float4 MainPs( PixelInput i ) : SV_Target0
 	{
@@ -56,6 +82,14 @@ PS
 		float b = dot( p, float2( -0.0018, 0.0042 ) ) + t * 1.15;
 		float c = dot( p, float2( 0.007, -0.003 ) ) + t * 1.8;
 		float swell = sin( a ) - 0.12 * cos( 2.0 * a ) + 0.45 * sin( b ) + 0.08 * sin( c );
+		ClipHold( p, g_flSeaLevel + g_flWaveHeight * swell, g_vHoldBounds0, g_vHoldAxis0 );
+		ClipHold( p, g_flSeaLevel + g_flWaveHeight * swell, g_vHoldBounds1, g_vHoldAxis1 );
+		ClipHold( p, g_flSeaLevel + g_flWaveHeight * swell, g_vHoldBounds2, g_vHoldAxis2 );
+		ClipHold( p, g_flSeaLevel + g_flWaveHeight * swell, g_vHoldBounds3, g_vHoldAxis3 );
+		ClipHold( p, g_flSeaLevel + g_flWaveHeight * swell, g_vHoldBounds4, g_vHoldAxis4 );
+		ClipHold( p, g_flSeaLevel + g_flWaveHeight * swell, g_vHoldBounds5, g_vHoldAxis5 );
+		ClipHold( p, g_flSeaLevel + g_flWaveHeight * swell, g_vHoldBounds6, g_vHoldAxis6 );
+		ClipHold( p, g_flSeaLevel + g_flWaveHeight * swell, g_vHoldBounds7, g_vHoldAxis7 );
 		float2 slope = g_flWaveHeight * (
 			float2( 0.0026, 0.0012 ) * (cos( a ) + 0.24 * sin( 2.0 * a ))
 			+ float2( -0.0018, 0.0042 ) * 0.45 * cos( b )

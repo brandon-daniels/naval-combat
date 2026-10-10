@@ -1,8 +1,9 @@
 using System;
 namespace NavalCombat;
 
-public sealed class ShipCannon : ShipStation
+public sealed class ShipCannon : ShipStation, Component.ExecuteInEditor
 {
+	private const string AuthoredCannonModel = "lowpoly pirates/models/cannon.vmdl";
 	[Property] public GameObject Barrel { get; set; }
 	[Property] public GameObject Muzzle { get; set; }
 	[Property] public float ReloadSeconds { get; set; } = 2;
@@ -12,6 +13,11 @@ public sealed class ShipCannon : ShipStation
 	public float ReloadRemaining => Math.Max( 0, ReadyAt - Time.Now );
 	[Sync( SyncFlags.FromHost )] public float ReadyAt { get; private set; }
 	private float recoil;
+	private GameObject authoredVisual;
+	private bool prototypeVisualsHidden;
+
+	protected override void OnStart() => ConfigureAuthoredVisual();
+	protected override void OnEnabled() => ConfigureAuthoredVisual();
 	public override Transform CalculateEyeTransform( PlayerController player )
 	{
 		if ( !EyePosition.IsValid() || !Barrel.IsValid() ) return base.CalculateEyeTransform( player );
@@ -60,8 +66,42 @@ public sealed class ShipCannon : ShipStation
 	}
 	protected override void OnUpdate()
 	{
+		ConfigureAuthoredVisual();
 		recoil = Math.Max( 0, recoil - Time.Delta * 3 );
 		UpdateBarrel();
+	}
+
+	private void ConfigureAuthoredVisual()
+	{
+		if ( !Ship.IsValid() ) return;
+		if ( !authoredVisual.IsValid() )
+		{
+			authoredVisual = GameObject.GetAllObjects( true )
+				.FirstOrDefault( child => child.Name == "Lowpoly Pirates cannon visual" );
+		}
+		if ( !authoredVisual.IsValid() )
+		{
+			var model = Model.Load( AuthoredCannonModel );
+			if ( model is null ) return;
+			authoredVisual = new GameObject( GameObject, true, "Lowpoly Pirates cannon visual" );
+			authoredVisual.NetworkMode = NetworkMode.Never;
+			authoredVisual.Flags |= GameObjectFlags.NotSaved;
+			var renderer = authoredVisual.AddComponent<ModelRenderer>();
+			renderer.Flags |= ComponentFlags.NotSaved | ComponentFlags.NotNetworked;
+			renderer.Model = model;
+		}
+
+		authoredVisual.LocalPosition = new Vector3( -recoil * 12, 0, 0 );
+		authoredVisual.LocalRotation = Rotation.FromYaw( Yaw ) * Rotation.FromPitch( -Elevation );
+		authoredVisual.LocalScale = Vector3.One * 28;
+		if ( prototypeVisualsHidden ) return;
+		foreach ( var renderer in Scene.GetAllComponents<ModelRenderer>().Where( renderer =>
+			renderer.GameObject.IsDescendant( GameObject ) &&
+			!renderer.GameObject.IsDescendant( authoredVisual ) && renderer.GameObject != authoredVisual ) )
+		{
+			renderer.Enabled = false;
+		}
+		prototypeVisualsHidden = true;
 	}
 	private void UpdateBarrel()
 	{

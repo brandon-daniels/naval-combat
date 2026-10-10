@@ -33,6 +33,16 @@ public static class NavalNetworkSmokeTest
 		}
 
 		Check( players.Select( x => x.Ship ).Distinct().Count() == players.Length, "No players share an assigned ship" );
+		var ships = scene.GetAllComponents<ArcadeShip>().Where( x => x.GameObject.Network.Active ).ToArray();
+		Check( ships.Length == players.Length && ships.All( ship => players.Any( player => player.Ship == ship ) ),
+			"No orphaned network ships remain" );
+		var identities = players.Select( x => x.GetComponent<PlayerVoyage>()?.Identity ).ToArray();
+		Check( identities.All( x => !string.IsNullOrWhiteSpace( x ) ) && identities.Distinct().Count() == players.Length,
+			"Every sailor has a distinct voyage identity" );
+		foreach ( var barrel in scene.GetAllComponents<GoodsBarrel>() )
+		{
+			Check( identities.Contains( barrel.OwnerId ), "Produced cargo belongs to a current voyage" );
+		}
 		foreach ( var station in scene.GetAllComponents<ShipStation>() )
 		{
 			Check( station.Ship.IsValid(), $"{station.GameObject.Name} has a ship authority boundary" );

@@ -8,7 +8,7 @@ public static class CannonSmokeTest
 	public static async Task Run()
 	{
 		if ( !Game.IsEditor || Networking.IsActive || running ) return;
-		var sailor = Game.ActiveScene?.GetAllComponents<ShipPlayer>().FirstOrDefault();
+		var sailor = Game.ActiveScene?.GetAllComponents<ShipPlayer>().FirstOrDefault( x => !x.IsNpc );
 		if ( !sailor.IsValid() || sailor.Scene.IsEditor ) return;
 		running = true;
 		var player = sailor.Controller;
@@ -23,14 +23,15 @@ public static class CannonSmokeTest
 			foreach ( var cannon in cannons )
 			{
 				Check( !cannon.Fire( player ), "Unoccupied cannon rejects firing" );
-				player.WorldPosition = cannon.SeatPosition.WorldPosition + Vector3.Up * 5;
+				player.WorldPosition = cannon.SeatPosition.WorldPosition - cannon.WorldRotation.Forward * 25 + Vector3.Up * 70;
 				player.WishVelocity = Vector3.Zero;
 				player.Body.Velocity = sailor.Ship.Body.GetVelocityAtPoint( player.WorldPosition );
-				for ( int i = 0; i < 20 && cannon.GetOccupant() != player; i++ )
-				{
-					await GameTask.DelaySeconds( 0.1f );
-					cannon.TryTake( player );
-				}
+				for ( int i = 0; i < 40 && !player.IsOnGround; i++ ) await GameTask.DelaySeconds( 0.1f );
+				Check( player.IsOnGround, "Gunner reaches the physical deck beside " + cannon.GameObject.Name );
+				player.WorldPosition = cannon.SeatPosition.WorldPosition - cannon.WorldRotation.Forward * 25 + Vector3.Up * 5;
+				player.Body.Velocity = sailor.Ship.Body.GetVelocityAtPoint( player.WorldPosition );
+				cannon.TryTake( player );
+				if ( cannon.GetOccupant() != player ) Log.Info( $"CANNON TEST: grounded={player.IsOnGround}, distance={(player.WorldPosition - cannon.SeatPosition.WorldPosition).Length:0.0}, occupied={cannon.Occupied}, body={player.Body.Enabled}" );
 				Check( cannon.GetOccupant() == player && !player.Body.Enabled, "Gunner mounts " + cannon.GameObject.Name );
 				cannon.Aim( player, 1, 1, 0.1f );
 				Check( cannon.Yaw > 0 && cannon.Elevation > 12, "Barrel aim responds" );
