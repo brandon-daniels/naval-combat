@@ -11,6 +11,8 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 	[Property] public ArcadeShip ShipTemplate { get; set; }
 	[Property] public GameObject ShipSpawn { get; set; }
 	[Property] public GameObject NpcShipTemplate { get; set; }
+	[Property] public bool SpawnNpcShip { get; set; } = true;
+	[Sync( SyncFlags.FromHost )] public ShipNpc PirateCaptain { get; private set; }
 	[Property] public float SpawnSpacing { get; set; } = 900;
 	[Property] public int MaximumPlayers { get; set; } = 8;
 
@@ -46,6 +48,7 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 			SpawnPlayer( null );
 			localPreviewSpawned = true;
 		}
+		EnsurePirate();
 	}
 
 	protected override void OnUpdate()
@@ -75,6 +78,7 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 
 	public void OnActive( Connection connection )
 	{
+		EnsurePirate();
 		connection.CanSpawnObjects = false;
 		connection.CanDestroyObjects = false;
 		connection.CanRefreshObjects = false;
@@ -142,6 +146,48 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 	public void OnBecameHost( Connection previousHost )
 	{
 		RebuildSlots();
+		EnsurePirate();
+	}
+
+	private void EnsurePirate()
+	{
+		if ( !GameplayAuthority.CanMutate || !SpawnNpcShip ) return;
+		// Adopt the existing captain after hotload or a host change, rather than cloning another.
+		if ( !PirateCaptain.IsValid() ) PirateCaptain = Scene.GetAllComponents<ShipNpc>().FirstOrDefault();
+		if ( !PirateCaptain.IsValid() )
+		{
+			if ( !NpcShipTemplate.IsValid() )
+			{
+				Log.Warning( "NPC spawning requires a ship template." );
+				return;
+			}
+			var shipObject = NpcShipTemplate.Clone( NpcShipTemplate.WorldPosition, NpcShipTemplate.WorldRotation );
+			shipObject.Name = "Pirate ship";
+			shipObject.NetworkMode = NetworkMode.Never;
+			shipObject.Enabled = true;
+			var ship = shipObject.GetComponent<ArcadeShip>();
+			var spawn = shipObject.GetAllObjects( true ).FirstOrDefault( x => x.Name is "NPC captain spawn" or "Deck spawn" );
+			if ( !ship.IsValid() || !spawn.IsValid() )
+			{
+				Log.Error( "NPC ship requires ArcadeShip and an authored deck spawn." );
+				shipObject.Destroy();
+				return;
+			}
+			var sailor = NavalPrototype.CreateSailor( GameObject, ship, spawn, true );
+			sailor.GameObject.Name = "Pirate captain";
+			sailor.GameObject.NetworkMode = NetworkMode.Never;
+			PirateCaptain = sailor.GameObject.AddComponent<ShipNpc>();
+			PirateCaptain.Sailor = sailor;
+		}
+
+		var captain = PirateCaptain.Sailor;
+		if ( !Networking.IsActive || !captain.IsValid() || !captain.Ship.IsValid() || captain.GameObject.Network.Active ) return;
+		// Promote a local preview safely even when its captain was already at a station.
+		captain.CurrentStation?.Release( captain.Controller );
+		captain.Ship.GameObject.NetworkMode = NetworkMode.Object;
+		captain.GameObject.NetworkMode = NetworkMode.Object;
+		captain.Ship.GameObject.NetworkSpawn( null );
+		captain.GameObject.NetworkSpawn( null );
 	}
 
 	private void SpawnPlayer( Connection owner )

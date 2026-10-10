@@ -8,6 +8,8 @@ public sealed class ShipCannon : ShipStation, Component.ExecuteInEditor
 	[Property] public GameObject Muzzle { get; set; }
 	[Property] public float ReloadSeconds { get; set; } = 2;
 	[Property] public float MuzzleSpeed { get; set; } = 1800;
+	[Property] public float MaximumDepression { get; set; } = 10;
+	public float MinimumElevation => -Math.Clamp( MaximumDepression, 0, 20 );
 	[Sync] public float Yaw { get; private set; }
 	[Sync] public float Elevation { get; private set; } = 12;
 	public float ReloadRemaining => Math.Max( 0, ReadyAt - Time.Now );
@@ -27,7 +29,7 @@ public sealed class ShipCannon : ShipStation, Component.ExecuteInEditor
 	{
 		if ( Occupant != player || !player.IsValid() || !Enabled ) return;
 		Yaw = Math.Clamp( Yaw + turn * 35 * Math.Clamp( delta, 0, 0.1f ), -35, 35 );
-		Elevation = Math.Clamp( Elevation + lift * 25 * Math.Clamp( delta, 0, 0.1f ), 0, 45 );
+		Elevation = Math.Clamp( Elevation + lift * 25 * Math.Clamp( delta, 0, 0.1f ), MinimumElevation, 45 );
 		UpdateBarrel();
 	}
 	public bool Fire( PlayerController player )
@@ -35,6 +37,7 @@ public sealed class ShipCannon : ShipStation, Component.ExecuteInEditor
 		if ( !Enabled || !player.IsValid() || Occupant != player || ReloadRemaining > 0 || !Muzzle.IsValid() || !Ship.IsValid() ) return false;
 		if ( Networking.IsActive )
 		{
+			if ( CanControlNpc( player ) ) return FireAuthoritative( player );
 			RequestFire( player );
 			return true;
 		}
@@ -93,11 +96,12 @@ public sealed class ShipCannon : ShipStation, Component.ExecuteInEditor
 
 		authoredVisual.LocalPosition = new Vector3( -recoil * 12, 0, 0 );
 		authoredVisual.LocalRotation = Rotation.FromYaw( Yaw ) * Rotation.FromPitch( -Elevation );
-		authoredVisual.LocalScale = Vector3.One * 28;
+		// Imported model is already 173 units long; fit it to a 130-unit deck gun.
+		authoredVisual.LocalScale = Vector3.One * 0.75f;
 		if ( prototypeVisualsHidden ) return;
 		foreach ( var renderer in Scene.GetAllComponents<ModelRenderer>().Where( renderer =>
-			renderer.GameObject.IsDescendant( GameObject ) &&
-			!renderer.GameObject.IsDescendant( authoredVisual ) && renderer.GameObject != authoredVisual ) )
+			GameObject.IsDescendant( renderer.GameObject ) &&
+			!authoredVisual.IsDescendant( renderer.GameObject ) && renderer.GameObject != authoredVisual ) )
 		{
 			renderer.Enabled = false;
 		}

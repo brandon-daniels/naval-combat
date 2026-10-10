@@ -33,8 +33,17 @@ public static class NavalNetworkSmokeTest
 		}
 
 		Check( players.Select( x => x.Ship ).Distinct().Count() == players.Length, "No players share an assigned ship" );
+		var captains = scene.GetAllComponents<ShipNpc>().ToArray();
+		foreach ( var captain in captains )
+		{
+			Check( captain.Sailor.IsValid() && captain.Sailor.IsNpc && captain.Sailor.Ship.IsValid(), "Pirate captain has its own NPC sailor and ship" );
+			Check( captain.Network.Owner is null && captain.Sailor.Ship.Network.Owner is null, "Pirate is simulated by the host, not a player owner" );
+			Check( captain.GameObject.Network.Active && captain.Sailor.Ship.GameObject.Network.Active, "Pirate sailor and ship are networked" );
+		}
+		Check( captains.Length == (session.SpawnNpcShip ? 1 : 0), "Configured pirate count matches the session" );
+		var assignedShips = players.Select( x => x.Ship ).Concat( captains.Select( x => x.Sailor.Ship ) ).ToArray();
 		var ships = scene.GetAllComponents<ArcadeShip>().Where( x => x.GameObject.Network.Active ).ToArray();
-		Check( ships.Length == players.Length && ships.All( ship => players.Any( player => player.Ship == ship ) ),
+		Check( assignedShips.Distinct().Count() == assignedShips.Length && ships.Length == assignedShips.Length && ships.All( assignedShips.Contains ),
 			"No orphaned network ships remain" );
 		var identities = players.Select( x => x.GetComponent<PlayerVoyage>()?.Identity ).ToArray();
 		Check( identities.All( x => !string.IsNullOrWhiteSpace( x ) ) && identities.Distinct().Count() == players.Length,
@@ -46,7 +55,9 @@ public static class NavalNetworkSmokeTest
 		foreach ( var station in scene.GetAllComponents<ShipStation>() )
 		{
 			Check( station.Ship.IsValid(), $"{station.GameObject.Name} has a ship authority boundary" );
-			if ( station.Occupied ) Check( station.Occupant.Network.Owner is not null, $"{station.GameObject.Name} has a network-owned occupant" );
+			if ( station.Occupied ) Check( station.Occupant.Network.Owner == station.Ship.Network.Owner
+				&& (station.Occupant.Network.Owner is not null || captains.Any( x => x.Sailor.Controller == station.Occupant && x.Sailor.Ship == station.Ship )),
+				$"{station.GameObject.Name} has an authorized human or NPC occupant" );
 		}
 
 		Log.Info( "NAVAL NETWORK SHELL TEST PASSED" );

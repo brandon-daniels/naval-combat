@@ -65,8 +65,13 @@ public sealed class NavalPrototype : Component
 		var ship = npcShip.GetComponent<ArcadeShip>();
 		ship.Ocean = Ocean;
 		ship.Sails.Wind = Wind;
-		var spawn = new GameObject( npcShip, true, "NPC deck spawn" );
-		spawn.LocalPosition = new Vector3( -65, 0, 42 );
+		var spawn = npcShip.GetAllObjects( true ).FirstOrDefault( x => x.Name == "Deck spawn" );
+		if ( !spawn.IsValid() )
+		{
+			Log.Error( "NPC prototype ship requires an authored deck spawn." );
+			npcShip.Destroy();
+			return;
+		}
 		var human = playerObject;
 		CreatePlayer( ship, ship.Helm, spawn, true );
 		npcObject = playerObject;

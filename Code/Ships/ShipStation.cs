@@ -9,6 +9,11 @@ public abstract class ShipStation : BaseChair
 	public bool Occupied => Networking.IsActive ? StationOccupant.IsValid() : GetOccupant().IsValid();
 	public PlayerController Occupant => Networking.IsActive ? StationOccupant : GetOccupant();
 
+	/// <summary>Only the host may directly operate an unowned NPC's own stations.</summary>
+	protected bool CanControlNpc( PlayerController player ) => Networking.IsHost && player.IsValid() && Ship.IsValid()
+		&& player.Network.Owner is null && Ship.Network.Owner is null
+		&& player.GetComponent<ShipPlayer>() is { IsNpc: true } sailor && sailor.Ship == Ship;
+
 	public override bool CanEnter( PlayerController player )
 	{
 		if ( !Enabled || !Ship.IsValid() || !player.IsValid() || Occupied ) return false;
@@ -33,11 +38,19 @@ public abstract class ShipStation : BaseChair
 		if ( !CanEnter( player ) ) return false;
 		if ( Networking.IsActive )
 		{
+			if ( CanControlNpc( player ) )
+			{
+				StationOccupant = player;
+				player.WishVelocity = Vector3.Zero;
+				using ( Rpc.FilterInclude( Connection.Local ) ) Sit( player );
+				return GetOccupant() == player;
+			}
 			RequestTake( player );
 			return true;
 		}
 		player.WishVelocity = Vector3.Zero;
 		Sit( player );
+		StationOccupant = GetOccupant();
 		return GetOccupant() == player;
 	}
 
@@ -46,9 +59,16 @@ public abstract class ShipStation : BaseChair
 		if ( !player.IsValid() || Occupant != player ) return;
 		if ( Networking.IsActive )
 		{
+			if ( CanControlNpc( player ) )
+			{
+				StationOccupant = null;
+				using ( Rpc.FilterInclude( Connection.Local ) ) ReleaseLocal( player );
+				return;
+			}
 			RequestRelease( player );
 			return;
 		}
+		StationOccupant = null;
 		ReleaseLocal( player );
 	}
 
@@ -89,7 +109,7 @@ public abstract class ShipStation : BaseChair
 		{
 			var player = StationOccupant;
 			StationOccupant = null;
-			using ( Rpc.FilterInclude( player.Network.Owner ) ) Eject( player );
+			using ( Rpc.FilterInclude( player.Network.Owner ?? Connection.Local ) ) Eject( player );
 			return;
 		}
 		var occupant = GetOccupant();

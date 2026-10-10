@@ -2,15 +2,16 @@ using System;
 
 namespace NavalCombat;
 
-/// <summary>Local captain: walks the deck and submits only occupied station controls.</summary>
+/// <summary>Host-controlled captain: walks the deck and submits only occupied station controls.</summary>
 public sealed class ShipNpc : Component
 {
 	[Property] public ShipPlayer Sailor { get; set; }
-	[Property] public ArcadeShip Target { get; set; }
+	[Property, Sync( SyncFlags.FromHost )] public ArcadeShip Target { get; set; }
 	[Property] public float EngagementRange { get; set; } = 1800;
 	[Property] public float IslandClearance { get; set; } = 700;
 	[Property] public float CruisingDeployment { get; set; } = 0.65f;
-	public string NavigationStatus { get; private set; } = "Planning";
+	[Property] public float TargetAimHeight { get; set; } = 73;
+	[Sync( SyncFlags.FromHost )] public string NavigationStatus { get; private set; } = "Planning";
 	public int WaypointsRemaining => route.Points.Count;
 	public int TacksCompleted { get; private set; }
 	private readonly SailingRoute route = new();
@@ -21,12 +22,14 @@ public sealed class ShipNpc : Component
 	private bool turning;
 	private float previousCourse;
 	private bool hasCourse;
-	public string Activity { get; private set; } = "Finding target";
-	public int ShotsFired { get; private set; }
-	public int StationsVisited { get; private set; }
-	public bool UsedSails { get; private set; }
-	public bool UsedHelm { get; private set; }
-	public bool UsedCannon { get; private set; }
+	[Sync( SyncFlags.FromHost )] public string Activity { get; private set; } = "Finding target";
+	[Sync( SyncFlags.FromHost )] public int ShotsFired { get; private set; }
+	[Sync( SyncFlags.FromHost )] public int StationsVisited { get; private set; }
+	[Sync( SyncFlags.FromHost )] public bool UsedSails { get; private set; }
+	[Sync( SyncFlags.FromHost )] public bool UsedHelm { get; private set; }
+	[Sync( SyncFlags.FromHost )] public bool UsedCannon { get; private set; }
+	/// <summary>Local-only diagnostic counter: clients must never advance the captain's decisions.</summary>
+	public int DecisionTicks { get; private set; }
 	private ShipStation destination;
 	private float desiredDeployment;
 	private bool sailing;
@@ -38,20 +41,41 @@ public sealed class ShipNpc : Component
 
 	protected override void OnFixedUpdate()
 	{
+		if ( !GameplayAuthority.CanMutate || IsProxy ) return;
+		DecisionTicks++;
 		if ( !Sailor.IsValid() || !Sailor.Controller.IsValid() ) return;
 		var player = Sailor.Controller;
 		var ship = Sailor.Ship;
-		if ( Networking.IsActive || !ship.IsValid() || !ship.Helm.IsValid() || !ship.Sails.IsValid() )
+		if ( !ship.IsValid() || !ship.Helm.IsValid() || !ship.Sails.IsValid() )
 		{
 			Sailor.CurrentStation?.Release( player );
 			player.WishVelocity = Vector3.Zero;
 			return;
 		}
-		if ( !Target.IsValid() || Target == ship || !Target.Enabled )
-			Target = Scene.GetAllComponents<ArcadeShip>().Where( x => x != ship && x.Enabled ).OrderBy( x => (x.WorldPosition - ship.WorldPosition).Length ).FirstOrDefault();
+		var targets = Scene.GetAllComponents<ShipPlayer>().Where( x => !x.IsNpc && x.Ship.IsValid() && x.Ship.Enabled && x.Ship != ship )
+			.Select( x => x.Ship ).Distinct().ToArray();
+		if ( !Target.IsValid() || !targets.Contains( Target ) )
+		{
+			var replacement = targets.OrderBy( x => (x.WorldPosition - ship.WorldPosition).Length ).FirstOrDefault();
+			if ( Target != replacement )
+			{
+				SetDestination( null );
+				Target = replacement;
+				route.Points.Clear();
+				nextPlan = 0;
+				hasCourse = false;
+			}
+		}
 		if ( !Target.IsValid() )
 		{
 			Activity = "Waiting for another ship";
+			if ( ship.Sails.Deployment > 0.005f )
+			{
+				SetDestination( ship.Sails );
+				if ( Sailor.CurrentStation != ship.Sails ) WalkToStation();
+				else ship.Sails.Adjust( player, 0, -1, Time.Delta );
+				return;
+			}
 			Sailor.CurrentStation?.Release( player );
 			player.WishVelocity = Vector3.Zero;
 			return;
@@ -81,7 +105,7 @@ public sealed class ShipNpc : Component
 		desiredDeployment = sailing && navigable && windAvailable && !turning ? Math.Clamp( CruisingDeployment, 0.2f, 0.75f ) : 0;
 		float trim = rig.Wind.IsValid() ? Wrap( rig.Wind.Heading - desiredHeading - rig.SailAngle ) : 0;
 		bool needsSails = Math.Abs( rig.Deployment - desiredDeployment ) > 0.005f || (sailing && navigable && Math.Abs( trim ) > (Sailor.IsAtMast ? 5 : 25));
-		var cannon = Scene.GetAllComponents<ShipCannon>().Where( x => x.Ship == ship && x.Enabled && (!x.IsOccupied || x.GetOccupant() == player) )
+		var cannon = Scene.GetAllComponents<ShipCannon>().Where( x => x.Ship == ship && x.Enabled && (!x.Occupied || x.Occupant == player) )
 			.OrderBy( x => Math.Abs( Wrap( bearing - x.WorldRotation.Angles().yaw ) ) ).FirstOrDefault();
 		if ( Sailor.CurrentStation is ShipCannon occupied && Math.Abs( Wrap( bearing - occupied.WorldRotation.Angles().yaw ) ) < 30 ) cannon = occupied;
 
@@ -154,6 +178,7 @@ public sealed class ShipNpc : Component
 	private void SetDestination( ShipStation station )
 	{
 		if ( destination == station ) return;
+		if ( Sailor.IsAtHelm ) Sailor.Ship.SetHelmTarget( Sailor.Helm, 0 );
 		Sailor.CurrentStation?.Release( Sailor.Controller );
 		destination = station;
 		blockedTime = 0;
@@ -192,7 +217,7 @@ public sealed class ShipNpc : Component
 	{
 		if ( !gun.Muzzle.IsValid() || !Target.Body.IsValid() ) return;
 		var start = gun.Muzzle.WorldPosition;
-		var aim = Target.WorldPosition + Vector3.Up * 15;
+		var aim = Target.WorldPosition + Vector3.Up * TargetAimHeight;
 		float flight = (aim - start).WithZ( 0 ).Length / gun.MuzzleSpeed;
 		// Compensate for target motion, inherited muzzle velocity, and ballistic drop.
 		var relative = aim - start + (Target.Body.Velocity - Sailor.Ship.Body.GetVelocityAtPoint( start )) * flight + Vector3.Up * (200 * flight * flight);
@@ -205,11 +230,19 @@ public sealed class ShipNpc : Component
 			return;
 		}
 		// Wait out wave-induced pitch instead of repeatedly changing stations.
-		if ( elevation < 0 || elevation > 45 ) return;
+		if ( elevation < gun.MinimumElevation || elevation > 45 )
+		{
+			Activity = "Target outside cannon elevation";
+			return;
+		}
 		gun.Aim( Sailor.Controller, Math.Clamp( (turn - gun.Yaw) / 5, -1, 1 ), Math.Clamp( (elevation - gun.Elevation) / 5, -1, 1 ), Time.Delta );
 		if ( Math.Abs( turn - gun.Yaw ) > 1.5f || Math.Abs( elevation - gun.Elevation ) > 1.5f ) return;
 		var trace = Scene.Trace.Ray( start, aim ).IgnoreGameObjectHierarchy( Sailor.Ship.GameObject ).IgnoreGameObjectHierarchy( GameObject ).Run();
-		if ( trace.Hit && trace.GameObject != Target.GameObject && !trace.GameObject.IsDescendant( Target.GameObject ) ) return;
+		if ( trace.Hit && trace.GameObject != Target.GameObject && !Target.GameObject.IsDescendant( trace.GameObject ) )
+		{
+			Activity = "Shot obstructed";
+			return;
+		}
 		if ( gun.Fire( Sailor.Controller ) ) ShotsFired++;
 		Activity = "Firing broadside";
 	}
@@ -223,7 +256,7 @@ public sealed class ShipNpc : Component
 		hasCourse = false;
 		turning = false;
 		sailing = false;
-		if ( !Sailor.IsValid() ) return;
+		if ( !GameplayAuthority.CanMutate || IsProxy || !Sailor.IsValid() ) return;
 		Sailor.CurrentStation?.Release( Sailor.Controller );
 		if ( Sailor.Controller.IsValid() ) Sailor.Controller.WishVelocity = Vector3.Zero;
 	}

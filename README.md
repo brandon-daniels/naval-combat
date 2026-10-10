@@ -71,6 +71,8 @@ Gameplay transfers should be atomic: validate the complete request first, then u
 
 ### Milestones and feature tracking
 
+**Current priority (2026-10-09): NPC gameplay.** The next development slice is the pirate NPC loop in Milestone 5. The captain is now integrated into the main gameplay scene; local and host/client checks passed sailing, target selection, station use, firing, replication and target replacement after disconnect. Next build patrol, disengagement and stuck recovery, then the combat and cargo-theft systems needed to complete piracy. Resolve other milestone items when they block this work; milestone numbers are not the current execution order. Multiplayer/economy validation gaps remain tracked below.
+
 Status legend: ✅ verified prototype, 🟡 partial/local prototype, ⬜ not started. A prototype is not considered complete for the main game until it is integrated into the vertical slice and tested with a host and client.
 
 #### 0. Baseline and design contracts
@@ -110,14 +112,14 @@ These are tuning baselines, not promises of final balance. Economy values remain
 #### 1. Authoritative multiplayer sailing shell
 
 - ✅ Two-instance check confirms one owned ship and character per connected player
-- 🟡 Define authority for hull physics, stations, sails, cannons, projectiles, and NPC ships (player hulls are owner-simulated; station occupancy and cannon acceptance are host-validated; NPC authority remains)
+- 🟡 Define authority for hull physics, stations, sails, cannons, projectiles, and NPC ships (player hulls are owner-simulated; station occupancy and cannon acceptance are host-validated; NPC ships and decisions are host-simulated; full remote player sailing/fire coverage remains)
 - 🟡 Synchronize ship motion and station occupancy with usable remote interpolation (network objects and synchronized occupancy/sail/cannon state are implemented; remote feel remains to be tuned)
 - 🟡 Handle join, leave, reconnect, owner loss, and ship cleanup (join, ship/sailor cleanup, departing-voyage barrel cleanup, and host slot rebuilding exist; reconnect/host migration need live verification)
 - 🟡 `naval_test_network_shell` and the non-teleporting `naval_test_voyage_network` pass with two players; physical remote sailing, interpolation tuning, reconnect, and host migration remain
 
 Exit criteria: two players can join, board only permitted stations, sail, observe each other, and fire without valuable state being client-controlled.
 
-Disconnect currently ends that player's voyage: its ship, sailor, production, wallet, upgrades, and produced barrels are discarded; reconnect starts fresh. `naval_test_voyage_cleanup` checks barrel cleanup in local editor Play, and `naval_test_network_shell` checks for orphaned ships and cargo after a real disconnect. The cleanup change compiles but still needs live editor and two-instance validation. Historical voyage-test passes predate the physical barrel flow; those diagnostics need updating before reuse.
+Disconnect currently ends that player's voyage: its ship, sailor, production, wallet, upgrades, and produced barrels are discarded; reconnect starts fresh. Local cleanup, two-owner physical cargo transactions, and actual remote disconnect cleanup passed on 2026-10-09. Run `naval_test_voyage_network false` for physical cargo and `naval_test_disconnect_cargo` to stage one batch per player before closing the remote client. The optional `naval_test_voyage_network true` additionally requires cannons on both ships; the current player template has none. A fresh client rejoined without the fixed HUD null-reference error, but post-rejoin state assertions, resource-delivery warnings, physical remote sailing and host migration remain open.
 
 The integrated scene now uses `NavalMultiplayerSession` instead of the local prototype bootstrap. It keeps the authored player ship as a disabled template, clones one ship and sailor for each connection, assigns both to that connection, and creates camera/HUD presentation locally. Ship movement, sail trim, and cannon aim are owner-simulated for responsiveness. The host owns station occupancy decisions and cannon-fire acceptance; cannonballs are host-spawned network objects. Run the scene as host, choose **Join via new instance**, then run `naval_test_network_shell` on the host to inspect connection-to-ship ownership before performing the physical station and firing checks.
 
@@ -157,12 +159,14 @@ Exit criteria: earnings create distinct ship builds, all effects replicate, and 
 
 #### 5. Pirate NPC loop
 
-- 🟡 Local NPC navigation, station use, pursuit, and cannon firing exist
-- ⬜ Move NPC decisions and valuable outcomes under session authority
+- ✅ Main-scene NPC sailing, station use, pursuit and cannon firing passed local and host/client checks
+- 🟡 NPC decisions, station access and firing run under host authority; damage and loot outcomes remain unimplemented
 - ⬜ Add target scoring based on cargo value, distance, danger, and recent attackers
 - ⬜ Add patrol, pursue, attack, loot, retreat, and deposit states
 - ⬜ Add disengage rules, difficulty tuning, and recovery from stuck or lost stations
 - ⬜ Reuse the same cargo, damage, loot, and market APIs used by players
+
+The main scene spawns one pirate by default; disable SpawnNpcShip on NavalMultiplayerSession for isolated sailing/economy tests. Use naval_npc_status for behavior, naval_test_npc locally or on the host for station/firing checks, and naval_test_npc_network with a joining client for replication and host-only decision checks. Target switching after an actual client disconnect passed; host migration remains unverified.
 
 Exit criteria: a pirate can discover a loaded ship, engage it, steal dropped goods, and leave; empty or newly spawned ships are not relentlessly targeted.
 
