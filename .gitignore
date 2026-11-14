@@ -31,6 +31,9 @@ Exports/
 # Local scene compilation data
 *.scene_d
 
+# Local validation captures, build outputs and editor backups
+/.validation/
+
 # Local credentials and machine-specific files
 .env
 .env.*
