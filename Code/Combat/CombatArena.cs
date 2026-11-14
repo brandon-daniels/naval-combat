@@ -67,21 +67,7 @@ public sealed class CombatArena : Component, Component.INetworkListener
 		fighter.Controller = controller;
 		fighter.IsNpc = npc;
 		fighter.SpawnPosition = go.WorldPosition;
-		fighter.Sword = new GameObject( go, true, "Sword" );
-		AddSwordPart( fighter.Sword, "Steel blade", new Vector3( 26, 0, 0 ), new Vector3( 44, 3, 5 ), new Color( 0.8f, 0.88f, 0.95f ) );
-		AddSwordPart( fighter.Sword, "Brass guard", Vector3.Zero, new Vector3( 3, 17, 4 ), new Color( 0.85f, 0.6f, 0.18f ) );
-		AddSwordPart( fighter.Sword, "Leather grip", new Vector3( -7, 0, 0 ), new Vector3( 12, 4, 4 ), new Color( 0.18f, 0.09f, 0.04f ) );
 		go.Enabled = true;
 		if ( Networking.IsActive ) go.NetworkSpawn( owner );
-	}
-
-	private static void AddSwordPart( GameObject parent, string name, Vector3 position, Vector3 size, Color tint )
-	{
-		var part = new GameObject( parent, true, name );
-		part.LocalPosition = position;
-		part.LocalScale = size / 50;
-		var model = part.AddComponent<ModelRenderer>();
-		model.Model = Model.Load( "models/dev/box.vmdl" );
-		model.Tint = tint;
 	}
 }

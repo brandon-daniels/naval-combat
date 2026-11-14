@@ -22,6 +22,16 @@
           "__guid": "bf984610-54da-4018-a340-03281372510a",
           "__enabled": true,
           "Flags": 0,
+          "BarrelSpawn": {
+            "_type": "gameobject",
+            "go": "91af2cd7-672f-491e-b0a1-a526fc8c1001"
+          },
+          "CaneField": {
+            "_type": "component",
+            "component_id": "91af2cd7-672f-491e-b0a1-a526fc8c1004",
+            "go": "91af2cd7-672f-491e-b0a1-a526fc8c1003",
+            "component_type": "SugarCaneProduction"
+          },
           "Goods": {
             "Id": "409f6253-96b3-455c-9cea-d78edcfad6c8",
             "Path": "definitions/goods/trade_goods.ngoods"
@@ -39,6 +49,75 @@
         }
       ],
       "Children": [
+        {
+          "__guid": "91af2cd7-672f-491e-b0a1-a526fc8c1001",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Goods barrel spawn - move me",
+          "Position": "-1567.19165,0,152.000046",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "NavalCombat.GoodsBarrelSpawn",
+              "__guid": "91af2cd7-672f-491e-b0a1-a526fc8c1002",
+              "__enabled": true,
+              "Flags": 0,
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "91af2cd7-672f-491e-b0a1-a526fc8c1003",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Sugar cane growing area - move me",
+          "Position": "-1200,100,140",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "NavalCombat.SugarCaneProduction",
+              "__guid": "91af2cd7-672f-491e-b0a1-a526fc8c1004",
+              "__enabled": true,
+              "Flags": 0,
+              "AnimatePreview": false,
+              "CaneHeight": 135,
+              "Columns": 7,
+              "FieldSize": "360,260",
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "PreviewProgress": 0.5,
+              "Rows": 5,
+              "ScytheRotationsPerSecond": 2
+            }
+          ],
+          "Children": []
+        },
         {
           "__guid": "cf984610-54da-4018-a340-03281372510a",
           "__version": 2,
@@ -66,7 +145,10 @@
               "MaterialGroup": null,
               "MaterialOverride": null,
               "Materials": null,
-              "Model": "models/dev/box.vmdl",
+              "Model": {
+                "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                "Path": "models/dev/box.vmdl"
+              },
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -108,6 +190,8 @@
           "__guid": "bf984610-54da-4018-a340-03281372510b",
           "__enabled": true,
           "Flags": 0,
+          "BarrelSpawn": null,
+          "CaneField": null,
           "Goods": {
             "Id": "409f6253-96b3-455c-9cea-d78edcfad6c8",
             "Path": "definitions/goods/trade_goods.ngoods"
@@ -152,7 +236,10 @@
               "MaterialGroup": null,
               "MaterialOverride": null,
               "Materials": null,
-              "Model": "models/dev/box.vmdl",
+              "Model": {
+                "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                "Path": "models/dev/box.vmdl"
+              },
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -194,6 +281,8 @@
           "__guid": "bf984610-54da-4018-a340-03281372510c",
           "__enabled": true,
           "Flags": 0,
+          "BarrelSpawn": null,
+          "CaneField": null,
           "Goods": {
             "Id": "409f6253-96b3-455c-9cea-d78edcfad6c8",
             "Path": "definitions/goods/trade_goods.ngoods"
@@ -238,7 +327,10 @@
               "MaterialGroup": null,
               "MaterialOverride": null,
               "Materials": null,
-              "Model": "models/dev/box.vmdl",
+              "Model": {
+                "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                "Path": "models/dev/box.vmdl"
+              },
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -316,13 +408,56 @@
         {
           "__type": "Sandbox.DirectionalLight",
           "__guid": "518bc4f0-f914-4183-acd0-63f9bd3bc21f",
-          "__enabled": true,
+          "__enabled": false,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
+          "BakeLightIndex": -1,
           "ContactShadows": true,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "IncludeStaticShadowCasters": false,
+          "Intensity": 1,
           "LightColor": "0.94419,0.97767,1,1",
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -335,6 +470,7 @@
           "ShadowHardness": 0,
           "Shadows": true,
           "SkyColor": "0.2532,0.32006,0.35349,1",
+          "Temperature": 6500,
           "Visualizer": {}
         }
       ],
@@ -367,8 +503,11 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "SkyIndirectLighting": true,
-          "SkyMaterial": "materials/skybox/skybox_day_01.vmat",
+          "SkyIndirectLighting": false,
+          "SkyMaterial": {
+            "Id": "43ea3d43-c4ea-4f77-91d2-5647693df991",
+            "Path": "materials/sky/naval_weather_sky.vmat"
+          },
           "Tint": "1,1,1,1"
         },
         {
@@ -509,6 +648,7 @@
             "go": "f148df84-e46a-4942-9469-92941d682f29",
             "component_type": "ArcadeShip"
           },
+          "SpawnNpcShip": true,
           "SpawnSpacing": 900
         }
       ],
@@ -535,7 +675,7 @@
               "__version": 2,
               "Flags": 0,
               "Name": "Ocean",
-              "Position": "1280,-1216,0",
+              "Position": "1296,-1188,0",
               "Rotation": "0,0,0,1",
               "Scale": "1,1,1",
               "Tags": "",
@@ -551,6 +691,8 @@
                   "__guid": "6881acf7-e5e0-4b99-81ff-0d7de4e29d7f",
                   "__enabled": true,
                   "Flags": 0,
+                  "CrestSteepness": 0.86,
+                  "DirectionalSpread": 1,
                   "FoamStrength": 1,
                   "FollowTarget": {
                     "_type": "gameobject",
@@ -563,7 +705,8 @@
                   "OnComponentStart": null,
                   "OnComponentUpdate": null,
                   "SeaLevel": 0,
-                  "WaveHeight": 55
+                  "WaveHeight": 55,
+                  "WaveSeed": 731
                 }
               ],
               "Children": []
@@ -663,7 +806,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -735,7 +881,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -807,7 +956,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -879,7 +1031,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -1037,6 +1192,7 @@
                           "Gravity": false,
                           "GravityScale": 1,
                           "ImpactDamage": 0,
+                          "InertiaScale": 1,
                           "LinearDamping": 0,
                           "Locking": {
                             "X": false,
@@ -1623,7 +1779,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -1695,7 +1854,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -1741,7 +1903,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -1787,7 +1952,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -1833,7 +2001,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -1879,7 +2050,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -1925,7 +2099,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -1971,7 +2148,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2043,7 +2223,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2089,7 +2272,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2135,7 +2321,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2181,7 +2370,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2227,7 +2419,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2273,7 +2468,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2319,7 +2517,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2391,7 +2592,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2437,7 +2641,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2483,7 +2690,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2529,7 +2739,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2575,7 +2788,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2621,7 +2837,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2667,7 +2886,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2739,7 +2961,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2785,7 +3010,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2831,7 +3059,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2877,7 +3108,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2923,7 +3157,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -2969,7 +3206,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -3015,7 +3255,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -3087,7 +3330,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -3133,7 +3379,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -3179,7 +3428,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -3225,7 +3477,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -3271,7 +3526,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -3317,7 +3575,10 @@
                           "MaterialGroup": null,
                           "MaterialOverride": null,
                           "Materials": null,
-                          "Model": "models/dev/box.vmdl",
+                          "Model": {
+                            "Id": "8a84e5a0-01f8-0000-f0db-b088f8010000",
+                            "Path": "models/dev/box.vmdl"
+                          },
                           "OnComponentDestroy": null,
                           "OnComponentDisabled": null,
                           "OnComponentEnabled": null,
@@ -3367,6 +3628,7 @@
                   "Gravity": false,
                   "GravityScale": 1,
                   "ImpactDamage": 0,
+                  "InertiaScale": 1,
                   "LinearDamping": 0.05,
                   "Locking": {
                     "X": false,
@@ -3459,13 +3721,18 @@
                   "__guid": "569922ca-e1e0-4024-9762-f5d5d8165910",
                   "__enabled": true,
                   "Flags": 0,
+                  "BreachMergeDistance": 60,
+                  "FloodCapacity": 1000,
+                  "FullLeakDepth": 30,
+                  "LeakRatePerTier": 6,
                   "MaximumHealth": 1000,
                   "OnComponentDestroy": null,
                   "OnComponentDisabled": null,
                   "OnComponentEnabled": null,
                   "OnComponentFixedUpdate": null,
                   "OnComponentStart": null,
-                  "OnComponentUpdate": null
+                  "OnComponentUpdate": null,
+                  "RepairSecondsPerTier": 2
                 },
                 {
                   "__type": "NavalCombat.ShipUpgradeManager",
@@ -3496,6 +3763,382 @@
               ],
               "Children": [
                 {
+                  "__guid": "05f55590-f2b2-4451-83d0-35b165547a6f",
+                  "__version": 2,
+                  "Flags": 0,
+                  "Name": "Starboard forward cannon",
+                  "Position": "155,-105,73",
+                  "Rotation": "0,0,-0.707106769,0.707106769",
+                  "Scale": "1,1,1",
+                  "Tags": "",
+                  "Enabled": true,
+                  "NetworkMode": 2,
+                  "NetworkFlags": 0,
+                  "NetworkOrphaned": 0,
+                  "NetworkTransmit": true,
+                  "OwnerTransfer": 1,
+                  "Components": [
+                    {
+                      "__type": "NavalCombat.ShipCannon",
+                      "__guid": "66f1dd90-a230-42ee-b240-0ff6fd06ed04",
+                      "__enabled": true,
+                      "Flags": 0,
+                      "Barrel": {
+                        "_type": "gameobject",
+                        "go": "b16b132f-5feb-4aec-9bd5-a4c9512de829"
+                      },
+                      "ExitPoints": [
+                        {
+                          "_type": "gameobject",
+                          "go": "47d2aaad-ed53-4d17-bdf3-1dd3995b492b"
+                        }
+                      ],
+                      "EyePosition": {
+                        "_type": "gameobject",
+                        "go": "1b99e747-b269-4ef0-8643-17d011e5ae19"
+                      },
+                      "MaximumDepression": 10,
+                      "Muzzle": {
+                        "_type": "gameobject",
+                        "go": "c11fab83-f601-4e18-ad47-f95cabf3ddaa"
+                      },
+                      "MuzzleSpeed": 1800,
+                      "OnComponentDestroy": null,
+                      "OnComponentDisabled": null,
+                      "OnComponentEnabled": null,
+                      "OnComponentFixedUpdate": null,
+                      "OnComponentStart": null,
+                      "OnComponentUpdate": null,
+                      "PitchRange": "-90,70",
+                      "ReloadSeconds": 2,
+                      "SeatPosition": {
+                        "_type": "gameobject",
+                        "go": "60d72dea-63da-44f9-bf9a-544070de2a09"
+                      },
+                      "Ship": {
+                        "_type": "component",
+                        "component_id": "d19c679a-6561-4ddd-9ffe-21034bb5723b",
+                        "go": "f148df84-e46a-4942-9469-92941d682f29",
+                        "component_type": "ArcadeShip"
+                      },
+                      "SitHeight": 0,
+                      "SitPose": "Standing",
+                      "TooltipDescription": "",
+                      "TooltipIcon": "airline_seat_recline_normal",
+                      "TooltipTitle": "Sit",
+                      "UseDistance": 48,
+                      "YawRange": "-120,120"
+                    },
+                    {
+                      "__type": "Sandbox.BoxCollider",
+                      "__guid": "c487ebea-4958-49bb-8429-aaab6263c729",
+                      "__enabled": true,
+                      "Flags": 0,
+                      "Center": "0,0,24",
+                      "ColliderFlags": 0,
+                      "Elasticity": null,
+                      "Friction": null,
+                      "IsTrigger": false,
+                      "OnComponentDestroy": null,
+                      "OnComponentDisabled": null,
+                      "OnComponentEnabled": null,
+                      "OnComponentFixedUpdate": null,
+                      "OnComponentStart": null,
+                      "OnComponentUpdate": null,
+                      "OnObjectTriggerEnter": null,
+                      "OnObjectTriggerExit": null,
+                      "OnTriggerEnter": null,
+                      "OnTriggerExit": null,
+                      "RollingResistance": null,
+                      "Scale": "44,44,48",
+                      "Static": false,
+                      "Surface": null,
+                      "SurfaceVelocity": "0,0,0"
+                    }
+                  ],
+                  "Children": [
+                    {
+                      "__guid": "60d72dea-63da-44f9-bf9a-544070de2a09",
+                      "__version": 2,
+                      "Flags": 0,
+                      "Name": "Gunner position",
+                      "Position": "-52,0,1",
+                      "Rotation": "0,0,0,1",
+                      "Scale": "1,1,1",
+                      "Tags": "",
+                      "Enabled": true,
+                      "NetworkMode": 2,
+                      "NetworkFlags": 0,
+                      "NetworkOrphaned": 0,
+                      "NetworkTransmit": true,
+                      "OwnerTransfer": 1,
+                      "Components": [],
+                      "Children": []
+                    },
+                    {
+                      "__guid": "1b99e747-b269-4ef0-8643-17d011e5ae19",
+                      "__version": 2,
+                      "Flags": 0,
+                      "Name": "Gunner eyes",
+                      "Position": "-52,0,66",
+                      "Rotation": "0,0,0,1",
+                      "Scale": "1,1,1",
+                      "Tags": "",
+                      "Enabled": true,
+                      "NetworkMode": 2,
+                      "NetworkFlags": 0,
+                      "NetworkOrphaned": 0,
+                      "NetworkTransmit": true,
+                      "OwnerTransfer": 1,
+                      "Components": [],
+                      "Children": []
+                    },
+                    {
+                      "__guid": "47d2aaad-ed53-4d17-bdf3-1dd3995b492b",
+                      "__version": 2,
+                      "Flags": 0,
+                      "Name": "Gunner exit",
+                      "Position": "-58,0,6",
+                      "Rotation": "0,0,0,1",
+                      "Scale": "1,1,1",
+                      "Tags": "",
+                      "Enabled": true,
+                      "NetworkMode": 2,
+                      "NetworkFlags": 0,
+                      "NetworkOrphaned": 0,
+                      "NetworkTransmit": true,
+                      "OwnerTransfer": 1,
+                      "Components": [],
+                      "Children": []
+                    },
+                    {
+                      "__guid": "b16b132f-5feb-4aec-9bd5-a4c9512de829",
+                      "__version": 2,
+                      "Flags": 0,
+                      "Name": "Aiming barrel",
+                      "Position": "0,0,65",
+                      "Rotation": "0,-0.104528464,0,0.994521916",
+                      "Scale": "1,1,1",
+                      "Tags": "",
+                      "Enabled": true,
+                      "NetworkMode": 2,
+                      "NetworkFlags": 0,
+                      "NetworkOrphaned": 0,
+                      "NetworkTransmit": true,
+                      "OwnerTransfer": 1,
+                      "Components": [],
+                      "Children": [
+                        {
+                          "__guid": "c11fab83-f601-4e18-ad47-f95cabf3ddaa",
+                          "__version": 2,
+                          "Flags": 0,
+                          "Name": "Muzzle",
+                          "Position": "75,0,0",
+                          "Rotation": "0,0,0,1",
+                          "Scale": "1,1,1",
+                          "Tags": "",
+                          "Enabled": true,
+                          "NetworkMode": 2,
+                          "NetworkFlags": 0,
+                          "NetworkOrphaned": 0,
+                          "NetworkTransmit": true,
+                          "OwnerTransfer": 1,
+                          "Components": [],
+                          "Children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "__guid": "3dfde199-ddc2-4f66-8b9e-159550e9f762",
+                  "__version": 2,
+                  "Flags": 0,
+                  "Name": "Port forward cannon",
+                  "Position": "155,105,73",
+                  "Rotation": "0,0,0.707106769,0.707106769",
+                  "Scale": "1,1,1",
+                  "Tags": "",
+                  "Enabled": true,
+                  "NetworkMode": 2,
+                  "NetworkFlags": 0,
+                  "NetworkOrphaned": 0,
+                  "NetworkTransmit": true,
+                  "OwnerTransfer": 1,
+                  "Components": [
+                    {
+                      "__type": "NavalCombat.ShipCannon",
+                      "__guid": "d93d5dce-41ac-48e1-8d9b-3921691b890f",
+                      "__enabled": true,
+                      "Flags": 0,
+                      "Barrel": {
+                        "_type": "gameobject",
+                        "go": "b66cf59e-c9d7-424b-8310-f975ba97d010"
+                      },
+                      "ExitPoints": [
+                        {
+                          "_type": "gameobject",
+                          "go": "3aa511d6-88a3-4809-813e-88ed6fc64d1a"
+                        }
+                      ],
+                      "EyePosition": {
+                        "_type": "gameobject",
+                        "go": "3beb132d-7934-4d79-894d-41d3d9abb32f"
+                      },
+                      "MaximumDepression": 10,
+                      "Muzzle": {
+                        "_type": "gameobject",
+                        "go": "9be127a6-e703-4f08-98ac-f6e57753c434"
+                      },
+                      "MuzzleSpeed": 1800,
+                      "OnComponentDestroy": null,
+                      "OnComponentDisabled": null,
+                      "OnComponentEnabled": null,
+                      "OnComponentFixedUpdate": null,
+                      "OnComponentStart": null,
+                      "OnComponentUpdate": null,
+                      "PitchRange": "-90,70",
+                      "ReloadSeconds": 2,
+                      "SeatPosition": {
+                        "_type": "gameobject",
+                        "go": "828fce36-830b-4b78-baad-60c0e0722145"
+                      },
+                      "Ship": {
+                        "_type": "component",
+                        "component_id": "d19c679a-6561-4ddd-9ffe-21034bb5723b",
+                        "go": "f148df84-e46a-4942-9469-92941d682f29",
+                        "component_type": "ArcadeShip"
+                      },
+                      "SitHeight": 0,
+                      "SitPose": "Standing",
+                      "TooltipDescription": "",
+                      "TooltipIcon": "airline_seat_recline_normal",
+                      "TooltipTitle": "Sit",
+                      "UseDistance": 48,
+                      "YawRange": "-120,120"
+                    },
+                    {
+                      "__type": "Sandbox.BoxCollider",
+                      "__guid": "8fe1f752-6953-40cf-b1ec-c79ad5fb6304",
+                      "__enabled": true,
+                      "Flags": 0,
+                      "Center": "0,0,24",
+                      "ColliderFlags": 0,
+                      "Elasticity": null,
+                      "Friction": null,
+                      "IsTrigger": false,
+                      "OnComponentDestroy": null,
+                      "OnComponentDisabled": null,
+                      "OnComponentEnabled": null,
+                      "OnComponentFixedUpdate": null,
+                      "OnComponentStart": null,
+                      "OnComponentUpdate": null,
+                      "OnObjectTriggerEnter": null,
+                      "OnObjectTriggerExit": null,
+                      "OnTriggerEnter": null,
+                      "OnTriggerExit": null,
+                      "RollingResistance": null,
+                      "Scale": "44,44,48",
+                      "Static": false,
+                      "Surface": null,
+                      "SurfaceVelocity": "0,0,0"
+                    }
+                  ],
+                  "Children": [
+                    {
+                      "__guid": "828fce36-830b-4b78-baad-60c0e0722145",
+                      "__version": 2,
+                      "Flags": 0,
+                      "Name": "Gunner position",
+                      "Position": "-52,0,1",
+                      "Rotation": "0,0,0,1",
+                      "Scale": "1,1,1",
+                      "Tags": "",
+                      "Enabled": true,
+                      "NetworkMode": 2,
+                      "NetworkFlags": 0,
+                      "NetworkOrphaned": 0,
+                      "NetworkTransmit": true,
+                      "OwnerTransfer": 1,
+                      "Components": [],
+                      "Children": []
+                    },
+                    {
+                      "__guid": "3beb132d-7934-4d79-894d-41d3d9abb32f",
+                      "__version": 2,
+                      "Flags": 0,
+                      "Name": "Gunner eyes",
+                      "Position": "-52,0,66",
+                      "Rotation": "0,0,0,1",
+                      "Scale": "1,1,1",
+                      "Tags": "",
+                      "Enabled": true,
+                      "NetworkMode": 2,
+                      "NetworkFlags": 0,
+                      "NetworkOrphaned": 0,
+                      "NetworkTransmit": true,
+                      "OwnerTransfer": 1,
+                      "Components": [],
+                      "Children": []
+                    },
+                    {
+                      "__guid": "3aa511d6-88a3-4809-813e-88ed6fc64d1a",
+                      "__version": 2,
+                      "Flags": 0,
+                      "Name": "Gunner exit",
+                      "Position": "-58,0,6",
+                      "Rotation": "0,0,0,1",
+                      "Scale": "1,1,1",
+                      "Tags": "",
+                      "Enabled": true,
+                      "NetworkMode": 2,
+                      "NetworkFlags": 0,
+                      "NetworkOrphaned": 0,
+                      "NetworkTransmit": true,
+                      "OwnerTransfer": 1,
+                      "Components": [],
+                      "Children": []
+                    },
+                    {
+                      "__guid": "b66cf59e-c9d7-424b-8310-f975ba97d010",
+                      "__version": 2,
+                      "Flags": 0,
+                      "Name": "Aiming barrel",
+                      "Position": "0,0,65",
+                      "Rotation": "0,-0.104528464,0,0.994521916",
+                      "Scale": "1,1,1",
+                      "Tags": "",
+                      "Enabled": true,
+                      "NetworkMode": 2,
+                      "NetworkFlags": 0,
+                      "NetworkOrphaned": 0,
+                      "NetworkTransmit": true,
+                      "OwnerTransfer": 1,
+                      "Components": [],
+                      "Children": [
+                        {
+                          "__guid": "9be127a6-e703-4f08-98ac-f6e57753c434",
+                          "__version": 2,
+                          "Flags": 0,
+                          "Name": "Muzzle",
+                          "Position": "75,0,0",
+                          "Rotation": "0,0,0,1",
+                          "Scale": "1,1,1",
+                          "Tags": "",
+                          "Enabled": true,
+                          "NetworkMode": 2,
+                          "NetworkFlags": 0,
+                          "NetworkOrphaned": 0,
+                          "NetworkTransmit": true,
+                          "OwnerTransfer": 1,
+                          "Components": [],
+                          "Children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
                   "__guid": "5ddab746-2ae2-4b0a-8803-2f9c74231f66",
                   "__version": 2,
                   "Flags": 0,
@@ -3522,7 +4165,10 @@
                       "MaterialGroup": null,
                       "MaterialOverride": null,
                       "Materials": null,
-                      "Model": "models/reference_ship/reference_ship.vmdl",
+                      "Model": {
+                        "Id": "42036058-653c-47db-8b71-6330162180d7",
+                        "Path": "models/reference_ship/reference_ship.vmdl"
+                      },
                       "OnComponentDestroy": null,
                       "OnComponentDisabled": null,
                       "OnComponentEnabled": null,
@@ -3543,9 +4189,28 @@
                       "__guid": "b16edd74-7734-4147-8d85-a9340f254b6f",
                       "__enabled": true,
                       "Flags": 0,
-                      "Model": "models/reference_ship/reference_ship.vmdl",
+                      "ColliderFlags": 0,
+                      "Elasticity": null,
+                      "Friction": null,
+                      "IsTrigger": false,
+                      "Model": {
+                        "Id": "42036058-653c-47db-8b71-6330162180d7",
+                        "Path": "models/reference_ship/reference_ship.vmdl"
+                      },
+                      "OnComponentDestroy": null,
+                      "OnComponentDisabled": null,
+                      "OnComponentEnabled": null,
+                      "OnComponentFixedUpdate": null,
+                      "OnComponentStart": null,
+                      "OnComponentUpdate": null,
+                      "OnObjectTriggerEnter": null,
+                      "OnObjectTriggerExit": null,
+                      "OnTriggerEnter": null,
+                      "OnTriggerExit": null,
+                      "RollingResistance": null,
                       "Static": false,
-                      "IsTrigger": false
+                      "Surface": null,
+                      "SurfaceVelocity": "0,0,0"
                     }
                   ],
                   "Children": []
@@ -4247,6 +4912,24 @@
       "OwnerTransfer": 1,
       "Components": [
         {
+          "__type": "NavalCombat.ShipHealth",
+          "__guid": "6adca67b-3470-41fd-b6d4-0b235e66997d",
+          "__enabled": true,
+          "Flags": 0,
+          "BreachMergeDistance": 60,
+          "FloodCapacity": 1000,
+          "FullLeakDepth": 30,
+          "LeakRatePerTier": 6,
+          "MaximumHealth": 1000,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RepairSecondsPerTier": 2
+        },
+        {
           "__type": "Sandbox.Rigidbody",
           "__guid": "8215edee-86f8-40cb-ba74-28bfeb525661",
           "__enabled": true,
@@ -4257,6 +4940,7 @@
           "Gravity": false,
           "GravityScale": 1,
           "ImpactDamage": 0,
+          "InertiaScale": 1,
           "LinearDamping": 0.05,
           "Locking": {
             "X": false,
@@ -4360,7 +5044,10 @@
               "MaterialGroup": null,
               "MaterialOverride": null,
               "Materials": null,
-              "Model": "models/reference_ship/reference_ship.vmdl",
+              "Model": {
+                "Id": "42036058-653c-47db-8b71-6330162180d7",
+                "Path": "models/reference_ship/reference_ship.vmdl"
+              },
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4381,9 +5068,28 @@
               "__guid": "008c1f82-2d25-45d9-a576-3cd98c149f3b",
               "__enabled": true,
               "Flags": 0,
-              "Model": "models/reference_ship/reference_ship.vmdl",
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "Model": {
+                "Id": "42036058-653c-47db-8b71-6330162180d7",
+                "Path": "models/reference_ship/reference_ship.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "OnObjectTriggerEnter": null,
+              "OnObjectTriggerExit": null,
+              "OnTriggerEnter": null,
+              "OnTriggerExit": null,
+              "RollingResistance": null,
               "Static": false,
-              "IsTrigger": false
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
             }
           ],
           "Children": []
@@ -5097,6 +5803,7 @@
                 "_type": "gameobject",
                 "go": "43200181-2e82-41e0-9d89-532acca0806f"
               },
+              "MaximumDepression": 10,
               "Muzzle": {
                 "_type": "gameobject",
                 "go": "746f3be5-d815-41d9-b035-1afb7326501a"
@@ -5482,6 +6189,7 @@
                 "_type": "gameobject",
                 "go": "27067200-533b-4995-a9ca-d3c31fc2dc31"
               },
+              "MaximumDepression": 10,
               "Muzzle": {
                 "_type": "gameobject",
                 "go": "4e80cb4b-3517-4cc0-beb3-b134eb2374a7"
@@ -5851,6 +6559,53 @@
           "Children": []
         }
       ]
+    },
+    {
+      "__guid": "9ba173d0-8a13-4a4b-bb20-de6d6ae7edeb",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Weather",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 1,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "NavalCombat.NavalWeather",
+          "__guid": "4b1d3608-754a-4620-808f-f3e9f65fd8fd",
+          "__enabled": true,
+          "Flags": 0,
+          "CycleEnabled": true,
+          "DayLengthMinutes": 24,
+          "Ocean": {
+            "_type": "component",
+            "component_id": "6881acf7-e5e0-4b99-81ff-0d7de4e29d7f",
+            "go": "999126b4-e5e1-42c2-b4e1-f2e2fb8b34be",
+            "component_type": "ArcadeOcean"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Preset": "Stormy",
+          "StartHour": 5.860465,
+          "Sun": {
+            "_type": "component",
+            "component_id": "518bc4f0-f914-4183-acd0-63f9bd3bc21f",
+            "go": "5ad8da7b-0eab-4493-a604-1f7557ba4ea5",
+            "component_type": "DirectionalLight"
+          }
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {

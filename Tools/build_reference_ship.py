@@ -7,6 +7,8 @@ import bpy
 import bmesh
 import math
 import os
+import sys
+import json
 from mathutils import Vector, Matrix
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -15,6 +17,10 @@ os.makedirs(OUT, exist_ok=True)
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.context.preferences.filepaths.save_version = 0
 render, collision, sails = [], [], []
+structure = []
+structure_objects = []
+shell = []
+shell_collision = []
 colors = {'ivory': (0.73, .72, .57, 1), 'trim': (.88, .86, .69, 1),
           'deck': (.56, .51, .36, 1), 'dark': (.24, .23, .17, 1),
           'rope': (.38, .36, .25, 1), 'canvas': (.85, .81, .64, 1)}
@@ -27,11 +33,13 @@ for name, color in colors.items():
     m.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value = .85
     mats[name] = m
     with open(os.path.join(OUT, name + '.vmat'), 'w') as f:
-        f.write('"Layer0"\n{\n "shader" "shaders/complex.shader"\n "g_flModelTintAmount" "1"\n'
+        shader = 'complex' if name == 'canvas' else 'naval_hull_damage'
+        tint = 'g_vColorTint' if name == 'canvas' else 'g_vHullColor'
+        f.write('"Layer0"\n{\n' + f' "shader" "shaders/{shader}.shader"\n "g_flModelTintAmount" "1"\n'
                 ' "TextureColor" "materials/default/default_color.tga"\n'
                 ' "TextureNormal" "materials/default/default_normal.tga"\n'
                 ' "TextureRoughness" "materials/default/default_rough.tga"\n'
-                f' "g_vColorTint" "[{color[0]} {color[1]} {color[2]} 0]"\n}}\n')
+                f' "{tint}" "[{color[0]} {color[1]} {color[2]} 0]"\n}}\n')
 
 def mesh(name, verts, faces, mat='ivory', solid=False, group=None):
     data = bpy.data.meshes.new(name)
@@ -44,9 +52,16 @@ def mesh(name, verts, faces, mat='ivory', solid=False, group=None):
     bpy.context.collection.objects.link(obj)
     obj.data.materials.append(mats[mat])
     (render if group is None else group).append(obj)
+    is_shell = name.startswith('Hull_') or name in ['End wall', 'Hold lining', 'Hold aft bulkhead', 'Hold fore bulkhead']
+    if is_shell:
+        shell.append(obj)
+        render.remove(obj)
     if solid:
         copy = obj.copy(); copy.data = obj.data.copy(); copy.name = 'UCX_' + name
         bpy.context.collection.objects.link(copy); collision.append(copy)
+        if is_shell:
+            shell_collision.append(copy)
+            collision.remove(copy)
     return obj
 
 def box(name, center, size, mat='ivory', solid=False):
@@ -57,12 +72,26 @@ def box(name, center, size, mat='ivory', solid=False):
 
 def beam(name, a, b, radius, mat='trim', solid=False, sides=8):
     a,b=Vector(a),Vector(b); delta=b-a
+    # These same authored beams become individual runtime meshes and colliders.
+    # Do not leave a second copy baked into the ship's render or physics model.
+    removable = name.startswith('Gunwale_') or name in [
+        'Rail stanchion', 'Stair handrail', 'Quarterdeck rail', 'Quarterdeck post', 'Stern rail',
+        'Mast base', 'Mast main', 'Mast top', 'Upper yard', 'Main yard', 'Bowsprit', 'Forestay', 'Shroud']
+    if removable:
+        # Short rail spans create local damage, not the disappearance of a whole broadside.
+        spans = math.ceil(delta.length / 1.6) if 'rail' in name.lower() or name.startswith('Gunwale_') else 1
+        for span in range(spans):
+            lo,hi = a + delta * span / spans, a + delta * (span+1) / spans
+            structure.append((name, tuple(lo), tuple(hi), radius, mat, sides))
     bpy.ops.mesh.primitive_cylinder_add(vertices=sides, radius=radius, depth=delta.length, location=(a+b)/2)
     obj=bpy.context.object; obj.name=name
     obj.rotation_euler=delta.to_track_quat('Z','Y').to_euler()
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
     obj.data.materials.append(mats[mat]); render.append(obj)
-    if solid:
+    if removable:
+        render.remove(obj)
+        structure_objects.append(obj)
+    if solid and not removable:
         copy=obj.copy();copy.data=obj.data.copy();copy.name='UCX_'+name
         bpy.context.collection.objects.link(copy);collision.append(copy)
     return obj
@@ -70,9 +99,15 @@ def beam(name, a, b, radius, mat='trim', solid=False, sides=8):
 # Each wall section is a separate convex slab: the hull is hollow, never a
 # single convex enclosure. Broad flat facets retain the reference silhouette.
 stations=[(-9,1.95),(-7.5,2.75),(-5,3.05),(0,3.2),(4,2.8),(7,1.7),(8.7,.12)]
-for i,((y0,w0),(y1,w1)) in enumerate(zip(stations,stations[1:])):
+# Short strakes are closed individual solids, ready for independent removal.
+hull_stations=[]
+for (ya,wa),(yb,wb) in zip(stations,stations[1:]):
+    count=math.ceil((yb-ya)/1.25)
+    hull_stations.extend((ya+(yb-ya)*j/count,wa+(wb-wa)*j/count) for j in range(count))
+hull_stations.append(stations[-1])
+for i,((y0,w0),(y1,w1)) in enumerate(zip(hull_stations,hull_stations[1:])):
     for side in [-1,1]:
-        for level,(z0,z1,f0,f1) in enumerate([(0,.95,.55,.80),(.95,2.25,.80,1),(2.25,3.34,1,1)]):
+        for level,(z0,z1,f0,f1) in enumerate([(0,.475,.55,.675),(.475,.95,.675,.80),(.95,1.60,.80,.90),(1.60,2.25,.90,1),(2.25,2.795,1,1),(2.795,3.34,1,1)]):
             p=[(side*w0*f0,y0,z0),(side*w1*f0,y1,z0),(side*w1*f1,y1,z1),(side*w0*f1,y0,z1)]
             q=[(x-side*.16,y,z) for x,y,z in p]
             mesh(f'Hull_{i}_{side}_{level}',p+q,[(0,1,2),(0,2,3),(4,7,6,5),(0,4,5,1),(1,5,6,2),(2,6,7,3),(3,7,4,0)],solid=True)
@@ -98,13 +133,24 @@ for end,(y,w) in enumerate([stations[0],stations[-1]]):
 for (y0,w0),(y1,w1) in zip(stations,stations[1:]):
     mesh('Keel floor',[(x,y,z) for z in [0,.12] for x,y in [(-w0*.55,y0),(w0*.55,y0),(w1*.55,y1),(-w1*.55,y1)]],
          [(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)],solid=True)
-box('Hold floor',(0,-1.15,.82),(3.5,12.4,.20),'deck',True)
-for side in [-1,1]:
-    box('Hold lining',(side*1.83,-1.15,2.05),(.16,12.4,2.55),'ivory',True)
-    for y in [-6.8,-4,-1,2,4.8]:
-        box('Interior rib',(side*1.72,y,2.0),(.12,.16,2.2),'trim')
-box('Hold aft bulkhead',(0,-7.35,2.05),(3.5,.15,2.55),'ivory',True)
-box('Hold fore bulkhead',(0,5.05,2.05),(3.5,.15,2.55),'ivory',True)
+# The inner face of the watertight hull IS the hold wall. Floors follow
+# the hull breadth at their height, leaving the bilge below the sole.
+for (y0,w0),(y1,w1) in zip(stations,stations[1:]):
+    lo=max(y0,-7.35); hi=min(y1,5.05)
+    if hi<=lo: continue
+    wl=(w0+(w1-w0)*(lo-y0)/(y1-y0))*.79-.17
+    wh=(w0+(w1-w0)*(hi-y0)/(y1-y0))*.79-.17
+    mesh('Hold sole',[(x,y,z) for z in [.72,.92] for x,y in
+         [(-wl,lo),(wl,lo),(wh,hi),(-wh,hi)]],
+         [(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)],'deck',True)
+    # Exposed frames trace the actual sloping hull, rather than a box liner.
+    for y,w in [(lo,w0+(w1-w0)*(lo-y0)/(y1-y0))]:
+        for side in [-1,1]:
+            for za,zb,fa,fb in [(.95,2.25,.80,1),(2.25,3.16,1,1)]:
+                beam('Hold frame',(side*(w*fa-.20),y,za),
+                     (side*(w*fb-.20),y,zb),.065,'trim')
+# No duplicate lining or enclosing rectangular bulkheads: the bow and stern
+# shell close the space, and damage opens directly into the hold.
 # 12 shallow treads, 1.9m wide, 4.8m run. Matching smooth convex ramp avoids
 # character-controller snagging while retaining visible stair nosings.
 for i in range(12):
@@ -127,7 +173,9 @@ for side in [-1,1]:
     beam('Quarterdeck rail',(side*2.12,-8.95,5.18),(side*2.12,-6.35,5.18),.055)
     for y in [-8.95,-7.65,-6.35]: beam('Quarterdeck post',(side*2.12,y,4.8),(side*2.12,y,5.18),.045)
 beam('Stern rail',(-2.12,-8.95,5.18),(2.12,-8.95,5.18),.055)
-beam('Mast',(0,1.65,.95),(0,1.65,14.0),.11,solid=True)
+beam('Mast base',(0,1.65,.95),(0,1.65,3.62),.11,solid=True)
+beam('Mast main',(0,1.65,3.62),(0,1.65,9.3),.11,solid=True)
+beam('Mast top',(0,1.65,9.3),(0,1.65,14.0),.11,solid=True)
 beam('Mast collar',(0,1.65,3.34),(0,1.65,3.62),.22)
 beam('Upper yard',(-1.35,1.65,13.55),(1.35,1.65,13.55),.06)
 beam('Main yard',(-3.4,1.65,9.2),(3.4,1.65,9.2),.07)
@@ -165,28 +213,59 @@ def export(name,objects):
 
 # FBX's Source coordinate conversion rotates Blender +Y to engine -X.
 # Pre-rotate the export only so ModelDoc stays +Y-forward as documented.
-for obj in collision:
+for obj in collision+shell_collision:
     obj.data.materials.clear()
     obj.data.materials.append(mats['ivory'])
+# Engine-neutral fracture source: stable IDs, closed vertices and polygons.
+# Coordinates match the model before FBX conversion. No baked duplicate liner.
+with open(os.path.join(OUT,'reference_ship_breakaway.json'),'w') as f:
+    json.dump({'version':1,'coordinates':'+Y bow, +Z up','parts':[
+        {'id':obj.name,'material':obj.data.materials[0].name,
+         'vertices':[list(v.co) for v in obj.data.vertices],
+         'faces':[list(p.vertices) for p in obj.data.polygons]}
+        for obj in shell]},f,indent=2)
 rotation=Matrix.Rotation(-math.pi/2,4,'Z')
-for obj in render+collision+sails: obj.data.transform(rotation)
+exported = render+collision+sails+shell+shell_collision
+for obj in exported: obj.data.transform(rotation)
 # Use stable material paths; avoid Blender dotted mesh names becoming materials.
-for obj in render+collision+sails:
+for obj in exported:
     obj.name=obj.name.replace(' ', '_').replace('.', '_')
     obj.data.name=obj.name
-export('reference_ship',render);export('reference_ship_collision',collision);export('reference_ship_sails',sails)
-for obj in render+collision+sails: obj.data.transform(rotation.inverted())
+export('reference_ship',render);export('reference_ship_collision',collision)
+export('reference_ship_hull',shell);export('reference_ship_hull_collision',shell_collision)
+if '--structure-only' not in sys.argv: export('reference_ship_sails',sails)
+for obj in exported: obj.data.transform(rotation.inverted())
 header='<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc30:version{8c2d7a91-9c42-4bf0-883a-5a3b1762d4f1} -->\n'
 remaps=', '.join('{ from = "'+n+'" to = "models/reference_ship/'+n+'.vmat" }' for n in mats)
-for name in ['reference_ship','reference_ship_sails']:
-    phys='{ _class = "PhysicsShapeList" children = [{ _class = "PhysicsHullFile" filename = "models/reference_ship/reference_ship_collision.fbx" import_scale = 1.0 parent_bone = "" surface_prop = "wood" collision_tags = "solid" faceMergeAngle = 20.0 maxHullVertices = 32 import_mode = "HullPerElement" }] },' if name=='reference_ship' else ''
+for name in ['reference_ship','reference_ship_hull','reference_ship_sails']:
+    if name == 'reference_ship_sails' and '--structure-only' in sys.argv: continue
+    phys=('{ _class = "PhysicsShapeList" children = [{ _class = "PhysicsHullFile" filename = "models/reference_ship/'+name+'_collision.fbx" import_scale = 1.0 parent_bone = "" surface_prop = "wood" collision_tags = "solid" faceMergeAngle = 20.0 maxHullVertices = 32 import_mode = "HullPerElement" }] },') if name!='reference_ship_sails' else ''
     with open(os.path.join(OUT,name+'.vmdl'),'w') as f:
         f.write(header+'{ rootNode = { _class = "RootNode" children = [ '
                 '{ _class = "MaterialGroupList" children = [{ _class = "DefaultMaterialGroup" remaps = ['+remaps+'] use_global_default = false }] },'+phys+
                 '{ _class = "RenderMeshList" children = [{ _class = "RenderMeshFile" filename = "models/reference_ship/'+name+'.fbx" import_scale = 1.0 import_translation = [0,0,0] import_rotation = [0,0,0] }] } ] } }')
-for obj in collision+sails: obj.hide_render=True;obj.hide_set(True)
+parents = {'Mast main':'Mast base', 'Mast top':'Mast main', 'Main yard':'Mast main',
+           'Upper yard':'Mast top', 'Forestay':'Mast top', 'Shroud':'Mast top'}
+ids = {part[0]:i for i,part in enumerate(structure)}
+def vector(p): return 'new Vector3( ' + ', '.join(f'{v:.6f}f' for v in p) + ' )'
+catalog = ['// Generated by Tools/build_reference_ship.py. Model coordinates: +Y bow, +Z up.',
+           'namespace NavalCombat;', '', 'internal static class ShipStructureCatalog', '{',
+           '\tinternal static readonly ShipPartDefinition[] Parts = new ShipPartDefinition[]', '\t{']
+for name,a,b,radius,mat,sides in structure:
+    parent = ids[parents[name]] if name in parents else -1
+    second = ids['Bowsprit'] if name == 'Forestay' else -1
+    sail = str(name in ['Mast base','Mast main','Main yard']).lower()
+    catalog.append(f'\t\tnew( "{name}", {vector(a)}, {vector(b)}, {radius:.6f}f, "{mat}", {sides}, {parent}, {second}, {sail} ),')
+catalog.extend(['\t}.Concat( ShipPlankCatalog.Parts ).ToArray();', '}', ''])
+with open(os.path.join(ROOT,'Code','Ships','ShipStructureCatalog.cs'),'w') as f: f.write('\n'.join(catalog))
+import runpy
+runpy.run_path(os.path.join(ROOT, 'Tools', 'build_ship_plank_catalog.py'))
+for obj in collision+shell_collision+sails: obj.hide_render=True;obj.hide_set(True)
 bpy.ops.object.select_all(action='DESELECT')
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT,'reference_ship.blend'))
+if '--structure-only' in sys.argv:
+    print(f'STRUCTURE: {len(structure)} breakable beams, {len(shell_collision)} hull shapes, {len(collision)} remaining shapes.')
+    sys.exit(0)
 
 # Reproducible beauty and hatch previews, kept outside the shipped asset folder.
 scene=bpy.context.scene;scene.render.engine='BLENDER_EEVEE'

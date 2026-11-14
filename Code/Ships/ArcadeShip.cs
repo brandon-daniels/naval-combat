@@ -32,6 +32,7 @@ public sealed class ArcadeShip : Component, Component.ExecuteInEditor
 	[Property, Group( "Handling" )] public float YawResponse { get; set; } = 2.4f;
 	[Property] public float BuoyancySpring { get; set; } = 50;
 	[Property] public float BuoyancyDamping { get; set; } = 12;
+	public bool IsSinking => GetComponent<ShipHealth>() is { IsDefeated: true };
 	public float Rudder => steering;
 	public bool WalkableModelReady => shipModelCollider.IsValid() && shipModelCollider.Enabled;
 	public GameObject WalkableModelObject => shipModelCollider.IsValid() ? shipModelCollider.GameObject : null;
@@ -41,9 +42,9 @@ public sealed class ArcadeShip : Component, Component.ExecuteInEditor
 	/// <summary>The hollow room bounds in model space, used to keep its interior dry.</summary>
 	public bool ContainsCargoInterior( Vector3 worldPosition )
 	{
-		if ( !WalkableModelReady ) return false;
+		if ( !WalkableModelReady || IsSinking ) return false;
 		var point = WalkableModelObject.WorldTransform.PointToLocal( worldPosition );
-		return MathF.Abs( point.x ) < 1.75f && point.y > -7.3f && point.y < 5.0f
+		return MathF.Abs( point.x ) < ShipHullGeometry.InnerWidth( point.y, point.z ) && point.y > -7.3f && point.y < 5.0f
 			&& point.z > 0.72f && point.z < 3.34f;
 	}
 
@@ -57,6 +58,11 @@ public sealed class ArcadeShip : Component, Component.ExecuteInEditor
 	protected override void OnStart()
 	{
 		ConfigureWalkableModel();
+	}
+
+	protected override void OnUpdate()
+	{
+		if ( Scene.IsEditor && !GetComponent<ShipStructure>().IsValid() ) ConfigureWalkableModel();
 	}
 
 	/// <summary>
@@ -109,6 +115,13 @@ public sealed class ArcadeShip : Component, Component.ExecuteInEditor
 		}
 		shipModelCollider.Model = model;
 		shipModelCollider.Enabled = true;
+		var structure = GetComponent<ShipStructure>( true );
+		if ( !structure.IsValid() )
+		{
+			structure = GameObject.AddComponent<ShipStructure>();
+			structure.Flags |= ComponentFlags.NotSaved | ComponentFlags.NotNetworked;
+		}
+		structure.Configure( this );
 
 		// The old root box encloses the cargo room, while the saved deck/cabin boxes
 		// cap its entrance. The model's PhysicsHullFile now supplies those shapes.
@@ -159,7 +172,7 @@ public sealed class ArcadeShip : Component, Component.ExecuteInEditor
 		}
 
 		// The authored hull supplies the complete mast and yards, while SailRig
-		// adds the matching separated sail model. Hide all prototype box rigging.
+		// adds matching deforming canvas. Hide all prototype box rigging.
 		if ( Sails.IsValid() )
 		{
 			if ( Sails.WindArrow.IsValid() ) Sails.WindArrow.Enabled = false;
@@ -202,8 +215,17 @@ public sealed class ArcadeShip : Component, Component.ExecuteInEditor
 		if ( IsProxy ) return;
 		if ( !Body.IsValid() || !Ocean.IsValid() ) return;
 		float mass = Body.Mass;
+		if ( IsSinking )
+		{
+			// Owner simulates motion from the host-authored defeat state. No spring lift or sail drive.
+			Body.ApplyForce( (Vector3.Down * 140 - Body.Velocity * 1.4f) * mass );
+			Body.AngularVelocity = Body.AngularVelocity * 0.98f;
+			return;
+		}
 		// Custom gravity makes the spring equilibrium independent of project gravity settings.
-		Body.ApplyForce( Vector3.Down * 900 * mass );
+		// Floodwater progressively increases displacement and reduces reserve buoyancy.
+		float flooding = GetComponent<ShipHealth>()?.FloodFraction ?? 0;
+		Body.ApplyForce( Vector3.Down * (900 + 1500 * flooding) * mass );
 		int submerged = 0;
 		float hullScale = Math.Max( 1, ShipModelScale ) / 24.4f;
 		foreach ( var baseSample in BaseFloats )

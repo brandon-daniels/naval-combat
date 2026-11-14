@@ -58,7 +58,7 @@
         {
           "__type": "Sandbox.DirectionalLight",
           "__guid": "7a4d1a1b-ff3d-48ad-b317-07aa8b8f18a7",
-          "__enabled": true,
+          "__enabled": false,
           "Flags": 0,
           "ContactShadows": true,
           "Contribution": "Diffuse, Specular, Transmissive",
@@ -109,8 +109,11 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "SkyIndirectLighting": true,
-          "SkyMaterial": "materials/skybox/skybox_day_01.vmat",
+          "SkyIndirectLighting": false,
+          "SkyMaterial": {
+            "Id": "43ea3d43-c4ea-4f77-91d2-5647693df991",
+            "Path": "materials/sky/naval_weather_sky.vmat"
+          },
           "Tint": "1,1,1,1"
         },
         {
@@ -251,7 +254,8 @@
                   "OnComponentStart": null,
                   "OnComponentUpdate": null,
                   "SeaLevel": 0,
-                  "WaveHeight": 55
+                  "WaveHeight": 55,
+                  "WaveSeed": 731
                 }
               ],
               "Children": []
@@ -3057,6 +3061,13 @@
               "OwnerTransfer": 1,
               "Components": [
                 {
+                  "__type": "NavalCombat.ShipHealth",
+                  "__guid": "4df9d517-7e05-47fa-a4a2-6c566f48889c",
+                  "__enabled": true,
+                  "Flags": 0,
+                  "MaximumHealth": 1000
+                },
+                {
                   "__type": "Sandbox.Rigidbody",
                   "__guid": "a6b7e837-a168-4f10-84f4-9f533e5c2eb1",
                   "__enabled": true,
@@ -5408,6 +5419,53 @@
           ]
         }
       ]
+    },
+    {
+      "__guid": "448826ce-b905-47cd-abbc-64c326c2732c",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Weather",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 1,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "NavalCombat.NavalWeather",
+          "__guid": "8867b9bf-4ce0-45e7-b90d-e45198564ec8",
+          "__enabled": true,
+          "Flags": 0,
+          "CycleEnabled": true,
+          "DayLengthMinutes": 24,
+          "Ocean": {
+            "_type": "component",
+            "component_id": "362ed3bd-0bf4-456d-924d-53f35122f3df",
+            "go": "18701d6d-d0ae-4edd-a6c7-4d4ccf761936",
+            "component_type": "ArcadeOcean"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Preset": "MediumChoppyDay",
+          "StartHour": 12,
+          "Sun": {
+            "_type": "component",
+            "component_id": "7a4d1a1b-ff3d-48ad-b317-07aa8b8f18a7",
+            "go": "1a35666c-f967-4dcf-8751-139a65c1e062",
+            "component_type": "DirectionalLight"
+          }
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {

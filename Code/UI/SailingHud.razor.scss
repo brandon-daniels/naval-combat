@@ -7,15 +7,39 @@ SailingHud {
 	pointer-events: none;
 	font-family: Poppins;
 	color: white;
+	.investment-overlay { position: absolute; width: 100%; height: 100%; background-color: rgba(4, 16, 24, 0.78); align-items: center; justify-content: center; pointer-events: all; z-index: 100; }
+	.investment-card { width: 520px; padding: 36px; background-color: #112f39; border: 2px solid #edbd60; border-radius: 16px; flex-direction: column; gap: 22px; font-size: 20px; }
+	.investment-actions { gap: 16px; }
+	.investment-actions button { padding: 14px 24px; background-color: #edbd60; color: #172d36; border-radius: 8px; cursor: pointer; font-weight: 700; }
+	.investment-actions button:hover { background-color: #ffe1a1; }
+	.investment-actions .cancel { background-color: #47616b; color: white; }
+	.hull-status { position: absolute; right: 32px; top: 390px; width: 310px; padding: 18px; background-color: rgba(9, 24, 32, 0.94); border-radius: 10px; flex-direction: column; gap: 8px; }
+	.hull-title { font-size: 14px; letter-spacing: 2px; color: #edbd60; }
+	.hull-value { font-size: 30px; font-weight: 700; }
+	.hull-segments { height: 16px; width: 100%; gap: 4px; }
+	.hull-segment { flex-grow: 1; border-radius: 2px; }
+	.intact { background-color: #68d7b1; }
+	.lost { background-color: #613d43; }
+	.flooded { background-color: #43bde5; }
+	.dry { background-color: #263d49; }
+	.critical .flooded { background-color: #efad54; }
+	.sinking .flooded { background-color: #ff776b; }
+	.work-progress { width: 360px; height: 9px; background-color: #263d49; border-radius: 4px; overflow: hidden; }
+	.work-fill { height: 100%; background-color: #edbd60; }
+	.hull-detail { font-size: 12px; color: #c4dce3; }
+	.critical .intact { background-color: #efad54; }
+	.sinking .hull-title { color: #ff776b; }
+	.sinking .hull-value { color: #ff776b; }
 	.voyage { position: absolute; left: 24px; top: 72px; width: 400px; padding: 18px; background-color: rgba(9, 24, 32, 0.9); border-radius: 10px; flex-direction: column; font-size: 14px; gap: 7px; }
 	.voyage-title { color: #edbd60; font-size: 18px; font-weight: 700; }
 	.route { color: #b8d1d8; font-size: 12px; }
 	.actions { margin-top: 10px; color: #edbd60; }
 	.feedback { margin-top: 10px; color: #9fdfc1; }
 	.mode { position: absolute; left: 32px; top: 28px; font-size: 20px; font-weight: 700; letter-spacing: 3px; }
-	.hint { position: absolute; bottom: 28px; align-self: center; background-color: rgba(9, 24, 32, 0.9); padding: 14px 24px; border-radius: 8px; font-size: 16px; }
-	.prompt { position: absolute; bottom: 110px; align-self: center; background-color: #edbd60; color: #172d36; padding: 12px 24px; border-radius: 8px; font-size: 22px; font-weight: 700; }
-	.objective { position: absolute; bottom: 98px; align-self: center; font-size: 17px; text-shadow: 1px 1px 3px black; }
+	.controls { position: absolute; bottom: 22px; width: 100%; flex-direction: column; gap: 8px; align-items: center; }
+	.hint { background-color: rgba(9, 24, 32, 0.9); padding: 8px 16px; border-radius: 6px; font-size: 16px; }
+	.prompt { background-color: #edbd60; color: #172d36; padding: 12px 24px; border-radius: 8px; font-size: 22px; font-weight: 700; }
+	.objective { background-color: rgba(9, 24, 32, 0.9); padding: 6px 12px; border-radius: 6px; font-size: 17px; color: #ffe1a1; }
 	.recovery { position: absolute; right: 32px; top: 30px; font-size: 14px; }
     .wind { position: absolute; right: 32px; top: 70px; width: 310px; padding: 18px; background-color: rgba(9, 24, 32, 0.9); border-radius: 10px; flex-direction: column; align-items: center; }
     .wind-title { font-size: 14px; letter-spacing: 2px; color: #edbd60; }

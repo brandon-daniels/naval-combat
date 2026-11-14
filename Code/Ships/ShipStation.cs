@@ -16,7 +16,9 @@ public abstract class ShipStation : BaseChair
 
 	public override bool CanEnter( PlayerController player )
 	{
-		if ( !Enabled || !Ship.IsValid() || !player.IsValid() || Occupied ) return false;
+		if ( !Enabled || !Ship.IsValid() || Ship.IsSinking || !player.IsValid() || Occupied ) return false;
+		if ( player.GetComponent<ShipPlayer>() is { InSwordCombat: true } ) return false;
+		if ( this is SailRig rig && !rig.RigSupported ) return false;
 		if ( !player.Enabled || !player.IsOnGround || !player.Body.IsValid() ) return false;
 		if ( Networking.IsActive && player.Network.Owner != Ship.Network.Owner ) return false;
 		if ( !player.IsProxy && !player.Body.Enabled ) return false;

@@ -8,6 +8,9 @@ public sealed class VoyagePort : Component
 	[Property] public int SalePrice { get; set; } = 18;
 	[Property] public float Radius { get; set; } = 650;
 	[Property] public GoodsDefinition Goods { get; set; }
+	[Property, Group( "Production" )] public GameObject BarrelSpawn { get; set; }
+	[Property, Group( "Production" )] public SugarCaneProduction CaneField { get; set; }
+	public Vector3 BarrelPosition => BarrelSpawn.IsValid() ? BarrelSpawn.WorldPosition : WorldPosition + Vector3.Up * 110;
 	public IslandPort Port { get; private set; }
 
 	protected override void OnStart()

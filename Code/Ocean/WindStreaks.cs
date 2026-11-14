@@ -79,8 +79,8 @@ public sealed class WindStreaks : Component
 				var q = Point( i, b, direction, side );
 				float wa = MathF.Sin( a * MathF.PI ) * 2.5f * fade;
 				float wb = MathF.Sin( b * MathF.PI ) * 2.5f * fade;
-				Quad( ref n, p, q, Vector3.Up, wa, wb );
-				Quad( ref n, p, q, side, wa, wb );
+				Quad( ref n, p, q, Vector3.Up, wa, wb, a, b );
+				Quad( ref n, p, q, side, wa, wb, a, b );
 			}
 		}
 		mesh.SetVertexBufferData<Vertex>( vertices );
@@ -90,12 +90,12 @@ public sealed class WindStreaks : Component
 		- direction * ((1 - t) * Math.Max( 1, StreakLength ))
 		+ side * (MathF.Sin( t * 4 + i ) * 8) + Vector3.Up * (MathF.Sin( t * 5 + i ) * 5);
 
-	private void Quad( ref int n, Vector3 a, Vector3 b, Vector3 axis, float wa, float wb )
+	private void Quad( ref int n, Vector3 a, Vector3 b, Vector3 axis, float wa, float wb, float u, float v )
 	{
-		vertices[n++] = new Vertex( a - axis * wa, Vector3.Up, Vector3.Left, Vector4.Zero );
-		vertices[n++] = new Vertex( b - axis * wb, Vector3.Up, Vector3.Left, Vector4.Zero );
-		vertices[n++] = new Vertex( b + axis * wb, Vector3.Up, Vector3.Left, Vector4.Zero );
-		vertices[n++] = new Vertex( a + axis * wa, Vector3.Up, Vector3.Left, Vector4.Zero );
+		vertices[n++] = new Vertex( a - axis * wa, Vector3.Up, Vector3.Left, new Vector4( u, 0, 0, 0 ) );
+		vertices[n++] = new Vertex( b - axis * wb, Vector3.Up, Vector3.Left, new Vector4( v, 0, 0, 0 ) );
+		vertices[n++] = new Vertex( b + axis * wb, Vector3.Up, Vector3.Left, new Vector4( v, 1, 0, 0 ) );
+		vertices[n++] = new Vertex( a + axis * wa, Vector3.Up, Vector3.Left, new Vector4( u, 1, 0, 0 ) );
 	}
 }
 

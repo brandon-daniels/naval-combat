@@ -50,7 +50,7 @@ public sealed class NavalPrototype : Component
 		var camera = cameraObject.AddComponent<CameraComponent>();
 		camera.IsMainCamera = true;
 		camera.FieldOfView = 75;
-		camera.ZFar = 16000;
+		camera.ZFar = ArcadeOcean.ViewDistance;
 		camera.ZNear = 4;
 		camera.BackgroundColor = new Color( 0.34f, 0.58f, 0.7f );
 		CreatePlayer( controller, helm, spawn );
@@ -133,6 +133,12 @@ public sealed class NavalPrototype : Component
 		sailor.Ship = ship;
 		sailor.SpawnPoint = spawn;
 		sailor.IsNpc = npc;
+		if ( !npc )
+		{
+			var fighter = playerObject.AddComponent<SwordFighter>();
+			fighter.Controller = player;
+			fighter.SpawnPosition = spawn.WorldPosition;
+		}
 		playerObject.Enabled = true;
 		return sailor;
 	}

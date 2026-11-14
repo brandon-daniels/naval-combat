@@ -247,7 +247,7 @@ public sealed class NavalMultiplayerSession : Component, Component.INetworkListe
 		var camera = new GameObject( presentation, true, "Player camera" ).AddComponent<CameraComponent>();
 		camera.IsMainCamera = true;
 		camera.FieldOfView = 75;
-		camera.ZFar = 16000;
+		camera.ZFar = ArcadeOcean.ViewDistance;
 		camera.ZNear = 4;
 		camera.BackgroundColor = new Color( 0.34f, 0.58f, 0.7f );
 		var hudObject = new GameObject( presentation, true, "Sailing HUD" );

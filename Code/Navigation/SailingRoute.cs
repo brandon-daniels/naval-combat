@@ -19,11 +19,22 @@ public sealed class SailingRoute
 			var scale = surface.WorldScale;
 			float radius = Math.Abs( surface.Radius ) * Math.Max( Math.Abs( surface.OuterScale ), Math.Abs( surface.InnerScale ) ) * 1.16f
 				* Math.Max( Math.Abs( scale.x ), Math.Abs( scale.y ) ) + clearance;
-			var circle = new Obstacle( surface.WorldPosition.WithZ( 0 ), radius );
-			if ( Islands.Any( x => (x.Center - circle.Center).Length + radius <= x.Radius + 1 ) ) continue;
-			Islands.RemoveAll( x => (x.Center - circle.Center).Length + x.Radius <= radius );
-			Islands.Add( circle );
+			AddIsland( surface.WorldPosition, radius );
 		}
+		foreach ( var island in scene.GetAllComponents<ProceduralIsland>() )
+		{
+			if ( !island.Active || island.NavigationRadius <= 0 ) continue;
+			var scale = island.WorldScale;
+			AddIsland( island.WorldPosition, island.NavigationRadius * Math.Max( Math.Abs( scale.x ), Math.Abs( scale.y ) ) + clearance );
+		}
+	}
+
+	private void AddIsland( Vector3 position, float radius )
+	{
+		var circle = new Obstacle( position.WithZ( 0 ), radius );
+		if ( Islands.Any( x => (x.Center - circle.Center).Length + radius <= x.Radius + 1 ) ) return;
+		Islands.RemoveAll( x => (x.Center - circle.Center).Length + x.Radius <= radius );
+		Islands.Add( circle );
 	}
 
 	public bool Clear( Vector3 start, Vector3 end )

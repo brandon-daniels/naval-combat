@@ -9,44 +9,86 @@ public sealed class ArcadeOcean : Component, Component.ExecuteInEditor
 	[Property] public float SeaLevel { get; set; } = 0;
 	[Property] public float WaveHeight { get; set; } = 55;
 	[Property] public float FoamStrength { get; set; } = 1;
+
+	/// <summary>Changes the directions, spacing and starting phases of the swell groups.</summary>
+	[Property] public int WaveSeed { get; set; } = 731;
+	/// <summary>Strength of the forward pitch at the crest. Storm packets produce the steepest faces.</summary>
+	[Property, Range( 0f, 1f )] public float CrestSteepness { get; set; } = 0.86f;
+	/// <summary>Angular separation between the prevailing swell and crossing wave trains.</summary>
+	[Property, Range( 0.5f, 1.5f )] public float DirectionalSpread { get; set; } = 1f;
 	[Property] public GameObject FollowTarget { get; set; }
 
-	private const int Cells = 128;
-	private const float Spacing = 64;
+	public const float ViewDistance = 44000f;
+	private const float HalfExtent = 50000f;
+	private const int Cells = 144;
+	private const float Spacing = 36f;
+	private static readonly Vector3 DefaultLightDirection = new Vector3( -0.4f, -0.25f, 0.8f ).Normal;
+	private float waveScale = 1;
+	private float foamScale = 1;
+	private float daylight = 1;
+	private float storminess;
+	private Vector3 lightDirection = DefaultLightDirection;
+	private OceanWaveField waveField;
+	private int cachedSeed;
+	private float cachedSpread;
+	private float EffectiveWaveHeight => WaveHeight * waveScale;
+	private float CrestSharpness => Math.Clamp( CrestSteepness * (0.90f + 0.25f * storminess), 0f, 1f )
+		* Math.Clamp( waveScale, 0f, 1f );
 	private Vertex[] vertices;
 	private float[] gridCoordinates;
+	private float[] cellSpacings;
+	private OceanWaveField.Sample[] gridSamples;
+	private Vector4[] columnPhases;
 	private Mesh mesh;
 	private ModelRenderer renderer;
+	private OceanBreakSpray spray;
+	private OceanShipWakes wakes;
+	private OceanShoals shoals;
 
-	public float HeightAt( Vector3 position, float time )
+	/// <summary>Scales the authored sea state and sets the water lighting without changing inspector values.</summary>
+	public void ApplyWeather( float waveScale, float foamScale, float daylight, float storminess, Vector3? lightDirection = null )
 	{
-		SampleWave( position, time, out float height, out _ );
-		return height;
+		this.waveScale = Math.Max( 0, waveScale );
+		this.foamScale = Math.Max( 0, foamScale );
+		this.daylight = Math.Clamp( daylight, 0, 1 );
+		this.storminess = Math.Clamp( storminess, 0, 1 );
+		this.lightDirection = lightDirection ?? DefaultLightDirection;
 	}
 
-	private void SampleWave( Vector3 position, float time, out float height, out Vector3 normal )
+	public float HeightAt( Vector3 position, float time ) =>
+		SeaLevel + EffectiveWaveHeight * GetWaveField().Height( position, time, CrestSharpness );
+
+	public bool TrySampleBreakingCrossing( Vector3 position, float time, out float strength, out Vector2 travelDirection )
 	{
-		// The material uses these same phases for crest placement and per-pixel lighting bands.
-		float a = position.x * 0.0026f + position.y * 0.0012f + time * 0.85f;
-		float b = position.x * -0.0018f + position.y * 0.0042f + time * 1.15f;
-		float c = position.x * 0.007f - position.y * 0.003f + time * 1.8f;
-		height = SeaLevel + WaveHeight * (MathF.Sin( a ) - 0.12f * MathF.Cos( 2 * a )
-			+ 0.45f * MathF.Sin( b ) + 0.08f * MathF.Sin( c ));
-		float da = MathF.Cos( a ) + 0.24f * MathF.Sin( 2 * a );
-		float db = 0.45f * MathF.Cos( b );
-		float dc = 0.08f * MathF.Cos( c );
-		normal = new Vector3( -WaveHeight * (0.0026f * da - 0.0018f * db + 0.007f * dc),
-			-WaveHeight * (0.0012f * da + 0.0042f * db - 0.003f * dc), 1 ).Normal;
+		float energy = Math.Clamp( (MathF.Abs( EffectiveWaveHeight ) - 4f) / 16f, 0f, 1f );
+		if ( energy <= 0 )
+		{
+			strength = 0;
+			travelDirection = Vector2.Zero;
+			return false;
+		}
+		strength = GetWaveField().CrossingAt( position, time, CrestSharpness, out travelDirection ) * energy;
+		return strength > 0.02f;
 	}
 
-	protected override void OnStart()
+	private OceanWaveField GetWaveField()
 	{
-		BuildSurface();
+		float spread = Math.Clamp( DirectionalSpread, 0.5f, 1.5f );
+		if ( waveField is null || cachedSeed != WaveSeed || cachedSpread != spread )
+		{
+			cachedSeed = WaveSeed;
+			cachedSpread = spread;
+			waveField = new OceanWaveField( WaveSeed, spread );
+		}
+		return waveField;
 	}
+
+	/// <summary>Rebuild the directional bands from the current code and inspector settings on the next sample.</summary>
+	public void InvalidateWaveField() => waveField = null;
 
 	protected override void OnRefresh()
 	{
-		// Hotloading preserves fields: rebuild buffers when grid size or material code changes.
+		InvalidateWaveField();
 		if ( mesh is not null ) BuildSurface();
 	}
 
@@ -55,7 +97,16 @@ public sealed class ArcadeOcean : Component, Component.ExecuteInEditor
 		if ( renderer.IsValid() ) renderer.Destroy();
 		vertices = new Vertex[(Cells + 1) * (Cells + 1)];
 		gridCoordinates = new float[Cells + 1];
+		cellSpacings = new float[Cells + 1];
+		gridSamples = new OceanWaveField.Sample[vertices.Length];
+		columnPhases = new Vector4[gridCoordinates.Length];
 		for ( int i = 0; i <= Cells; i++ ) gridCoordinates[i] = GridCoordinate( i );
+		for ( int i = 0; i <= Cells; i++ )
+		{
+			float left = gridCoordinates[i] - gridCoordinates[Math.Max( 0, i - 1 )];
+			float right = gridCoordinates[Math.Min( Cells, i + 1 )] - gridCoordinates[i];
+			cellSpacings[i] = Math.Max( left, right );
+		}
 		mesh = new Mesh( Material.Load( "materials/ocean/naval_ocean.vmat" ) );
 		UpdateVertices();
 		mesh.CreateVertexBuffer<Vertex>( vertices.Length, vertices );
@@ -83,49 +134,70 @@ public sealed class ArcadeOcean : Component, Component.ExecuteInEditor
 
 	protected override void OnUpdate()
 	{
-		if ( mesh is null ) return;
-		if ( vertices is null || vertices.Length != (Cells + 1) * (Cells + 1)
-			|| gridCoordinates is null || gridCoordinates.Length != Cells + 1 ) BuildSurface();
+		if ( mesh is null || !renderer.IsValid() || vertices is null || vertices.Length != (Cells + 1) * (Cells + 1)
+			|| gridSamples is null || columnPhases is null || cellSpacings is null )
+		{
+			BuildSurface();
+			return;
+		}
 		UpdateVertices();
 		mesh.SetVertexBufferData<Vertex>( vertices );
 		UpdateMaterial();
+		(spray ??= new OceanBreakSpray()).Update( this, GetWaveField(), WorldPosition, Time.Now, CrestSharpness, EffectiveWaveHeight, daylight, storminess, foamScale * FoamStrength );
+		(wakes ??= new OceanShipWakes()).Update( this, Time.Now, daylight, storminess );
 	}
 
 	private void UpdateMaterial()
 	{
 		if ( !renderer.IsValid() || !renderer.SceneObject.IsValid() ) return;
-		// Mask the eight closest enclosed holds, including other players' vessels.
+		// Mask the eight closest hull interiors, including other players' vessels.
 		var target = FollowTarget.IsValid() ? FollowTarget.WorldPosition : WorldPosition;
-		var ships = Scene.GetAllComponents<ArcadeShip>().Where( ship => ship.Active && ship.WalkableModelReady )
+		var ships = Scene.GetAllComponents<ArcadeShip>().Where( ship => ship.Active && ship.WalkableModelReady && !ship.IsSinking )
 			.OrderBy( ship => (ship.WorldPosition - target).LengthSquared ).Take( 8 ).ToArray();
 		for ( int i = 0; i < 8; i++ )
 		{
-			var bounds = Vector4.Zero;
-			var axis = Vector4.Zero;
+			var x = Vector4.Zero;
+			var y = Vector4.Zero;
+			var z = Vector4.Zero;
 			if ( i < ships.Length )
 			{
-				var ship = ships[i];
-				float scale = ship.ShipModelScale;
-				var center = ship.WorldTransform.PointToWorld( new Vector3( -1.15f * scale, 0, 0 ) );
-				var forward = ship.WorldRotation.Forward.WithZ( 0 ).Normal;
-				bounds = new Vector4( center.x, center.y, 6.18f * scale, 1.8f * scale );
-				axis = new Vector4( forward.x, forward.y, ship.WorldPosition.z + ship.ShipModelVerticalOffset + 0.72f * scale,
-					ship.WorldPosition.z + ship.ShipModelVerticalOffset + 3.34f * scale );
+				// Full inverse model transform: pitch, roll, authored yaw and scale all matter.
+				var transform = ships[i].WalkableModelObject.WorldTransform;
+				var origin = transform.PointToLocal( Vector3.Zero );
+				var dx = transform.PointToLocal( Vector3.Forward ) - origin;
+				var dy = transform.PointToLocal( Vector3.Left ) - origin;
+				var dz = transform.PointToLocal( Vector3.Up ) - origin;
+				x = new Vector4( dx.x, dy.x, dz.x, origin.x );
+				y = new Vector4( dx.y, dy.y, dz.y, origin.y );
+				z = new Vector4( dx.z, dy.z, dz.z, origin.z );
 			}
-			renderer.SceneObject.Attributes.Set( $"HoldBounds{i}", bounds );
-			renderer.SceneObject.Attributes.Set( $"HoldAxis{i}", axis );
+			renderer.SceneObject.Attributes.Set( $"HullLocalX{i}", x );
+			renderer.SceneObject.Attributes.Set( $"HullLocalY{i}", y );
+			renderer.SceneObject.Attributes.Set( $"HullLocalZ{i}", z );
 		}
 		renderer.SceneObject.Attributes.Set( "OceanSeaLevel", SeaLevel );
 		renderer.SceneObject.Attributes.Set( "OceanTime", Time.Now );
-		renderer.SceneObject.Attributes.Set( "OceanWaveHeight", WaveHeight );
-		renderer.SceneObject.Attributes.Set( "OceanFoamStrength", Math.Max( 0, FoamStrength ) );
+		renderer.SceneObject.Attributes.Set( "OceanWaveHeight", EffectiveWaveHeight );
+		renderer.SceneObject.Attributes.Set( "OceanFoamStrength", Math.Max( 0, FoamStrength ) * foamScale );
+		renderer.SceneObject.Attributes.Set( "OceanHasBreakers", 1f );
+		renderer.SceneObject.Attributes.Set( "OceanTravelDirection", GetWaveField().TravelDirection );
+		(shoals ??= new OceanShoals()).Apply( this, renderer );
+		ApplyWaterLighting( renderer );
+	}
+
+	internal void ApplyWaterLighting( ModelRenderer water )
+	{
+		water.SceneObject.Attributes.Set( "OceanDaylight", daylight );
+		water.SceneObject.Attributes.Set( "OceanStorminess", storminess );
+		water.SceneObject.Attributes.Set( "OceanLightDirection", lightDirection );
 	}
 
 	private static float GridCoordinate( int index )
 	{
 		float unit = (index - Cells / 2) / (float)(Cells / 2);
 		// Dense around the player, stretched at the horizon: no extra far-water draw calls.
-		return (index - Cells / 2) * Spacing + MathF.Sign( unit ) * MathF.Pow( MathF.Abs( unit ), 4 ) * 14000;
+		return (index - Cells / 2) * Spacing + MathF.Sign( unit ) * MathF.Pow( MathF.Abs( unit ), 12 )
+			* (HalfExtent - Cells / 2 * Spacing);
 	}
 
 	private void UpdateVertices()
@@ -135,28 +207,37 @@ public sealed class ArcadeOcean : Component, Component.ExecuteInEditor
 			MathF.Floor( target.y / Spacing ) * Spacing, 0 );
 		// Keep the mesh near its object origin so model bounds remain stable as the ship travels.
 		WorldPosition = center;
-		float time = Time.Now;
+		var field = GetWaveField();
+		float amplitude = EffectiveWaveHeight;
+		float sharpness = CrestSharpness;
+		field.SampleGrid( gridCoordinates, center, Time.Now, sharpness, gridSamples, columnPhases, cellSpacings );
 		for ( int y = 0; y <= Cells; y++ )
 		{
 			for ( int x = 0; x <= Cells; x++ )
 			{
 				var local = new Vector3( gridCoordinates[x], gridCoordinates[y], 0 );
-				var world = center + local;
-				SampleWave( world, time, out float height, out var normal );
-				local.z = height;
-				vertices[y * (Cells + 1) + x] = new Vertex( local, normal,
-					Vector3.Forward, new Vector4( world.x / 512, world.y / 512, 0, 0 ) );
+				int index = y * (Cells + 1) + x;
+				var sample = gridSamples[index];
+				local.z = SeaLevel + amplitude * sample.Height;
+				var normal = new Vector3( -sample.Dx * amplitude, -sample.Dy * amplitude, 1 ).Normal;
+				// The primary UV carries local travel direction weighted by breaking strength.
+				vertices[index] = new Vertex( local, normal,
+					Vector3.Forward, new Vector4( sample.Breaker.x, sample.Breaker.y, 0, 0 ) );
 			}
 		}
 		float half = GridCoordinate( Cells );
-		float maxHeight = MathF.Abs( WaveHeight ) * 1.82f + 32;
+		float maxHeight = MathF.Abs( amplitude ) * field.MaximumAmplitude + 32;
 		mesh.Bounds = new BBox( new Vector3( -half, -half, SeaLevel - maxHeight ),
 			new Vector3( half, half, SeaLevel + maxHeight ) );
 	}
 
-	protected override void OnDestroy()
+	protected override void OnDisabled()
 	{
 		if ( renderer.IsValid() ) renderer.Destroy();
+		spray?.Clear();
+		spray = null;
+		wakes?.Clear();
+		wakes = null;
 		mesh = null;
 	}
 }

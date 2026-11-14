@@ -4,16 +4,16 @@ A game project for S&box. The planned game combines ship physics, PvPvE combat, 
 
 ## Play the first voyage
 
-The startup scene is now `Assets/scenes/naval_gameplay.scene`. Press Play locally to start aboard a ship with 500 coins and an empty cargo hold. This is a playable local trading slice. Multiplayer is experimental: two-player spawning, custom-resource delivery, and the scripted owner-RPC voyage pass work, but physical remote sailing and interpolation still block a complete client voyage. Ship damage, defeat, loot, and pirate attacks are later milestones.
+The startup scene is now `Assets/scenes/naval_gameplay.scene`. Press Play locally to start aboard a ship with 500 coins and an empty cargo hold. This is a playable local trading slice. Multiplayer is experimental: two-player spawning, custom-resource delivery, and the scripted owner-RPC voyage pass work, but physical remote sailing and interpolation still block a complete client voyage. Host-controlled pirates and cannon damage are now integrated: ten hull holes sink a ship. Loot and ship respawn remain planned.
 
 1. Walk to the mast, press **E**, then hold **S** to lower the sail. Use **A/D** to align it with the wind and press **E** to release.
 2. Take the bow helm with **E** and steer with **A/D**. The voyage HUD lists every port's distance and direction relative to your bow.
 3. Approach Beacon Island's gold trade buoy. Raise the sail at the mast to slow down; trading requires the ship within 650 units of the buoy, speed below 100, and the sailor aboard.
-4. Press **1** to invest 100 coins. After 60 seconds, press **1** at Beacon again to load ten Trade Goods. Production is reserved to your sailor and continues while you sail elsewhere.
-5. Sail to a green buoy and press **2** to sell your cargo. Beacon pays 18 per unit, Twin Rocks 24, and Palm Island 35, giving a 250-coin profit on a Palm delivery.
-6. At any port, use **3 / 4 / 5** to purchase cargo, hull, or sailing upgrades. The HUD shows current levels and the next price. Upgrades last for the current play session.
+4. Press **E** at the production buoy and choose **Invest $100**. After 60 seconds, use **E** to pick up your barrel and again to secure it aboard. Production is reserved to your sailor and continues while you sail elsewhere.
+5. Sail to a green buoy and press **4** to sell your cargo. Beacon pays 18 per unit, Twin Rocks 24, and Palm Island 35, giving a 250-coin profit on a Palm delivery.
+6. At any port, use **5 / 6 / 7** to purchase cargo, hull, or sailing upgrades. The HUD shows current levels and the next price. Upgrades last for the current play session.
 
-Four cannons remain usable with **E**, **WASD** aiming, and left-click firing. **C** changes camera view; **R** returns you to the deck. Falling into the sea enters swimming mode.
+Two cannons per player ship are usable with **E**, **WASD** aiming, and left-click firing. **C** changes camera view; **R** returns you to the deck. Falling into the sea enters swimming mode.
 
 Editor configuration: the three **trade buoy** objects in `naval_gameplay.scene` expose location, trade radius, production availability, commodity, and sale price. Goods use `.ngoods` resources and upgrades use `.nupgrade` resources (S&box limits custom asset extensions to eight characters). Preserve their `.meta` files when moving resources. The prototype and combat scenes remain available separately.
 
@@ -71,14 +71,14 @@ Gameplay transfers should be atomic: validate the complete request first, then u
 
 ### Milestones and feature tracking
 
-**Current priority (2026-10-09): NPC gameplay.** The next development slice is the pirate NPC loop in Milestone 5. The captain is now integrated into the main gameplay scene; local and host/client checks passed sailing, target selection, station use, firing, replication and target replacement after disconnect. Next build patrol, disengagement and stuck recovery, then the combat and cargo-theft systems needed to complete piracy. Resolve other milestone items when they block this work; milestone numbers are not the current execution order. Multiplayer/economy validation gaps remain tracked below.
+**Current priority (2026-10-10): NPC gameplay.** The next development slice is the pirate NPC loop in Milestone 5. The captain is now integrated into the main gameplay scene; local and host/client checks passed sailing, target selection, station use, firing, replication and target replacement after disconnect. Patrol, bounded pursuit, disengagement and blocked-station recovery are implemented alongside ten-hole cannon damage and sinking. Next build defeat cargo drops, theft/delivery, and cargo-aware target selection to complete piracy. Resolve other milestone items when they block this work; milestone numbers are not the current execution order. Multiplayer/economy validation gaps remain tracked below.
 
 Status legend: ✅ verified prototype, 🟡 partial/local prototype, ⬜ not started. A prototype is not considered complete for the main game until it is integrated into the vertical slice and tested with a host and client.
 
 #### 0. Baseline and design contracts
 
 - ✅ Arcade ship handling, physical deck, helm, sail, ocean, and three authored islands
-- ✅ Four cannon stations with ballistic projectiles and impact effects
+- ✅ Two broadside cannon stations per ship with ballistic projectiles and impact effects
 - ✅ Local NPC captain that sails, avoids islands, operates stations, and fires cannons
 - ✅ Separate multiplayer sword arena with host-authoritative damage
 - ✅ First-slice session rules and balance contract are documented below
@@ -119,7 +119,7 @@ These are tuning baselines, not promises of final balance. Economy values remain
 
 Exit criteria: two players can join, board only permitted stations, sail, observe each other, and fire without valuable state being client-controlled.
 
-Disconnect currently ends that player's voyage: its ship, sailor, production, wallet, upgrades, and produced barrels are discarded; reconnect starts fresh. Local cleanup, two-owner physical cargo transactions, and actual remote disconnect cleanup passed on 2026-10-09. Run `naval_test_voyage_network false` for physical cargo and `naval_test_disconnect_cargo` to stage one batch per player before closing the remote client. The optional `naval_test_voyage_network true` additionally requires cannons on both ships; the current player template has none. A fresh client rejoined without the fixed HUD null-reference error, but post-rejoin state assertions, resource-delivery warnings, physical remote sailing and host migration remain open.
+Disconnect currently ends that player's voyage: its ship, sailor, production, wallet, upgrades, and produced barrels are discarded; reconnect starts fresh. Local cleanup, two-owner physical cargo transactions, and actual remote disconnect cleanup passed on 2026-10-09. Run `naval_test_voyage_network false` for physical cargo and `naval_test_disconnect_cargo` to stage one batch per player before closing the remote client. The optional `naval_test_voyage_network true` additionally requires cannons on both ships; both guns are now present on the player template. A fresh client rejoined without the fixed HUD null-reference error, but post-rejoin state assertions, resource-delivery warnings, physical remote sailing and host migration remain open.
 
 The integrated scene now uses `NavalMultiplayerSession` instead of the local prototype bootstrap. It keeps the authored player ship as a disabled template, clones one ship and sailor for each connection, assigns both to that connection, and creates camera/HUD presentation locally. Ship movement, sail trim, and cannon aim are owner-simulated for responsiveness. The host owns station occupancy decisions and cannon-fire acceptance; cannonballs are host-spawned network objects. Run the scene as host, choose **Join via new instance**, then run `naval_test_network_shell` on the host to inspect connection-to-ship ownership before performing the physical station and firing checks.
 
@@ -137,9 +137,9 @@ Exit criteria: a host and client can independently invest, wait, load, sail, sel
 
 #### 3. Ship combat, defeat, and piracy
 
-- 🟡 Cannon aiming/projectile foundation exists locally; damage is not implemented
-- 🟡 Add ship health, armor/damage rules, hit attribution, repair rules, and clear feedback (health/repair foundation exists)
-- ⬜ Define disabled/sinking behavior that does not strand players
+- ✅ Cannon hits create replicated visible breaches and water effects; ten holes sink a ship
+- 🟡 Hull integrity HUD and fixed ten-hole sinking rule work; armor, attacker attribution, and hole patching remain
+- 🟡 Sinking releases stations, stops buoyancy/propulsion, and leaves crews able to swim; rescue/respawn remain
 - ⬜ Convert a configured percentage of defeated cargo into authoritative floating loot
 - ⬜ Add pickup validation, temporary ownership protection if needed, and despawn rules
 - ⬜ Add ship respawn with spawn protection and anti-camping placement
@@ -160,13 +160,13 @@ Exit criteria: earnings create distinct ship builds, all effects replicate, and 
 #### 5. Pirate NPC loop
 
 - ✅ Main-scene NPC sailing, station use, pursuit and cannon firing passed local and host/client checks
-- 🟡 NPC decisions, station access and firing run under host authority; damage and loot outcomes remain unimplemented
+- 🟡 NPC decisions, station access, firing and damage run under host authority; loot outcomes remain unimplemented
 - ⬜ Add target scoring based on cargo value, distance, danger, and recent attackers
-- ⬜ Add patrol, pursue, attack, loot, retreat, and deposit states
-- ⬜ Add disengage rules, difficulty tuning, and recovery from stuck or lost stations
-- ⬜ Reuse the same cargo, damage, loot, and market APIs used by players
+- 🟡 Patrol, pursue, attack and disengage states exist; loot and deposit states remain
+- 🟡 Detection range, home leash, pursuit timeout, reengagement cooldown and blocked-station recovery are configurable; broader difficulty tuning remains
+- 🟡 NPC cannon damage uses the same ship-health rules as players; cargo, loot and market use remain
 
-The main scene spawns one pirate by default; disable SpawnNpcShip on NavalMultiplayerSession for isolated sailing/economy tests. Use naval_npc_status for behavior, naval_test_npc locally or on the host for station/firing checks, and naval_test_npc_network with a joining client for replication and host-only decision checks. Target switching after an actual client disconnect passed; host migration remains unverified.
+The main scene spawns one pirate by default; disable SpawnNpcShip on NavalMultiplayerSession for isolated sailing/economy tests. Use naval_npc_status for behavior, naval_test_npc locally or on the host for station/firing checks, and naval_test_npc_network with a joining client for replication and host-only decision checks. Use naval_test_npc_patrol for live patrol/pursuit transitions and naval_test_npc_recovery for blocked-captain recovery. Target switching after an actual client disconnect passed; host migration remains unverified.
 
 Exit criteria: a pirate can discover a loaded ship, engage it, steal dropped goods, and leave; empty or newly spawned ships are not relentlessly targeted.
 
@@ -209,13 +209,25 @@ For each milestone:
 
 Avoid building core state solely in scene scripts or UI. The editor should configure and visualize the game; authoritative C# services and components should enforce its rules.
 
+## Handheld equipment
+
+| Select | Held item | Action |
+| --- | --- | --- |
+| **1** | Sword | Left-click to lunge at an opponent. |
+| **2** | Bucket | Right-click in a flooded hold to scoop. Take the full bucket up to the deck, aim out over a rail, and right-click to empty it. |
+| **3** | Planks | Stand near the damaged section inside the hold and hold left-click until the breach is patched. |
+
+Use the previous/next slot bindings to cycle instead. Changing tools interrupts unfinished work; stowing a full bucket keeps its water. Patching a breach stops its leak, but leaves the water already aboard.
+
 ## Try sword combat
 
-Open `Assets/scenes/combat_test.scene` and press Play. A separate enclosed arena spawns a swordsman and a red sparring NPC. WASD moves, mouse looks, left click slashes, Shift runs, Space jumps, and C switches camera view. Approach the NPC to spar; it turns toward nearby players and attacks within sword range, but does not chase.
+Every human sailor starts with the sword drawn. Host the sailing scene and use **Join via new instance** in the editor network menu to bring in a second player. Equip your sword, face the other player on foot and left-click within reach. A wall blocks the lunge. A successful lunge opens a rhythm duel for those two players; a defender holding an idle tool draws their sword.
 
-Each fighter has 100 health. Sword hits deal 25 damage, with a 0.65-second cooldown (the NPC attacks half as often). Defeated fighters cannot attack and respawn after three seconds. The HUD shows your health and hit/miss feedback. Swords and characters use placeholder geometry and Citizen models.
+Tap **W** for up, **A** for left, **S** for down, and **D** for right as each arrow crosses the gold line. Both fighters play the same sequence. Each miss costs its player 25 of their 100 health, so both players can take a hit on the same beat. At zero health a fighter dies and respawns after three seconds. Press **Ctrl** (crouch) to leave the duel with your remaining health. Both fighters get two seconds to move away before either can duel again.
 
-For PvP, use the editor network menu to start hosting, then **Join via new instance**. Each connection owns its movement; the host validates sword cooldown, health, range, obstruction and damage. Run `naval_test_combat` in local play or `naval_test_combat_network` with exactly two connected players for integration checks. The arena is separate from sailing; open `combat_test.scene` explicitly when testing sword combat.
+If moving decks pull the fighters more than 240 units apart, the duel ends and both regain control. A wrong input already committed still costs health; unanswered notes cause no further damage after separation.
+
+The same PvP duel is available in `Assets/scenes/combat_test.scene`. Its red sparring NPC uses direct sword hits for solo practice. Run `naval_test_combat` in the offline arena to check sparring or `naval_test_combat_network` on an editor host with two connected players to check duels.
 
 ## Try the arcade prototype
 
@@ -235,7 +247,7 @@ Walk toward the brass wheel at the front of the ship until the **E · Take the h
 
 The player uses the built-in S&box `PlayerController`, the default Citizen model, and the local user's avatar clothing. The widened deck, cabin, and rails have collision. The ship uses four-point spring buoyancy, assisted steering, and placeholder geometry. The ocean has dramatic intersecting swells, cel-shaded blue/teal bands, and animated white foam ribbons along wave crests. Its denser mesh follows the ship and fades into distant haze. Water is opaque, without reflections or underwater rendering. Adjust `WaveHeight` and `FoamStrength` on `ArcadeOcean` to tune it.
 
-The sailing prototype remains local and refuses startup in an active network session. Multiplayer spawning is handled by the integrated gameplay scene, while sword combat remains available in the separate combat arena described above. The project now starts in `naval_gameplay.scene`; the original minimal scene remains preserved for reference.
+The sailing prototype runs locally. The startup scene, `naval_gameplay.scene`, handles multiplayer sailing and sword duels. The original minimal scene remains available for reference.
 
 Handling values are inspector properties on `ArcadeShip`; initial defaults live in `Code/Ships/ArcadeShip.cs`. The ship and islands are saved scene objects. Edit them outside Play mode and save the scene to retain changes. Player, camera, HUD and wind streaks are created at runtime; play-mode edits are temporary.
 

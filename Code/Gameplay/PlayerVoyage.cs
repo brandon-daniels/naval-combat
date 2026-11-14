@@ -16,12 +16,64 @@ public sealed class PlayerVoyage : Component
 		.OrderBy( x => x.WorldPosition.Distance( Sailor.Ship.WorldPosition ) ).FirstOrDefault();
 	public string Identity => PlayerId;
 	private float nextRequest;
+	public bool InvestmentOpen { get; private set; }
+	private VoyagePort dialogPort;
+	private bool savedInput;
+	private bool savedLook;
+	public bool CanOpenInvestment => !IsProxy && Sailor.IsValid() && !Sailor.InSwordCombat && Sailor.Ship.IsValid()
+		&& !Sailor.CurrentStation.IsValid() && !Sailor.CarriedBarrel.IsValid()
+		&& NearestPort is { ProducesGoods: true } port && port.CanTrade( Sailor );
+
+	public void OpenInvestment()
+	{
+		if ( InvestmentOpen || !CanOpenInvestment || !Sailor.Controller.IsValid() ) return;
+		dialogPort = NearestPort;
+		InvestmentOpen = true;
+		savedInput = Sailor.Controller.UseInputControls;
+		savedLook = Sailor.Controller.UseLookControls;
+		Sailor.Controller.UseInputControls = false;
+		Sailor.Controller.UseLookControls = false;
+		Sailor.Controller.WishVelocity = Vector3.Zero;
+	}
+
+	public void CloseInvestment()
+	{
+		if ( !InvestmentOpen ) return;
+		InvestmentOpen = false;
+		if ( Sailor.IsValid() && Sailor.Controller.IsValid() )
+		{
+			Sailor.Controller.UseInputControls = savedInput;
+			Sailor.Controller.UseLookControls = savedLook;
+		}
+		dialogPort = null;
+	}
+
+	public void ConfirmInvestment()
+	{
+		if ( !InvestmentOpen ) return;
+		bool valid = dialogPort.IsValid() && dialogPort == NearestPort && dialogPort.CanTrade( Sailor );
+		CloseInvestment();
+		if ( valid ) RequestAction( 1 );
+	}
+
+	protected override void OnDisabled() => CloseInvestment();
 
 	protected override void OnUpdate()
 	{
 		if ( IsProxy || !Sailor.IsValid() || !Sailor.Ship.IsValid() ) return;
-		for ( int i = 1; i <= 5; i++ )
-			if ( Input.Pressed( $"Slot{i}" ) ) RequestAction( i );
+		if ( Sailor.InSwordCombat )
+		{
+			if ( InvestmentOpen ) CloseInvestment();
+			return;
+		}
+		if ( InvestmentOpen )
+		{
+			if ( !dialogPort.IsValid() || !dialogPort.CanTrade( Sailor ) ) CloseInvestment();
+			return;
+		}
+		// Slots 1–3 are the player's held equipment; port transactions use slots 4–7.
+		for ( int action = 2; action <= 5; action++ )
+			if ( Input.Pressed( $"Slot{action + 2}" ) ) RequestAction( action );
 	}
 
 	public void RequestAction( int action )
@@ -40,6 +92,7 @@ public sealed class PlayerVoyage : Component
 	public TransactionResult Execute( int action )
 	{
 		if ( !GameplayAuthority.CanMutate ) return TransactionResult.Rejected( TransactionFailure.NotAuthoritative );
+		if ( !Sailor.IsValid() || Sailor.InSwordCombat ) return TransactionResult.Rejected( TransactionFailure.InvalidRequest );
 		if ( Time.Now < nextRequest ) return TransactionResult.Rejected( TransactionFailure.InvalidRequest );
 		nextRequest = Time.Now + 0.2f;
 		var port = NearestPort;
@@ -52,6 +105,7 @@ public sealed class PlayerVoyage : Component
 		TransactionResult result;
 		if ( action == 1 && port.ProducesGoods )
 		{
+			if ( !Production.IsProducing ) Production.SourcePort = port;
 			result = Production.Invest( Identity, Wallet );
 			Feedback = result.Success ? "Production started. Return in 60 seconds to collect the barrel." : Explain( result.Failure );
 		}
@@ -80,7 +134,7 @@ public sealed class PlayerVoyage : Component
 
 	private string Explain( TransactionFailure failure ) => failure switch
 	{
-		TransactionFailure.ProductionBusy => $"Production: {MathF.Ceiling( Production.RemainingSeconds )} seconds remaining.",
+		TransactionFailure.ProductionBusy => "This growing area is busy. Wait for the current batch to finish.",
 		TransactionFailure.InsufficientFunds => "Not enough money. Deliver cargo to earn more.",
 		TransactionFailure.InsufficientCapacity => "Cargo hold is full. Sell cargo or expand the hold.",
 		TransactionFailure.MaximumLevel => "This upgrade is already at maximum level.",

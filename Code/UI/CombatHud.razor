@@ -3,17 +3,52 @@
 @namespace NavalCombat
 @inherits PanelComponent
 <root>
-	<div class="card">
-		<div class="title">SWORD COMBAT TEST</div>
-		<div>WASD move · Mouse look · Left click slash · C camera</div>
-		<div class="health">Health: @(Player?.Health ?? 100) / 100</div>
-		<div>@(Player?.Feedback ?? "Waiting for player")</div>
-		<div class="hint">Red NPC fights back at close range. Four hits defeat an opponent.</div>
-		<div class="hint">Host and join via the editor network menu to test PvP.</div>
-	</div>
-	<div class="crosshair">+</div>
+	@if ( Player is { } fighter )
+	{
+		<SwordDuelPanel Fighter=@fighter />
+		@if ( !fighter.InDuel && fighter.Health > 0 )
+		{
+			<div class="card">
+				<div class="title">SWORD ARENA</div>
+				<div class="health">@fighter.Health HP</div>
+				@if ( fighter.EquippedItem == HeldItem.Sword )
+				{
+					<div>@($"Face a fighter and press {Input.GetButtonOrigin( "Attack1" )} to lunge.")</div>
+				}
+				else
+				{
+					<div>@($"Equip your sword ({Input.GetButtonOrigin( "Slot1" )}) to lunge.")</div>
+				}
+				<div class="hint">WASD move · Mouse look · C camera</div>
+				<div class="hint">Spar with the red NPC or join a player for a rhythm duel.</div>
+				@if ( fighter.Feedback != "Ready" && (fighter.DuelEndedAt < 0 || Time.Now - fighter.DuelEndedAt >= 3) )
+				{
+					<div>@fighter.Feedback</div>
+				}
+			</div>
+			<div class="crosshair">+</div>
+			@if ( fighter.CanHoldItem )
+			{
+				<div class="loadout"><EquipmentBar Item=@fighter.EquippedItem /></div>
+			}
+		}
+	}
 </root>
 @code {
-	private SwordFighter Player => Scene.GetAllComponents<SwordFighter>().FirstOrDefault( x => x.IsLocalPlayer );
-	protected override int BuildHash() => System.HashCode.Combine( Player?.Health, Player?.Feedback );
+	private SwordFighter player;
+	private SwordFighter Player
+	{
+		get
+		{
+			if ( !player.IsValid() || !player.IsLocalPlayer )
+				player = Scene.GetAllComponents<SwordFighter>().FirstOrDefault( x => x.IsLocalPlayer );
+			return player;
+		}
+	}
+	protected override int BuildHash()
+	{
+		var fighter = Player;
+		return System.HashCode.Combine( fighter, fighter?.Health, fighter?.Feedback, fighter?.InDuel,
+			fighter?.EquippedItem, fighter?.CanHoldItem, Input.UsingController, fighter.IsValid() && Time.Now - fighter.DuelEndedAt < 3 );
+	}
 }

@@ -11,7 +11,7 @@ public static class NpcNetworkSmokeTest
 	private static readonly Dictionary<Guid, string> results = new();
 
 	[ConCmd( "naval_test_npc_network" )]
-	public static async Task Run()
+	public static async Task Run( bool requirePatrol = false )
 	{
 		if ( !Game.IsEditor || !Networking.IsActive || !Networking.IsHost || pending is not null ) return;
 		if ( Connection.All.Count < 2 ) { Log.Warning( "NPC network test needs a host and another client." ); return; }
@@ -26,7 +26,7 @@ public static class NpcNetworkSmokeTest
 			// Give the last host state time to replicate before inspecting each peer's copy.
 			int shots = captain.ShotsFired;
 			await GameTask.DelaySeconds( 1 );
-			Probe( pending, shots );
+			Probe( pending, shots, requirePatrol );
 			for ( int i = 0; i < 40 && !connections.All( results.ContainsKey ); i++ )
 				await GameTask.DelaySeconds( 0.2f );
 			if ( !connections.All( results.ContainsKey ) ) throw new InvalidOperationException( "A peer did not report its pirate state." );
@@ -34,14 +34,14 @@ public static class NpcNetworkSmokeTest
 			{
 				if ( results[id] != "OK" ) throw new InvalidOperationException( $"Peer {id}: {results[id]}" );
 			}
-			Log.Info( "NPC NETWORK TEST PASSED: all peers see one unowned pirate, replicated target/activity/shots, and clients run no NPC decisions." );
+			Log.Info( "NPC NETWORK TEST PASSED: all peers see one unowned pirate, replicated behavior/target/activity/shots, and clients run no NPC decisions." );
 		}
 		catch ( Exception e ) { Log.Error( $"NPC NETWORK TEST FAILED: {e.Message}" ); }
 		finally { pending = null; results.Clear(); }
 	}
 
 	[Rpc.Broadcast( NetFlags.HostOnly )]
-	private static void Probe( string token, int minimumShots )
+	private static void Probe( string token, int minimumShots, bool requirePatrol )
 	{
 		var captains = Game.ActiveScene.GetAllComponents<ShipNpc>().ToArray();
 		string error = "OK";
@@ -55,8 +55,9 @@ public static class NpcNetworkSmokeTest
 			else if ( captain.Network.Owner is not null || sailor.Ship.Network.Owner is not null ) error = "Pirate has a player owner";
 			else if ( captain.IsProxy == Networking.IsHost || sailor.Ship.IsProxy == Networking.IsHost ) error = "Wrong simulation authority";
 			else if ( !Networking.IsHost && captain.DecisionTicks != 0 ) error = "Client ran NPC decisions";
-			else if ( !captain.Target.IsValid() || string.IsNullOrWhiteSpace( captain.Activity ) || captain.ShotsFired < minimumShots ) error = "Target/activity/shot state did not replicate";
-			Log.Info( $"NPC NETWORK VIEW: host={Networking.IsHost}; proxy={captain.IsProxy}; decisions={captain.DecisionTicks}; shots={captain.ShotsFired}; activity={captain.Activity}; result={error}" );
+			else if ( requirePatrol && (captain.Behaviour != "Patrolling" || captain.Target.IsValid()) ) error = "Expected replicated patrol without a target";
+			else if ( ((captain.Behaviour == "Pursuing" || captain.Behaviour == "Attacking") && !captain.Target.IsValid()) || string.IsNullOrWhiteSpace( captain.Behaviour ) || string.IsNullOrWhiteSpace( captain.Activity ) || captain.ShotsFired < minimumShots ) error = "Target/activity/shot state did not replicate";
+			Log.Info( $"NPC NETWORK VIEW: host={Networking.IsHost}; proxy={captain.IsProxy}; decisions={captain.DecisionTicks}; shots={captain.ShotsFired}; behaviour={captain.Behaviour}; activity={captain.Activity}; result={error}" );
 		}
 		Report( token, error );
 	}

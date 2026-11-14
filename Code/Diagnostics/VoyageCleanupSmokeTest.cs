@@ -35,7 +35,11 @@ public static class VoyageCleanupSmokeTest
 			foreach ( var voyage in voyages )
 			{
 				voyage.Production.ProductionSeconds = 0.1f;
+				voyage.Production.SourcePort = scene.GetAllComponents<VoyagePort>().FirstOrDefault( x => x.ProducesGoods );
 				Check( voyage.Production.Invest( voyage.Identity, voyage.Wallet ).Success, "Disconnect fixture invests in one real batch" );
+				// The authored growing area is shared, so finish this batch before the next investment.
+				for ( int tick = 0; tick < 30 && voyage.Production.IsProducing; tick++ ) await GameTask.DelaySeconds( 0.1f );
+				Check( !voyage.Production.IsProducing, "Disconnect batch completed before reserving the field again" );
 			}
 			await GameTask.DelaySeconds( 1 );
 			var departingCargo = scene.GetAllComponents<GoodsBarrel>().Single( x => x.OwnerId == identity );

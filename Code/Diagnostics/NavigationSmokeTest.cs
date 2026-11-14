@@ -60,6 +60,7 @@ public static class NavigationSmokeTest
 		var originalShip = ship.WorldTransform;
 		var originalTarget = target.WorldTransform;
 		float heading = wind.Heading, strength = wind.Strength, deployment = target.Sails.Deployment, range = npc.EngagementRange;
+		float leash = npc.HomeLeash, pursuit = npc.MaximumPursuitSeconds;
 		var human = Game.ActiveScene.GetAllComponents<ShipPlayer>().FirstOrDefault( x => !x.IsNpc );
 		bool humanEnabled = human.IsValid() && human.Enabled;
 		bool humanInput = human.IsValid() && human.Controller.UseInputControls;
@@ -70,11 +71,14 @@ public static class NavigationSmokeTest
 			if ( human.IsValid() )
 			{
 				human.ReturnToDeck();
-				human.Enabled = false;
+				// Keep the sailor discoverable by perception while suppressing controller input.
 				human.Controller.UseInputControls = false;
 				human.Controller.UseLookControls = false;
 			}
 			npc.EngagementRange = upwind ? 1500 : 1800;
+			// This fixture relocates ships far from their authored patrol area. Test routing, not the home leash.
+			npc.HomeLeash = 50000;
+			npc.MaximumPursuitSeconds = 240;
 			wind.Heading = 0;
 			wind.Strength = 1;
 			ship.Sails.Deployment = 0;
@@ -112,6 +116,8 @@ public static class NavigationSmokeTest
 			{
 				npc.Enabled = false;
 				npc.EngagementRange = range;
+				npc.HomeLeash = leash;
+				npc.MaximumPursuitSeconds = pursuit;
 				ship.WorldTransform = originalShip;
 				target.WorldTransform = originalTarget;
 				ship.Body.Velocity = Vector3.Zero;

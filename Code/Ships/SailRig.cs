@@ -5,7 +5,6 @@ namespace NavalCombat;
 /// <summary>Rotating square sail and local rigging station; lowered cloth catches wind.</summary>
 public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 {
-	private const string AuthoredSailModel = "models/reference_ship/reference_ship_sails.vmdl";
 	private const float AuthoredSailTop = 9.1f;
 	[Property] public SailingWind Wind { get; set; }
 	[Property] public GameObject Yard { get; set; }
@@ -20,7 +19,8 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 	public Vector3 SailDirection => Rotation.FromYaw( Ship.WorldRotation.Angles().yaw + SailAngle ).Forward;
 	public float Alignment => Wind.IsValid() && Ship.IsValid()
 		? MathF.Pow( Math.Max( 0, Vector3.Dot( SailDirection, Wind.Direction ) ), 2 ) : 0;
-	public float DriveFraction => Enabled && Wind.IsValid() && Wind.Enabled && Ship.IsValid()
+	public bool RigSupported => !Ship.IsValid() || Ship.GetComponent<ShipStructure>()?.SailSupported != false;
+	public float DriveFraction => Enabled && RigSupported && Wind.IsValid() && Wind.Enabled && Ship.IsValid()
 		? Deployment * Alignment * HeadingPower( Vector3.Dot( Ship.WorldRotation.Forward.WithZ( 0 ).Normal, Wind.Direction ) ) * Wind.CurrentStrength : 0;
 
 	/// <summary>Arcade sailing polar: no drive within 45 degrees of directly upwind.</summary>
@@ -39,11 +39,16 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 	private Mesh mesh;
 	private GameObject cloth;
 	private GameObject authoredSail;
+	private Mesh authoredMesh;
+	private Vertex[] authoredVertices;
+	private float visualCatch;
+	public float WindCatch => Wind.IsValid() && Wind.Enabled ? Math.Clamp( Alignment * Wind.CurrentStrength, 0, 1 ) : 0;
+	internal float VisualCatch => visualCatch;
 	private float RigScale => Ship.IsValid() ? Math.Max( 1, Ship.ShipModelScale ) / 24.4f : 1;
 
 	public void Adjust( PlayerController source, float rotation, float lower, float delta )
 	{
-		if ( !Enabled || !source.IsValid() || Occupant != source ) return;
+		if ( !Enabled || !RigSupported || !source.IsValid() || Occupant != source ) return;
 		float step = Math.Clamp( delta, 0, 0.1f );
 		SailAngle += Math.Clamp( rotation, -1, 1 ) * Math.Max( 0, RotationSpeed ) * step;
 		Deployment += Math.Clamp( lower, -1, 1 ) * Math.Max( 0, DeploymentSpeed ) * step;
@@ -52,7 +57,9 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 	protected override void OnStart() => BuildCloth();
 	protected override void OnRefresh()
 	{
-		if ( mesh is not null ) BuildCloth();
+		if ( authoredSail.IsValid() ) authoredSail.Destroy();
+		authoredMesh = null;
+		BuildCloth();
 	}
 
 	private void BuildCloth()
@@ -97,6 +104,7 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 
 	protected override void OnUpdate()
 	{
+		visualCatch += (WindCatch - visualCatch) * (1 - MathF.Exp( -5 * Time.Delta ));
 		if ( EnsureAuthoredSail() )
 		{
 			UpdateAuthoredSail();
@@ -116,10 +124,8 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 
 	private bool EnsureAuthoredSail()
 	{
-		if ( authoredSail.IsValid() ) return true;
+		if ( authoredSail.IsValid() && authoredMesh is not null ) return true;
 		if ( !Ship.IsValid() || !Ship.WalkableModelObject.IsValid() ) return false;
-		var model = Model.Load( AuthoredSailModel );
-		if ( model is null ) return false;
 		authoredSail = Ship.WalkableModelObject.GetAllObjects( true )
 			.FirstOrDefault( child => child.Name == "Reference ship dynamic sail" );
 		if ( !authoredSail.IsValid() )
@@ -127,17 +133,42 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 			authoredSail = new GameObject( Ship.WalkableModelObject, true, "Reference ship dynamic sail" );
 			authoredSail.NetworkMode = NetworkMode.Never;
 			authoredSail.Flags |= GameObjectFlags.NotSaved;
-			var renderer = authoredSail.AddComponent<ModelRenderer>();
-			renderer.Flags |= ComponentFlags.NotSaved | ComponentFlags.NotNetworked;
-			renderer.Model = model;
 		}
+		if ( cloth.IsValid() ) cloth.Destroy();
+		mesh = null;
+		int faceCount = (Columns + 1) * (Rows + 1);
+		authoredVertices = new Vertex[faceCount * 2];
+		authoredMesh = new Mesh( Material.Load( "models/reference_ship/canvas.vmat" ) );
+		UpdateAuthoredVertices();
+		authoredMesh.CreateVertexBuffer<Vertex>( authoredVertices.Length, authoredVertices );
+		var indices = new int[Columns * Rows * 12];
+		int n = 0;
+		for ( int y = 0; y < Rows; y++ )
+		for ( int x = 0; x < Columns; x++ )
+		{
+			int a = y * (Columns + 1) + x;
+			int b = a + 1;
+			int c = a + Columns + 2;
+			int d = a + Columns + 1;
+			// Separate vertices and reversed winding keep both faces intact.
+			indices[n++] = a; indices[n++] = b; indices[n++] = c;
+			indices[n++] = a; indices[n++] = c; indices[n++] = d;
+			indices[n++] = a + faceCount; indices[n++] = c + faceCount; indices[n++] = b + faceCount;
+			indices[n++] = a + faceCount; indices[n++] = d + faceCount; indices[n++] = c + faceCount;
+		}
+		authoredMesh.CreateIndexBuffer( indices.Length, indices );
+		authoredMesh.Bounds = new BBox( new Vector3( -3.3f, 1.3f, 4.5f ), new Vector3( 3.3f, 2.8f, 9.2f ) );
+		var renderer = authoredSail.GetComponent<ModelRenderer>();
+		if ( !renderer.IsValid() ) renderer = authoredSail.AddComponent<ModelRenderer>();
+		renderer.Flags |= ComponentFlags.NotSaved | ComponentFlags.NotNetworked;
+		renderer.Model = Model.Builder.AddMesh( authoredMesh ).Create();
 		return true;
 	}
 
 	private void UpdateAuthoredSail()
 	{
 		if ( !authoredSail.IsValid() ) return;
-		authoredSail.Enabled = Deployment > 0.02f;
+		authoredSail.Enabled = RigSupported && Deployment > 0.02f;
 		if ( !authoredSail.Enabled ) return;
 		float deployedScale = Math.Clamp( Deployment, 0.04f, 1.0f );
 		var rotation = Rotation.FromYaw( SailAngle );
@@ -145,6 +176,36 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 		authoredSail.LocalPosition = mast - rotation * mast + new Vector3( 0, 0, AuthoredSailTop * (1 - deployedScale) );
 		authoredSail.LocalRotation = Rotation.FromYaw( SailAngle );
 		authoredSail.LocalScale = new Vector3( 1, 1, deployedScale );
+		UpdateAuthoredVertices();
+		authoredMesh.SetVertexBufferData<Vertex>( authoredVertices );
+	}
+
+	private Vector3 AuthoredPoint( float u, float v )
+	{
+		// The head and side corners stay attached; the foot can bow out with the wind.
+		float envelope = MathF.Sin( u * MathF.PI ) * MathF.Sin( v * MathF.PI * 0.8f );
+		float air = Wind.IsValid() && Wind.Enabled ? Math.Clamp( Wind.CurrentStrength, 0, 1 ) : 0;
+		float ripple = MathF.Sin( u * 18 + v * 12 - Time.Now * 6 ) * 0.10f * air * (1 - visualCatch);
+		float belly = envelope * Deployment * (0.035f + 0.85f * visualCatch + ripple);
+		return new Vector3( (u - 0.5f) * 6.4f, 1.65f + belly, AuthoredSailTop - v * 4.5f );
+	}
+
+	private void UpdateAuthoredVertices()
+	{
+		int faceCount = (Columns + 1) * (Rows + 1);
+		for ( int y = 0; y <= Rows; y++ )
+		for ( int x = 0; x <= Columns; x++ )
+		{
+			float u = x / (float)Columns;
+			float v = y / (float)Rows;
+			var tangent = (AuthoredPoint( u + 0.001f, v ) - AuthoredPoint( u - 0.001f, v )).Normal;
+			var down = (AuthoredPoint( u, v + 0.001f ) - AuthoredPoint( u, v - 0.001f )).Normal;
+			var normal = Vector3.Cross( tangent, down ).Normal;
+			var position = AuthoredPoint( u, v );
+			int index = y * (Columns + 1) + x;
+			authoredVertices[index] = new Vertex( position, normal, tangent, new Vector4( u, v, 0, 0 ) );
+			authoredVertices[index + faceCount] = new Vertex( position, -normal, tangent, new Vector4( u, v, 0, 0 ) );
+		}
 	}
 
 	private void UpdateCloth()
@@ -157,8 +218,9 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 			float u = x / (float)Columns;
 			float v = y / (float)Rows;
 			float envelope = MathF.Sin( u * MathF.PI ) * MathF.Sin( v * MathF.PI );
-			float belly = envelope * Deployment * (7 + 20 * Alignment);
-			float ripple = MathF.Sin( u * 18 + v * 12 - Time.Now * 4 ) * envelope * Deployment * 2;
+			float belly = envelope * Deployment * (1 + 26 * visualCatch);
+			float air = Wind.IsValid() && Wind.Enabled ? Math.Clamp( Wind.CurrentStrength, 0, 1 ) : 0;
+			float ripple = MathF.Sin( u * 18 + v * 12 - Time.Now * 4 ) * envelope * Deployment * 2 * air * (1 - visualCatch);
 			var position = new Vector3( belly + ripple, (u - 0.5f) * 190, 230 - v * drop );
 			int index = y * (Columns + 1) + x;
 			vertices[index] = new Vertex( position, Vector3.Forward, Vector3.Left, new Vector4( u, v, 0, 0 ) );
@@ -171,5 +233,6 @@ public sealed class SailRig : ShipStation, Component.ExecuteInEditor
 		if ( cloth.IsValid() ) cloth.Destroy();
 		if ( authoredSail.IsValid() ) authoredSail.Destroy();
 		mesh = null;
+		authoredMesh = null;
 	}
 }

@@ -1,4 +1,5 @@
 Layer0
 {
 	shader "shaders/naval_ocean.shader"
+	"WaveletSlopes" "materials/ocean/wavelet_slopes.png"
 }

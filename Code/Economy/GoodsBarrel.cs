@@ -16,7 +16,7 @@ public sealed class GoodsBarrel : Component
 	public bool IsLoose => !Carrier.IsValid() && !SecuredShip.IsValid();
 
 	private Rigidbody body;
-	private ModelCollider collider;
+	private CapsuleCollider collider;
 	private Vector3 securedLocalPosition;
 
 	public static GoodsBarrel Spawn( ProductionSite source, Vector3 position )
@@ -31,9 +31,7 @@ public sealed class GoodsBarrel : Component
 		barrel.Quantity = source.OutputQuantity;
 		barrel.Goods = source.OutputGoods;
 		barrel.BuildPhysicalBarrel();
-		// Keep finished production staged at the offshore buoy instead of letting it
-		// fall through the non-physical ocean before its owner returns.
-		barrel.SetPhysicsEnabled( false );
+		barrel.SetPhysicsEnabled( true );
 		if ( Networking.IsActive ) gameObject.NetworkSpawn( null );
 		return barrel;
 	}
@@ -49,8 +47,15 @@ public sealed class GoodsBarrel : Component
 		var model = Model.Load( ModelPath );
 		var renderer = GetComponent<ModelRenderer>() ?? GameObject.AddComponent<ModelRenderer>();
 		renderer.Model = model;
-		collider = GetComponent<ModelCollider>() ?? GameObject.AddComponent<ModelCollider>();
-		collider.Model = model;
+		// The imported barrel is render-only. Give it a real rounded collision shape.
+		collider = GetComponent<CapsuleCollider>() ?? GameObject.AddComponent<CapsuleCollider>();
+		var bounds = model.Bounds;
+		collider.Radius = Math.Max( 1, Math.Min( bounds.Size.x, bounds.Size.y ) * 0.5f );
+		float halfSegment = Math.Max( 0, bounds.Size.z * 0.5f - collider.Radius );
+		collider.Start = bounds.Center - Vector3.Up * halfSegment;
+		collider.End = bounds.Center + Vector3.Up * halfSegment;
+		collider.Friction = 0.6f;
+		collider.RollingResistance = 0.1f;
 		body = GetComponent<Rigidbody>() ?? GameObject.AddComponent<Rigidbody>();
 		body.MassOverride = 20;
 	}
@@ -125,10 +130,23 @@ public sealed class GoodsBarrel : Component
 		WorldRotation = SecuredShip.WorldRotation;
 	}
 
+	protected override void OnFixedUpdate()
+	{
+		if ( !GameplayAuthority.CanMutate || !IsLoose ) return;
+		body ??= GetComponent<Rigidbody>();
+		var ocean = Scene.GetAllComponents<ArcadeOcean>().FirstOrDefault();
+		if ( !body.IsValid() || !body.Enabled || !ocean.IsValid() ) return;
+		if ( Scene.GetAllComponents<ArcadeShip>().Any( x => x.ContainsCargoInterior( WorldPosition ) ) ) return;
+		float depth = ocean.HeightAt( WorldPosition, Time.Now ) + 12 - WorldPosition.z;
+		if ( depth <= 0 ) return;
+		// The ocean has no collider. Buoyancy keeps loose cargo physical and recoverable.
+		body.ApplyForce( Vector3.Up * body.MassOverride * Math.Clamp( 800 + depth * 35 - body.Velocity.z * 12, 0, 2400 ) );
+	}
+
 	private void SetPhysicsEnabled( bool enabled )
 	{
 		body ??= GetComponent<Rigidbody>();
-		collider ??= GetComponent<ModelCollider>();
+		collider ??= GetComponent<CapsuleCollider>();
 		if ( body.IsValid() ) body.Enabled = enabled;
 		if ( collider.IsValid() ) collider.Enabled = enabled;
 	}

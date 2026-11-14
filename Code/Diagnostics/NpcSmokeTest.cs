@@ -15,7 +15,7 @@ public static class NpcSmokeTest
 			if ( !npc.Sailor.IsValid() || !npc.Sailor.Ship.IsValid() ) continue;
 			var ship = npc.Sailor.Ship;
 			var range = npc.Target.IsValid() ? (npc.Target.WorldPosition - ship.WorldPosition).Length : 0;
-			Log.Info( $"NPC: {npc.Activity}; target={npc.Target?.GameObject.Name ?? "none"}; route={npc.NavigationStatus}; visits={npc.StationsVisited}; shots={npc.ShotsFired}; ship={ship.WorldPosition}; sailor={npc.WorldPosition}; sail={ship.Sails.Deployment:0.00}; yaw={ship.WorldRotation.Angles().yaw:0}; range={range:0}; proxy={npc.IsProxy}" );
+			Log.Info( $"NPC: {npc.Behaviour}; {npc.Activity}; recoveries={npc.Recoveries}; target={npc.Target?.GameObject.Name ?? "none"}; route={npc.NavigationStatus}; visits={npc.StationsVisited}; shots={npc.ShotsFired}; ship={ship.WorldPosition}; sailor={npc.WorldPosition}; sail={ship.Sails.Deployment:0.00}; yaw={ship.WorldRotation.Angles().yaw:0}; range={range:0}; proxy={npc.IsProxy}" );
 		}
 	}
 

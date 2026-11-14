@@ -47,11 +47,17 @@ public static class SailingSmokeTest
 			rig.Wind.Heading = rig.Ship.WorldRotation.Angles().yaw;
 			rig.SailAngle = 0;
 			Check( rig.DriveFraction > 0.8f, "Aligned full sail catches wind" );
+			await GameTask.DelaySeconds( 1 );
+			Check( rig.VisualCatch > 0.75f, "Canvas fills under aligned wind" );
 			rig.SailAngle = 180;
 			Check( rig.DriveFraction == 0, "Back-facing sail loses drive" );
+			await GameTask.DelaySeconds( 1 );
+			Check( rig.VisualCatch < 0.05f, "Canvas relaxes when facing away from wind" );
 			rig.SailAngle = 0;
 			rig.Wind.Strength = 0;
 			Check( rig.DriveFraction == 0, "Calm wind gives no drive" );
+			await GameTask.DelaySeconds( 1 );
+			Check( rig.VisualCatch < 0.01f, "Canvas stays slack in calm wind" );
 			rig.Wind.Strength = 1;
 			rig.Release( player );
 			await GameTask.DelaySeconds( 0.5f );

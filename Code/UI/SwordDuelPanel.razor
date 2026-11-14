@@ -1,0 +1,100 @@
+@using System
+@using Sandbox
+@using Sandbox.UI
+@namespace NavalCombat
+@inherits Panel
+
+<root>
+	@if ( Fighter.IsValid() && Fighter.IsLocalPlayer )
+	{
+		@if ( Fighter.InDuel && Fighter.Opponent.IsValid() )
+		{
+			var rival = Fighter.Opponent;
+			var rivalName = rival.Network.Owner?.DisplayName ?? rival.GameObject.Name;
+			<div class="duel-card">
+				<div class="duel-heading">
+					<div class="duel-title">SWORD DUEL</div>
+					<div class="escape">@($"{Input.GetButtonOrigin( "Duck" ) ?? "Ctrl"} · Flee")</div>
+				</div>
+				<div class="fighters">
+					<div class="vitals">
+						<div class="health-label"><label class="name">You</label><label>@Fighter.Health HP</label></div>
+						<div class="bar"><div class="fill" style="@($"width: {Fighter.Health}%")"></div></div>
+					</div>
+					<div class="vitals rival">
+						<div class="health-label"><label class="name">@rivalName</label><label>@rival.Health HP</label></div>
+						<div class="bar"><div class="fill" style="@($"width: {rival.Health}%")"></div></div>
+					</div>
+				</div>
+				<div class="track">
+					@foreach ( var lane in Lanes )
+					{
+						<div class="lane">
+							@for ( int offset = 0; offset < 4; offset++ )
+							{
+								int beat = Fighter.BeatIndex + offset;
+								if ( Fighter.DirectionAt( beat ) != lane.Direction ) continue;
+								float until = Fighter.BeatAt - Time.Now + offset * SwordFighter.BeatInterval;
+								int bottom = (int)MathF.Round( StrikeHeight + until * PixelsPerSecond - NoteHalfHeight );
+								string result = offset != 0 ? "" : Fighter.BeatResult.ToString();
+								<div class="note @result" style="@($"bottom: {bottom}px")">@lane.Arrow</div>
+							}
+						</div>
+					}
+					<div class="timing-band" style="@WindowStyle"></div>
+					<div class="strike-line" style="@($"bottom: {StrikeHeight}px")"></div>
+				</div>
+				<div class="key-row">
+					@foreach ( var lane in Lanes )
+					{
+						<div class="lane-key">@(Input.GetButtonOrigin( lane.Action ) ?? lane.Key)</div>
+					}
+				</div>
+				<div class="instruction">Tap in the gold band. Each miss costs health.</div>
+				<div class="judgment @Fighter.BeatResult">@Fighter.Feedback</div>
+			</div>
+		}
+		else if ( Fighter.Health <= 0 || (Fighter.DuelEndedAt >= 0 && Time.Now - Fighter.DuelEndedAt < 3) )
+		{
+			<div class="duel-outcome">@Fighter.Feedback</div>
+		}
+	}
+</root>
+
+@code
+{
+	public SwordFighter Fighter { get; set; }
+
+	private const int StrikeHeight = 31;
+	private const int PixelsPerSecond = 84;
+	private const int NoteHalfHeight = 16;
+
+	private static readonly (SwordDirection Direction, string Arrow, string Action, string Key)[] Lanes =
+	{
+		(SwordDirection.Left, "←", "Left", "A"),
+		(SwordDirection.Down, "↓", "Backward", "S"),
+		(SwordDirection.Up, "↑", "Forward", "W"),
+		(SwordDirection.Right, "→", "Right", "D")
+	};
+
+	private static string WindowStyle
+	{
+		get
+		{
+			int radius = (int)MathF.Round( SwordFighter.HitWindow * PixelsPerSecond );
+			return $"bottom: {StrikeHeight - radius}px; height: {radius * 2}px";
+		}
+	}
+
+	protected override int BuildHash()
+	{
+		if ( !Fighter.IsValid() || !Fighter.IsLocalPlayer ) return 0;
+		if ( Fighter.InDuel )
+		{
+			return HashCode.Combine( Fighter, Fighter.Opponent, Fighter.Health, Fighter.Opponent?.Health,
+				Fighter.BeatIndex, Fighter.BeatResult, Fighter.Feedback, (int)(Time.Now * 60) );
+		}
+
+		return HashCode.Combine( Fighter.Health, Fighter.Feedback, Fighter.DuelEndedAt >= 0 && Time.Now - Fighter.DuelEndedAt < 3 );
+	}
+}

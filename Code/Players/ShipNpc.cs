@@ -8,6 +8,23 @@ public sealed class ShipNpc : Component
 	[Property] public ShipPlayer Sailor { get; set; }
 	[Property, Sync( SyncFlags.FromHost )] public ArcadeShip Target { get; set; }
 	[Property] public float EngagementRange { get; set; } = 1800;
+	[Property] public float DetectionRange { get; set; } = 6000;
+	[Property] public float DisengageRange { get; set; } = 8500;
+	[Property] public float MaximumPursuitSeconds { get; set; } = 120;
+	[Property] public float ReengageDelay { get; set; } = 30;
+	[Property] public float PatrolRadius { get; set; } = 1800;
+	[Property] public float HomeLeash { get; set; } = 10000;
+	[Sync( SyncFlags.FromHost )] public string Behaviour { get; private set; } = "Patrolling";
+	[Sync( SyncFlags.FromHost )] public Vector3 PatrolCenter { get; private set; }
+	[Sync( SyncFlags.FromHost )] public int Recoveries { get; private set; }
+	private bool hasPatrolCenter;
+	private Vector3 patrolGoal;
+	private int patrolLeg;
+	private float nextPatrolGoal;
+	private float pursuitStarted;
+	private float reacquireAt;
+	private bool alternateAisle;
+	private float recoveryUntil;
 	[Property] public float IslandClearance { get; set; } = 700;
 	[Property] public float CruisingDeployment { get; set; } = 0.65f;
 	[Property] public float TargetAimHeight { get; set; } = 73;
@@ -52,52 +69,46 @@ public sealed class ShipNpc : Component
 			player.WishVelocity = Vector3.Zero;
 			return;
 		}
-		var targets = Scene.GetAllComponents<ShipPlayer>().Where( x => !x.IsNpc && x.Ship.IsValid() && x.Ship.Enabled && x.Ship != ship )
-			.Select( x => x.Ship ).Distinct().ToArray();
-		if ( !Target.IsValid() || !targets.Contains( Target ) )
+		if ( ship.IsSinking )
 		{
-			var replacement = targets.OrderBy( x => (x.WorldPosition - ship.WorldPosition).Length ).FirstOrDefault();
-			if ( Target != replacement )
-			{
-				SetDestination( null );
-				Target = replacement;
-				route.Points.Clear();
-				nextPlan = 0;
-				hasCourse = false;
-			}
-		}
-		if ( !Target.IsValid() )
-		{
-			Activity = "Waiting for another ship";
-			if ( ship.Sails.Deployment > 0.005f )
-			{
-				SetDestination( ship.Sails );
-				if ( Sailor.CurrentStation != ship.Sails ) WalkToStation();
-				else ship.Sails.Adjust( player, 0, -1, Time.Delta );
-				return;
-			}
+			Behaviour = "Sinking";
+			Activity = "Ship sinking";
 			Sailor.CurrentStation?.Release( player );
 			player.WishVelocity = Vector3.Zero;
 			return;
 		}
-
-		var offset = (Target.WorldPosition - ship.WorldPosition).WithZ( 0 );
-		float distance = offset.Length;
+		if ( !hasPatrolCenter )
+		{
+			PatrolCenter = ship.WorldPosition.WithZ( 0 );
+			patrolGoal = PatrolCenter;
+			hasPatrolCenter = true;
+		}
 		if ( Time.Now >= nextIslandScan )
 		{
 			route.ReadIslands( Scene, Math.Max( 350, IslandClearance ) );
 			nextIslandScan = Time.Now + 2;
 		}
-		if ( distance > EngagementRange + 400 ) sailing = true;
-		if ( distance < EngagementRange && route.Clear( ship.WorldPosition, Target.WorldPosition ) ) sailing = false;
-		if ( !route.Clear( ship.WorldPosition, Target.WorldPosition ) ) sailing = true;
+		UpdateTarget( ship );
+		bool engaging = Target.IsValid();
+		if ( !engaging ) UpdatePatrol( ship );
+		var goal = engaging ? Target.WorldPosition : patrolGoal;
+		var offset = (goal - ship.WorldPosition).WithZ( 0 );
+		float distance = offset.Length;
+		if ( !engaging ) sailing = distance > 260;
+		else
+		{
+			if ( distance > EngagementRange + 400 ) sailing = true;
+			if ( distance < EngagementRange && route.Clear( ship.WorldPosition, goal ) ) sailing = false;
+			if ( !route.Clear( ship.WorldPosition, goal ) ) sailing = true;
+			Behaviour = sailing ? "Pursuing" : "Attacking";
+		}
 		float yaw = ship.WorldRotation.Angles().yaw;
 		float bearing = Heading( offset );
 		// Choose the closer broadside so a solo sailor need not circle the target.
 		float broadside = Math.Abs( Wrap( bearing - 90 - yaw ) ) < Math.Abs( Wrap( bearing + 90 - yaw ) ) ? bearing - 90 : bearing + 90;
 		var rig = ship.Sails;
 		bool navigable = true;
-		float desiredHeading = sailing ? Navigate( ship, out navigable ) : broadside;
+		float desiredHeading = sailing ? Navigate( ship, goal, out navigable ) : broadside;
 		float headingError = Wrap( desiredHeading - yaw );
 		if ( Math.Abs( headingError ) > 60 ) turning = true;
 		if ( Math.Abs( headingError ) < 8 ) turning = false;
@@ -110,13 +121,19 @@ public sealed class ShipNpc : Component
 		if ( Sailor.CurrentStation is ShipCannon occupied && Math.Abs( Wrap( bearing - occupied.WorldRotation.Angles().yaw ) ) < 30 ) cannon = occupied;
 
 		// Complete a station operation before reconsidering the next walk.
+		if ( destination.IsValid() && (!destination.Enabled || (destination.Occupied && destination.Occupant != player)) ) SetDestination( null );
 		if ( !destination.IsValid() || Sailor.CurrentStation == destination )
 		{
 			if ( needsSails ) SetDestination( rig );
-			else if ( sailing || Math.Abs( headingError ) > (Sailor.CurrentStation is ShipCannon ? 25 : 14) || !cannon.IsValid() ) SetDestination( ship.Helm );
+			else if ( !engaging || sailing || Math.Abs( headingError ) > (Sailor.CurrentStation is ShipCannon ? 25 : 14) || !cannon.IsValid() ) SetDestination( ship.Helm );
 			else SetDestination( cannon );
 		}
-		if ( !destination.IsValid() ) return;
+		if ( !destination.IsValid() )
+		{
+			Activity = "Waiting for an available station";
+			player.WishVelocity = Vector3.Zero;
+			return;
+		}
 		if ( Sailor.CurrentStation != destination )
 		{
 			WalkToStation();
@@ -132,8 +149,8 @@ public sealed class ShipNpc : Component
 		else if ( destination == ship.Helm )
 		{
 			UsedHelm = true;
-			Activity = !windAvailable ? "Waiting for wind" : sailing ? NavigationStatus : "Turning broadside";
-			ship.SetHelmTarget( ship.Helm, navigable ? Math.Clamp( headingError / 25, -1, 1 ) : 0 );
+			Activity = !windAvailable ? "Waiting for wind" : sailing ? NavigationStatus : engaging ? "Turning broadside" : "Patrol holding";
+			ship.SetHelmTarget( ship.Helm, navigable && (engaging || sailing) ? Math.Clamp( headingError / 25, -1, 1 ) : 0 );
 		}
 		else if ( destination is ShipCannon gun )
 		{
@@ -143,11 +160,72 @@ public sealed class ShipNpc : Component
 		}
 	}
 
-	private float Navigate( ArcadeShip ship, out bool navigable )
+	private void UpdateTarget( ArcadeShip ship )
+	{
+		var targets = Scene.GetAllComponents<ShipPlayer>()
+			.Where( x => !x.IsNpc && x.Ship.IsValid() && x.Ship.Enabled && !x.Ship.IsSinking && x.Ship != ship )
+			.Select( x => x.Ship ).Distinct().ToArray();
+		if ( Target.IsValid() && (!targets.Contains( Target )
+			|| (Target.WorldPosition - ship.WorldPosition).WithZ( 0 ).Length > Math.Max( DetectionRange, DisengageRange )
+			|| (ship.WorldPosition - PatrolCenter).WithZ( 0 ).Length > Math.Max( PatrolRadius + 500, HomeLeash )
+			|| Time.Now - pursuitStarted >= Math.Max( 1, MaximumPursuitSeconds )) )
+		{
+			Target = null;
+			reacquireAt = Time.Now + Math.Max( 1, ReengageDelay );
+			patrolGoal = PatrolCenter;
+			ResetCourse();
+		}
+		if ( Target.IsValid() || Time.Now < reacquireAt ) return;
+		var replacement = targets.Where( x => (x.WorldPosition - ship.WorldPosition).WithZ( 0 ).Length <= Math.Max( 0, DetectionRange )
+			&& (x.WorldPosition - PatrolCenter).WithZ( 0 ).Length <= Math.Max( PatrolRadius + 500, HomeLeash ) )
+			.OrderBy( x => (x.WorldPosition - ship.WorldPosition).Length ).FirstOrDefault();
+		if ( !replacement.IsValid() ) return;
+		Target = replacement;
+		pursuitStarted = Time.Now;
+		ResetCourse();
+	}
+
+	private void ResetCourse()
+	{
+		SetDestination( null );
+		route.Points.Clear();
+		nextPlan = 0;
+		hasCourse = false;
+		sailing = true;
+	}
+
+	private void UpdatePatrol( ArcadeShip ship )
+	{
+		bool returning = Time.Now < reacquireAt || (ship.WorldPosition - PatrolCenter).WithZ( 0 ).Length > Math.Max( PatrolRadius + 500, HomeLeash );
+		Behaviour = returning ? "Disengaging" : "Patrolling";
+		if ( returning )
+		{
+			patrolGoal = PatrolCenter;
+			return;
+		}
+		if ( Time.Now < nextPatrolGoal ) return;
+		if ( (ship.WorldPosition - patrolGoal).WithZ( 0 ).Length > 300 && route.Clear( patrolGoal, patrolGoal ) ) return;
+		// Try a bounded set of destinations. Unsafe shorelines produce a hold and later retry.
+		float wind = ship.Sails.Wind.IsValid() ? ship.Sails.Wind.Heading : 0;
+		for ( int i = 0; i < 8; i++ )
+		{
+			var candidate = PatrolCenter + Rotation.FromYaw( patrolLeg++ * 45 ).Forward * Math.Max( 400, PatrolRadius );
+			if ( !route.Plan( ship.WorldPosition, candidate, wind ) ) continue;
+			patrolGoal = candidate;
+			plannedGoal = candidate;
+			plannedWind = wind;
+			nextPlan = Time.Now + 2;
+			return;
+		}
+		patrolGoal = ship.WorldPosition.WithZ( 0 );
+		nextPatrolGoal = Time.Now + 5;
+	}
+
+	private float Navigate( ArcadeShip ship, Vector3 goal, out bool navigable )
 	{
 		float wind = ship.Sails.Wind.IsValid() ? ship.Sails.Wind.Heading : 0;
 		var position = ship.WorldPosition.WithZ( 0 );
-		var goal = Target.WorldPosition.WithZ( 0 );
+		goal = goal.WithZ( 0 );
 		while ( route.Points.Count > 0 && (route.Points[0] - position).Length < 260 ) route.Points.RemoveAt( 0 );
 		bool stale = route.Points.Count == 0 || (goal - plannedGoal).Length > 450 || Math.Abs( Wrap( wind - plannedWind ) ) > 10
 			|| !route.Clear( position, route.Points[0] );
@@ -171,22 +249,37 @@ public sealed class ShipNpc : Component
 		if ( hasCourse && Math.Abs( Wrap( course - previousCourse ) ) > 90 ) TacksCompleted++;
 		previousCourse = course;
 		hasCourse = true;
-		NavigationStatus = Math.Abs( Wrap( course - wind ) ) > 100 ? "Sailing upwind tack" : route.Points.Count > 1 ? "Routing around island" : "Closing on target";
+		NavigationStatus = Math.Abs( Wrap( course - wind ) ) > 100 ? "Sailing upwind tack" : route.Points.Count > 1 ? "Routing around island" : Target.IsValid() ? "Closing on target" : "Sailing patrol";
 		return course;
 	}
 
 	private void SetDestination( ShipStation station )
 	{
+		if ( station.IsValid() && (!station.Enabled || (station.Occupied && station.Occupant != Sailor.Controller)) ) station = null;
 		if ( destination == station ) return;
 		if ( Sailor.IsAtHelm ) Sailor.Ship.SetHelmTarget( Sailor.Helm, 0 );
+		if ( Sailor.CurrentStation is ShipCannon previousGun ) previousGun.SetLoading( Sailor.Controller, false );
 		Sailor.CurrentStation?.Release( Sailor.Controller );
 		destination = station;
 		blockedTime = 0;
+		alternateAisle = false;
 	}
 
 	private void WalkToStation()
 	{
 		var player = Sailor.Controller;
+		if ( Time.Now < recoveryUntil )
+		{
+			Activity = "Recovering footing";
+			player.WishVelocity = Vector3.Zero;
+			return;
+		}
+		if ( !destination.SeatPosition.IsValid() )
+		{
+			SetDestination( null );
+			player.WishVelocity = Vector3.Zero;
+			return;
+		}
 		Activity = "Walking to " + destination.GameObject.Name;
 		if ( destination.TryTake( player ) )
 		{
@@ -197,7 +290,7 @@ public sealed class ShipNpc : Component
 		var ship = Sailor.Ship;
 		var local = ship.WorldRotation.Inverse * (WorldPosition - ship.WorldPosition);
 		var seat = ship.WorldRotation.Inverse * (destination.SeatPosition.WorldPosition - ship.WorldPosition);
-		float aisle = local.x < 45 || seat.x < 45 ? -85 : 0;
+		float aisle = alternateAisle ? 85 : local.x < 45 || seat.x < 45 ? -85 : 0;
 		var waypoint = Math.Abs( local.x - seat.x ) > 35 ? new Vector3( seat.x, aisle, seat.z ) : seat;
 		if ( Math.Abs( local.y - aisle ) > 18 && Math.Abs( local.x - seat.x ) > 35 ) waypoint = new Vector3( local.x, aisle, seat.z );
 		var direction = (ship.WorldPosition + ship.WorldRotation * waypoint - WorldPosition).WithZ( 0 );
@@ -205,17 +298,26 @@ public sealed class ShipNpc : Component
 		if ( direction.Length > 5 ) player.EyeAngles = new Angles( 0, Heading( direction ), 0 );
 		blockedTime = (local - lastPosition).WithZ( 0 ).Length < 0.25f ? blockedTime + Time.Delta : 0;
 		lastPosition = local;
+		if ( blockedTime > 3 ) alternateAisle = true;
 		if ( blockedTime > 8 )
 		{
-			Activity = "Station obstructed; retrying";
-			destination = null;
-			blockedTime = 0;
+			Activity = "Recovering from blocked station";
+			SetDestination( null );
+			Sailor.ReturnToDeck();
+			Recoveries++;
+			recoveryUntil = Time.Now + 2;
 		}
 	}
 
 	private void AimAndFire( ShipCannon gun )
 	{
-		if ( !gun.Muzzle.IsValid() || !Target.Body.IsValid() ) return;
+		if ( !gun.Muzzle.IsValid() || !Target.IsValid() || !Target.Body.IsValid() )
+		{
+			gun.SetLoading( Sailor.Controller, false );
+			return;
+		}
+		gun.SetLoading( Sailor.Controller, !gun.IsLoaded );
+		if ( !gun.IsLoaded ) Activity = $"Loading cannon {gun.LoadProgress * 100:0}%";
 		var start = gun.Muzzle.WorldPosition;
 		var aim = Target.WorldPosition + Vector3.Up * TargetAimHeight;
 		float flight = (aim - start).WithZ( 0 ).Length / gun.MuzzleSpeed;
@@ -243,8 +345,12 @@ public sealed class ShipNpc : Component
 			Activity = "Shot obstructed";
 			return;
 		}
-		if ( gun.Fire( Sailor.Controller ) ) ShotsFired++;
-		Activity = "Firing broadside";
+		if ( !gun.IsLoaded ) return;
+		if ( gun.Fire( Sailor.Controller ) )
+		{
+			ShotsFired++;
+			Activity = "Firing broadside";
+		}
 	}
 
 	protected override void OnDisabled()
@@ -257,6 +363,7 @@ public sealed class ShipNpc : Component
 		turning = false;
 		sailing = false;
 		if ( !GameplayAuthority.CanMutate || IsProxy || !Sailor.IsValid() ) return;
+		if ( Sailor.CurrentStation is ShipCannon gun ) gun.SetLoading( Sailor.Controller, false );
 		Sailor.CurrentStation?.Release( Sailor.Controller );
 		if ( Sailor.Controller.IsValid() ) Sailor.Controller.WishVelocity = Vector3.Zero;
 	}

@@ -10,5 +10,6 @@ CombatHud {
 	.title { font-size: 25px; font-weight: bold; color: #edca83; }
 	.health { font-size: 22px; font-weight: bold; }
 	.hint { font-size: 14px; color: #b8c8d6; }
-	.crosshair { position: absolute; left: 50%; top: 50%; font-size: 24px; }
+	.crosshair { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 24px; }
+	.loadout { position: absolute; bottom: 22px; width: 100%; justify-content: center; }
 }

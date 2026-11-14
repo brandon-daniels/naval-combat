@@ -1,0 +1,28 @@
+@using Sandbox
+@using Sandbox.UI
+@namespace NavalCombat
+@inherits Panel
+
+<root>
+	@foreach ( var slot in Slots )
+	{
+		<div class="slot @(Item == slot.Item ? "selected" : "")">
+			<label class="key">@Input.GetButtonOrigin( slot.Action )</label>
+			<label>@slot.Item</label>
+		</div>
+	}
+</root>
+
+@code
+{
+	public HeldItem Item { get; set; }
+
+	private static readonly (HeldItem Item, string Action)[] Slots =
+	{
+		(HeldItem.Sword, "Slot1"),
+		(HeldItem.Bucket, "Slot2"),
+		(HeldItem.Planks, "Slot3")
+	};
+
+	protected override int BuildHash() => System.HashCode.Combine( Item, Input.UsingController );
+}

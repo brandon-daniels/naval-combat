@@ -3,20 +3,40 @@
 @namespace NavalCombat
 @inherits PanelComponent
 <root>
+	@if ( Fighter is { } localFighter )
+	{
+		<SwordDuelPanel Fighter=@localFighter />
+	}
 	@if ( !PlayerReady )
 	{
 		<div class="mode">Joining voyage...</div>
 	}
-	else
+	else if ( Fighter is not { InDuel: true } && Fighter is not { Health: <= 0 } )
 	{
-	<div class="mode">@(AtCannon ? "AT THE CANNON" : AtHelm ? "AT THE HELM" : AtMast ? "WORKING THE SAILS" : "ON DECK")</div>
-	<div class="hint">@(AtCannon ? "W / S - Elevation | A / D - Aim | LEFT CLICK - Fire | E - Release" : AtHelm ? "A / D - Turn wheel (it holds position) | E - Release helm" : AtMast ? "A / D - Rotate sail | W - Raise | S - Lower | E - Release mast" : "WASD - Walk | MOUSE - Look | SPACE - Jump | SHIFT - Run | C - View")</div>
-	@if ( Player.CarriedBarrel.IsValid() ) { <div class="prompt">E - Drop barrel @(Player.WorldPosition.Distance( Player.Ship.WorldPosition ) <= 450 ? "and secure it aboard" : "")</div> }
-	else if ( Player.AvailableBarrel.IsValid() ) { <div class="prompt">E - Carry goods barrel</div> }
-	else if ( Ready ) { <div class="prompt">E - @(Player.AvailableStation is ShipCannon ? "Use cannon" : Player.AvailableStation is SailRig ? "Work the sails" : "Take the helm")</div> }
-	else if ( !AtHelm && !AtMast && !AtCannon ) { <div class="objective">Lower and align the sail at the mast, then steer at the bow wheel.</div> }
-	@if ( AtCannon ) { <div class="prompt">@CannonStatus</div> }
-	@if ( AtHelm ) { <div class="prompt">@RudderStatus</div> }
+	var workHint = DamageControlStatus;
+	<div class="mode">@(Player.Ship.IsSinking ? "ABANDON SHIP" : AtCannon ? "AT THE CANNON" : AtHelm ? "AT THE HELM" : AtMast ? "WORKING THE SAILS" : "ON DECK") @(Fighter.IsValid() ? $"· {Fighter.Health} HP" : "")</div>
+	<div class="controls">
+		@if ( Player.CarriedBarrel.IsValid() ) { <div class="prompt">E - Drop barrel @(Player.WorldPosition.Distance( Player.Ship.WorldPosition ) <= 450 ? "and secure it aboard" : "")</div> }
+		else if ( Player.AvailableBarrel.IsValid() ) { <div class="prompt">E - Carry goods barrel</div> }
+		else if ( Ready ) { <div class="prompt">E - @(Player.AvailableStation is ShipCannon ? "Use cannon" : Player.AvailableStation is SailRig ? "Work the sails" : "Take the helm")</div> }
+		else if ( VoyageReady && Voyage.CanOpenInvestment ) { <div class="prompt">E - Interact with production buoy</div> }
+		@if ( !AtHelm && !AtMast && !AtCannon && workHint is not null ) { <div class="objective">@workHint</div> }
+		@if ( AtCannon ) { <div class="prompt">@CannonStatus</div> }
+		@if ( AtCannon && Player.ActiveCannon.IsLoading )
+		{
+			<div class="work-progress"><div class="work-fill" style="@($"width: {Player.ActiveCannon.LoadProgress * 100:0}%")"></div></div>
+		}
+		@if ( Player.IsRepairing )
+		{
+			<div class="work-progress"><div class="work-fill" style="@($"width: {Player.RepairProgress * 100:0}%")"></div></div>
+		}
+		@if ( AtHelm ) { <div class="prompt">@RudderStatus</div> }
+		<div class="hint">@(AtCannon ? "W / S - Elevation | A / D - Aim | HOLD R - Load | LEFT CLICK - Fire | E - Release" : AtHelm ? "A / D - Turn wheel (it holds position) | E - Release helm" : AtMast ? "A / D - Rotate sail | W - Raise | S - Lower | E - Release mast" : OnFootControls( workHint ))</div>
+		@if ( Fighter is { CanHoldItem: true } equipped )
+		{
+			<EquipmentBar Item=@equipped.EquippedItem />
+		}
+	</div>
 	@if ( Rig.IsValid() && Rig.Wind.IsValid() ) {
 		<div class="wind">
 			<div class="wind-title">WIND BLOWS TOWARD</div>
@@ -26,39 +46,84 @@
 			<div class="wind-detail">@($"Trim {Trim}° - Sail power {Power}%")</div>
 		</div>
 	}
-	<div class="recovery">R - Return to deck</div>
+	@if ( Hull.IsValid() )
+	{
+		<div class="hull-status @(Hull.IsDefeated ? "sinking" : Hull.FloodFraction >= 0.65f ? "critical" : "")">
+			<div class="hull-title">@(Hull.IsDefeated ? "SHIP SINKING" : "WATER IN THE HOLD")</div>
+			<div class="hull-value">@(Hull.FloodPercent)%</div>
+			<div class="hull-segments">
+				@for ( int i = 0; i < 10; i++ )
+				{
+					<div class="hull-segment @(i < Hull.FloodFraction * 10 ? "flooded" : "dry")"></div>
+				}
+			</div>
+			<div class="hull-detail">@($"{Hull.HoleCount} open breaches | Inflow {Hull.LeakRate:0}/s")</div>
+			<div class="hull-detail">@(Hull.IsDefeated ? "Abandon ship!" : Hull.HoleCount > 0 ? "Use planks below deck to patch open breaches." : Hull.FloodVolume > 0 ? "Leaks sealed. Bail the hold with your bucket." : "Hold dry. Hull sealed.")</div>
+			@if ( Player.BucketFull ) { <div class="hull-detail">Bucket full</div> }
+		</div>
+	}
+	@if ( !Player.Ship.IsSinking && !Player.CurrentStation.IsValid() ) { <div class="recovery">R - Return to deck</div> }
 	@if ( VoyageReady )
 	{
 		<div class="voyage">
 			<div class="voyage-title">THE FIRST VOYAGE</div>
 			<div>@($"Coins {Voyage.Wallet.Balance}  |  Cargo {Voyage.Cargo.UsedCapacity}/{Voyage.Cargo.Capacity}")</div>
-			<div>@($"Speed {Player.Ship.Body.Velocity.WithZ( 0 ).Length:0}  |  Hull {Hull.Health}/{Hull.MaximumHealth}")</div>
+			<div>@($"Speed {Player.Ship.Body.Velocity.WithZ( 0 ).Length:0}  |  Flooding {Hull.FloodPercent}%")</div>
 			<div class="feedback">@(Voyage.NearestPort is { } nearby && nearby.CanTrade( Player ) ? $"Trading available: {nearby.PortName}" : "Sail to a buoy and slow down to trade")</div>
 			<div>@ProductionStatus</div>
 			@foreach ( var port in Player.Scene.GetAllComponents<VoyagePort>() )
 			{
 				<div class="route">@PortText( port )</div>
 			}
-			<div class="actions">1 - Invest 100 at Beacon</div>
+			<div class="actions">E - Interact with the gold production buoy</div>
 			<div>E - Carry/drop the produced barrel aboard</div>
-			<div>2 - Deliver secured barrels at the nearest sell point</div>
-			<div>@UpgradeText( ShipUpgradeStat.CargoCapacity, 3 )</div>
-			<div>@UpgradeText( ShipUpgradeStat.HullHealth, 4 )</div>
-			<div>@UpgradeText( ShipUpgradeStat.SailingPerformance, 5 )</div>
+			<div>@(Input.GetButtonOrigin( "Slot4" ) ?? "4") - Deliver secured barrels at the nearest sell point</div>
+			<div>@UpgradeText( ShipUpgradeStat.CargoCapacity, 5 )</div>
+			<div>@UpgradeText( ShipUpgradeStat.HullHealth, 6 )</div>
+			<div>@UpgradeText( ShipUpgradeStat.SailingPerformance, 7 )</div>
 			<div class="feedback">@Voyage.Feedback</div>
 			<div class="route">Trade near a buoy with sail raised and speed below 100.</div>
 		</div>
+		@if ( Voyage.InvestmentOpen )
+		{
+			<div class="investment-overlay">
+				<div class="investment-card">
+					<div class="voyage-title">SUGAR CANE PRODUCTION</div>
+					<div>Grow, harvest and pack a barrel of goods in 60 seconds.</div>
+					<div>@($"Balance: ${Voyage.Wallet.Balance}")</div>
+					<div class="investment-actions">
+						<button onclick=@Voyage.ConfirmInvestment>Invest $100</button>
+						<button class="cancel" onclick=@Voyage.CloseInvestment>Cancel</button>
+					</div>
+				</div>
+			</div>
+		}
 	}
 	}
 </root>
 @code {
 	[Property] public ShipPlayer Player { get; set; }
+	private SwordFighter Fighter => Player.IsValid() ? Player.GetComponent<SwordFighter>() : null;
+	private string OnFootControls( string workHint )
+	{
+		var movement = Input.UsingController ? "Left stick - Move" : "WASD - Move";
+		var controls = $"{movement} | {Input.GetButtonOrigin( "View" )} - View";
+		if ( workHint is not null || Fighter is not { CanHoldItem: true } fighter ) return controls;
+		return fighter.EquippedItem switch
+		{
+			HeldItem.Sword => $"{controls} | {Input.GetButtonOrigin( "Attack1" )} - Sword lunge",
+			HeldItem.Bucket => $"{controls} | {Input.GetButtonOrigin( "Attack2" )} - Scoop or throw water",
+			HeldItem.Planks => $"{controls} | Hold {Input.GetButtonOrigin( "Attack1" )} - Patch a breach",
+			_ => controls
+		};
+	}
 	private bool PlayerReady => Player.IsValid() && Player.Ship.IsValid() && Player.Controller.IsValid() && Player.Ship.Body.IsValid();
 	private PlayerVoyage Voyage => Player.IsValid() ? Player.GetComponent<PlayerVoyage>() : null;
 	private bool VoyageReady => PlayerReady && Voyage.IsValid() && Voyage.Sailor.IsValid() && Voyage.Sailor.Ship.IsValid()
 		&& Voyage.Wallet.IsValid() && Voyage.Production.IsValid() && Voyage.Cargo.IsValid() && Voyage.Upgrades.IsValid() && Hull.IsValid();
 	private ShipHealth Hull => Player.Ship.GetComponent<ShipHealth>();
-	private string ProductionStatus => Voyage.Production.IsProducing ? $"Production: {Voyage.Production.RemainingSeconds:0}s remaining" : Player.Scene.GetAllComponents<GoodsBarrel>().Any( x => x.OwnerId == Voyage.Identity && !x.SecuredShip.IsValid() ) ? "Goods ready at Beacon: carry the barrel aboard" : "Invest at Beacon, then deliver to Palm Island";
+	private string ProductionStatus => Voyage.Production.IsProducing ? $"{ProductionPhase}: {Voyage.Production.RemainingSeconds:0}s remaining" : Player.Scene.GetAllComponents<GoodsBarrel>().Any( x => x.OwnerId == Voyage.Identity && !x.SecuredShip.IsValid() ) ? "Goods ready at Beacon: carry the barrel aboard" : "Invest at Beacon, then deliver to Palm Island";
+	private string ProductionPhase => Voyage.Production.Progress < 2f / 3 ? "Growing sugar cane" : Voyage.Production.Progress < 52f / 60 ? "Harvesting" : "Packing barrel";
 	private string PortText( VoyagePort port )
 	{
 		var delta = port.WorldPosition - Player.Ship.WorldPosition;
@@ -71,11 +136,36 @@
 		var upgrade = Voyage.Upgrades.AvailableUpgrades.FirstOrDefault( x => x is not null && x.Stat == stat );
 		if ( upgrade is null ) return "Upgrade unavailable";
 		var level = Voyage.Upgrades.GetLevel( upgrade );
-		return $"{key} - {upgrade.DisplayName} {level}/{upgrade.MaximumLevel} | {(level >= upgrade.MaximumLevel ? "MAX" : upgrade.GetCost( level ).ToString())}";
+		var binding = Input.GetButtonOrigin( $"Slot{key}" ) ?? key.ToString();
+		return $"{binding} - {upgrade.DisplayName} {level}/{upgrade.MaximumLevel} | {(level >= upgrade.MaximumLevel ? "MAX" : upgrade.GetCost( level ).ToString())}";
 	}
 	private SailRig Rig => Player.IsValid() ? Player.Sails : null;
 	private bool AtCannon => Player.IsValid() && Player.ActiveCannon.IsValid();
-	private string CannonStatus => AtCannon ? $"{(Player.ActiveCannon.ReloadRemaining > 0 ? "RELOADING" : "READY")} | Elevation {Player.ActiveCannon.Elevation:0} | Aim {Player.ActiveCannon.Yaw:0}" : "";
+	private string CannonStatus => AtCannon ? $"{(Player.ActiveCannon.IsLoaded ? "LOADED — LEFT CLICK TO FIRE" : Player.ActiveCannon.IsLoading ? $"LOADING {Player.ActiveCannon.LoadProgress * 100:0}% — KEEP HOLDING R" : "EMPTY — HOLD R TO LOAD")} | Elevation {Player.ActiveCannon.Elevation:0}°" : "";
+	private string DamageControlStatus
+	{
+		get
+		{
+			if ( Player.Ship.IsSinking ) return "Swim clear of the sinking hull.";
+			if ( Fighter is not { CanHoldItem: true } fighter ) return null;
+			if ( Player.IsRepairing ) return $"Patching breach · {Player.RepairProgress * 100:0}%";
+			if ( Player.IsUsingBucket ) return Player.BucketFull ? "Throwing water overboard…" : "Scooping water…";
+			if ( fighter.EquippedItem == HeldItem.Bucket )
+			{
+				if ( Player.BucketFull ) return $"Aim over a rail and press {Input.GetButtonOrigin( "Attack2" )} to empty the bucket";
+				if ( Player.WaterInReach ) return $"{Input.GetButtonOrigin( "Attack2" )} - Scoop water from the hold";
+			}
+			if ( Player.NearbyBreachSequence >= 0 )
+			{
+				return fighter.EquippedItem == HeldItem.Planks
+					? $"Hold {Input.GetButtonOrigin( "Attack1" )} to board up this breach"
+					: $"Equip planks ({Input.GetButtonOrigin( "Slot3" )}) to board up this breach";
+			}
+			if ( Player.BucketFull ) return $"Equip the bucket ({Input.GetButtonOrigin( "Slot2" )}) to empty it over a rail";
+			if ( Player.WaterInReach ) return $"Equip the bucket ({Input.GetButtonOrigin( "Slot2" )}) to bail the hold";
+			return null;
+		}
+	}
 	private string RudderStatus => $"Rudder {System.MathF.Abs( Player.Ship.Rudder ) * 100:0}% {(Player.Ship.Rudder > 0.02f ? "PORT" : Player.Ship.Rudder < -0.02f ? "STARBOARD" : "CENTERED")}";
 	private bool AtHelm => Player.IsValid() && Player.IsAtHelm;
 	private bool AtMast => Player.IsValid() && Player.IsAtMast;
@@ -86,5 +176,11 @@
 	private int Trim => Rig.IsValid() ? (int)Rig.SailAngle : 0;
 	private int WindAngle => Rig.IsValid() && Rig.Wind.IsValid() && Rig.Ship.IsValid() ? (int)(Rig.Wind.Heading - Rig.Ship.WorldRotation.Angles().yaw) : 0;
 	private string ArrowStyle => $"transform: rotate({-WindAngle}deg);";
-	protected override int BuildHash() => !PlayerReady ? 0 : System.HashCode.Combine( System.HashCode.Combine( AtHelm, AtMast, AtCannon, CannonStatus, RudderStatus ), Ready, Deployment, Catch, Power, Trim, WindAngle, (int)(Time.Now * 5) );
+	protected override int BuildHash()
+	{
+		var fighter = Fighter;
+		if ( fighter is { InDuel: true } || fighter is { Health: <= 0 } )
+			return System.HashCode.Combine( fighter, fighter.InDuel, fighter.Health );
+		return !PlayerReady ? 0 : System.HashCode.Combine( System.HashCode.Combine( AtHelm, AtMast, AtCannon, CannonStatus, RudderStatus, fighter, fighter?.Health, fighter?.EquippedItem ), Ready, Deployment, Catch, Power, Trim, WindAngle, (int)(Time.Now * 5) );
+	}
 }

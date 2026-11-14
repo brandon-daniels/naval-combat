@@ -1,7 +1,7 @@
 namespace NavalCombat;
 
 /// <summary>Switches a Citizen between deck movement and an occupied helm.</summary>
-public sealed class ShipPlayer : Component
+public sealed partial class ShipPlayer : Component
 {
 	[Property] public PlayerController Controller { get; set; }
 	[Property] public ShipHelm Helm { get; set; }
@@ -13,6 +13,7 @@ public sealed class ShipPlayer : Component
 	[Property, Group( "Camera" )] public Vector3 StationCameraOffset { get; set; } = new( 420, 24, 72 );
 	[Property, Group( "Camera" )] public Vector3 HelmCameraOffset { get; set; } = new( 560, 24, 96 );
 	[Sync( SyncFlags.FromHost )] public GoodsBarrel CarriedBarrel { get; private set; }
+	public bool InSwordCombat => GetComponent<SwordFighter>() is { } fighter && (fighter.InDuel || fighter.Health <= 0);
 	public bool IsAtHelm => Helm.IsValid() && Helm.Occupant == Controller;
 	public bool CanUseHelm => Controller.IsValid() && Helm.IsValid() && Helm.CanEnter( Controller );
 	public bool IsAtMast => Sails.IsValid() && Sails.Occupant == Controller;
@@ -37,10 +38,14 @@ public sealed class ShipPlayer : Component
 
 	public void ToggleStation()
 	{
+		if ( InSwordCombat ) return;
+		var voyage = GetComponent<PlayerVoyage>();
+		if ( voyage.IsValid() && voyage.InvestmentOpen ) { voyage.CloseInvestment(); return; }
 		if ( CarriedBarrel.IsValid() ) RequestBarrelInteraction( CarriedBarrel );
 		else if ( AvailableBarrel is { } barrel ) RequestBarrelInteraction( barrel );
 		else if ( CurrentStation.IsValid() ) CurrentStation.Release( Controller );
-		else AvailableStation?.TryTake( Controller );
+		else if ( AvailableStation is { } station ) station.TryTake( Controller );
+		else if ( voyage.IsValid() && voyage.CanOpenInvestment ) voyage.OpenInvestment();
 	}
 
 	internal void RequestBarrelInteraction( GoodsBarrel barrel )
@@ -58,20 +63,29 @@ public sealed class ShipPlayer : Component
 
 	private void InteractWithBarrel( GoodsBarrel barrel )
 	{
-		if ( !barrel.IsValid() ) return;
+		if ( InSwordCombat || !barrel.IsValid() ) return;
 		if ( CarriedBarrel == barrel ) barrel.DropOrSecure( this );
 		else barrel.TryPickup( this );
 	}
 
 	protected override void OnUpdate()
 	{
-		if ( IsNpc || IsProxy || !Controller.IsValid() ) return;
+		UpdateDamageControl();
+		if ( IsProxy || !Controller.IsValid() ) return;
+		if ( Ship.IsValid() && (Ship.IsSinking || CurrentStation is SailRig { RigSupported: false }) )
+		{
+			CurrentStation?.Release( Controller );
+		}
+		if ( IsNpc || InSwordCombat ) return;
 		Controller.CameraOffset = IsAtHelm ? HelmCameraOffset : CurrentStation.IsValid() ? StationCameraOffset : OnFootCameraOffset;
+		if ( !Controller.UseInputControls ) return;
 		if ( Input.Pressed( "Use" ) ) ToggleStation();
-		if ( Input.Pressed( "Reload" ) ) ReturnToDeck();
+		if ( GetComponent<PlayerVoyage>() is { InvestmentOpen: true } ) return;
+		if ( !CurrentStation.IsValid() && Input.Pressed( "Reload" ) ) ReturnToDeck();
 
 		if ( ActiveCannon is { } cannon )
 		{
+			cannon.SetLoading( Controller, Input.Down( "Reload" ) );
 			cannon.Aim( Controller, (Input.Down( "Left" ) ? 1 : 0) - (Input.Down( "Right" ) ? 1 : 0), (Input.Down( "Forward" ) ? 1 : 0) - (Input.Down( "Backward" ) ? 1 : 0), Time.Delta );
 			if ( Input.Pressed( "Attack1" ) ) cannon.Fire( Controller );
 		}
@@ -82,6 +96,7 @@ public sealed class ShipPlayer : Component
 			if ( IsAtHelm ) Ship.SetHelmInput( Helm, turn, Time.Delta );
 			else Sails.Adjust( Controller, turn, -forward, Time.Delta );
 		}
+		ReadDamageControlInput();
 	}
 
 	protected override void OnFixedUpdate()
@@ -98,7 +113,7 @@ public sealed class ShipPlayer : Component
 
 	public void ReturnToDeck()
 	{
-		if ( !SpawnPoint.IsValid() || !Controller.IsValid() ) return;
+		if ( !Ship.IsValid() || Ship.IsSinking || !SpawnPoint.IsValid() || !Controller.IsValid() ) return;
 		CurrentStation?.Release( Controller );
 		WorldPosition = SpawnPoint.WorldPosition;
 		WorldRotation = Rotation.FromYaw( Ship.WorldRotation.Angles().yaw );
